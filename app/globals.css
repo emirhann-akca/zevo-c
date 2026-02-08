@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0A1628;
+  /* Deep navy - mobile app exact */
+  color: #FFFFFF;
+  /* White text */
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+
+  /* Emerald gradient utilities (Mobile App Colors) */
+  .gradient-primary {
+    background: linear-gradient(135deg, #10DC78 0%, #0EA968 100%);
+    /* Brighter emerald gradient */
+  }
+
+  .gradient-accent {
+    background: linear-gradient(135deg, #22C55E 0%, #0EA968 100%);
+  }
+
+  .gradient-ai-coach {
+    background: linear-gradient(135deg, #0EA968 0%, #0D9488 100%);
+  }
+
+  .gradient-pvp {
+    background: linear-gradient(135deg, #0EA968 0%, #15803D 100%);
+  }
+
+  .gradient-page {
+    background: linear-gradient(135deg, #0A1628 0%, #1A2942 50%, #0A1628 100%);
+    /* Dark gradient for pages */
+  }
+
+  /* Text gradient */
+  .text-gradient-emerald {
+    background: linear-gradient(135deg, #10DC78 0%, #22C55E 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Matte icon container (Mobile App Style) */
+  .matte-icon {
+    background: rgba(0, 0, 0, 0.1);
+    /* Dark matte finish, NOT glass blur */
+  }
+
+  /* Glass effect for headers */
+  .glass-header {
+    background: rgba(26, 41, 66, 0.8);
+    /* dark-secondary with opacity */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* Glow effect for emerald elements */
+  .emerald-glow {
+    box-shadow: 0 0 30px rgba(16, 220, 120, 0.3);
+  }
+}
+
+/* Custom scrollbar - Dark Theme */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1A2942;
+  /* dark-secondary */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #10DC78;
+  /* emerald-primary */
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0EA968;
+  /* emerald-dark */
+}
+
+/* Selection color */
+::selection {
+  background: #10DC78;
+  /* emerald-primary */
+  color: #0A1628;
+  /* dark-primary */
+}
+
+::-moz-selection {
+  background: #10DC78;
+  color: #0A1628;
+}
+
+/* Focus ring - Emerald */
+*:focus-visible {
+  outline: 2px solid #10DC78;
+  outline-offset: 2px;
+}
