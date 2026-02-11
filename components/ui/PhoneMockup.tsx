@@ -22,44 +22,45 @@ export default function PhoneMockup({
     className = '',
 }: PhoneMockupProps) {
     return (
-        <div className={`relative flex justify-center ${className}`}>
-            {/* Decorative glow */}
+        <div className={`relative overflow-visible flex justify-center ${className}`}>
+            {/* Decorative glow - POSITIONED BEHIND */}
             <div
-                className="absolute -inset-8 rounded-[50px] opacity-30"
+                className="absolute -inset-12 z-0 rounded-[60px] opacity-40 blur-xl"
                 style={{
                     background: `radial-gradient(circle at center, ${glowColor}, transparent 70%)`,
                 }}
             />
 
-            {/* Phone Container */}
-            <div className="relative w-[260px] h-[540px]">
+            {/* Phone Container - CLIPS CONTENT */}
+            <div className="relative z-10 w-[260px] h-[540px]">
                 {/* Phone Frame */}
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-800 to-slate-900 rounded-[3rem] shadow-[0_0_60px_-15px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-800 to-slate-900 rounded-[3rem] shadow-2xl border border-white/10 overflow-hidden">
                     {/* Inner Screen */}
                     <div className="absolute inset-[8px] bg-[#0f172a] rounded-[2.5rem] overflow-hidden">
                         {/* Top Notch */}
-                        <div className="absolute top-0 inset-x-0 h-8 bg-black rounded-b-2xl w-36 mx-auto z-50" />
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-7 bg-black rounded-b-2xl w-32 z-50" />
 
                         {/* Status Bar */}
-                        <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/60 to-transparent z-40 flex items-center justify-between px-8">
+                        <div className="absolute top-0 left-0 right-0 h-12 z-40 flex items-center justify-between px-6 pt-2">
                             <span className="text-[10px] text-white/80 font-medium">9:41</span>
                             <div className="flex gap-1.5 items-center">
-                                <div className="w-3.5 h-2 border border-white/60 rounded-sm relative">
-                                    <div
-                                        className="absolute inset-[1px] bg-emerald-400 rounded-[1px]"
-                                        style={{ width: '70%' }}
-                                    />
+                                <div className="w-4 h-2.5 bg-white/20 rounded-sm" />
+                                <div className="w-4 h-2.5 bg-white/20 rounded-sm" />
+                                <div className="w-5 h-2.5 border border-white/60 rounded-sm relative">
+                                    <div className="absolute inset-[1px] bg-white rounded-[1px]" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Screen Content */}
-                        {children}
+                        <div className="relative w-full h-full overflow-hidden">
+                            {children}
+                        </div>
                     </div>
-
-                    {/* Home Indicator */}
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-28 h-1 bg-white/20 rounded-full z-50" />
                 </div>
+
+                {/* Home Indicator */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/20 rounded-full z-50 pointer-events-none" />
             </div>
         </div>
     )
