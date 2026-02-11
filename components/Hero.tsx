@@ -1,11 +1,13 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, Play } from 'lucide-react'
 
 export default function Hero() {
+  const [comingSoon, setComingSoon] = useState(false)
   return (
-    <section className="min-h-screen bg-dark-primary relative overflow-hidden">
+    <section id="anasayfa" className="min-h-screen bg-dark-primary relative overflow-hidden">
       {/* Subtle emerald glow effects */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
@@ -54,7 +56,7 @@ export default function Hero() {
             </motion.div>
 
             {/* Title */}
-            <h1 className="text-6xl font-bold text-white mb-6 leading-tight">
+            <h1 id="performans" className="scroll-mt-32 text-6xl font-bold text-white mb-6 leading-tight">
               Performansını
               <span className="text-emerald-primary"> Geliştir</span>
             </h1>
@@ -70,10 +72,36 @@ export default function Hero() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 gradient-primary text-white rounded-xl font-bold shadow-lg shadow-emerald-primary/30 flex items-center justify-center gap-2"
+                onClick={() => {
+                  setComingSoon(true);
+                  setTimeout(() => setComingSoon(false), 2000);
+                }}
+                className="px-8 py-4 gradient-primary text-white rounded-xl font-bold shadow-lg shadow-emerald-primary/30 flex items-center justify-center gap-2 min-w-[200px]"
               >
-                Hemen İndir
-                <ChevronRight className="w-5 h-5" />
+                <AnimatePresence mode='wait'>
+                  {comingSoon ? (
+                    <motion.span
+                      key="soon"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex items-center gap-2"
+                    >
+                      Çok Yakında 🚀
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="default"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex items-center gap-2"
+                    >
+                      Hemen İndir
+                      <ChevronRight className="w-5 h-5" />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </motion.button>
 
               <motion.button

@@ -1,28 +1,36 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 
 const navItems = [
-  { name: 'Anasayfa', href: '#anasayfa' },
+  { name: 'Anasayfa', href: '#performans' },
   { name: 'Özellikler', href: '#ozellikler' },
   { name: 'Hakkımızda', href: '#hakkimizda' },
-  { name: 'Ekip', href: '#ekip' },
+  { name: 'Ekip', href: '#ekipler' },
 ]
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
+  const [comingSoon, setComingSoon] = useState(false)
+
+  const { scrollY } = useScroll()
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious() || 0
+    if (latest > previous && latest > 150) {
+      setIsVisible(false)
+    } else {
+      setIsVisible(true)
     }
+    setIsScrolled(latest > 20)
+  })
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  // Remove old useEffect for scroll
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href)
@@ -32,23 +40,29 @@ export default function Navigation() {
     }
   }
 
+  const handleDownloadClick = () => {
+    setComingSoon(true)
+    setTimeout(() => setComingSoon(false), 2000)
+  }
+
   return (
     <>
       <motion.nav
         initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5 }}
+        animate={{ y: (isVisible || isMobileMenuOpen) ? 0 : -100 }}
+        transition={{ duration: 0.3 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-            ? 'glass-header border-b border-white/10 shadow-lg'
-            : 'bg-transparent'
+          ? 'glass-header border-b border-white/10 shadow-lg'
+          : 'bg-transparent'
           }`}
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <motion.div
-              className="flex items-center gap-3"
+              className="flex items-center gap-3 cursor-pointer"
               whileHover={{ scale: 1.05 }}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
               <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg shadow-emerald-primary/30">
                 <span className="text-white font-bold text-lg">Z</span>
@@ -75,9 +89,30 @@ export default function Navigation() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="hidden md:block px-6 py-3 gradient-primary text-white rounded-xl font-bold shadow-lg shadow-emerald-primary/30"
+              onClick={handleDownloadClick}
+              className="hidden md:block px-6 py-3 gradient-primary text-white rounded-xl font-bold shadow-lg shadow-emerald-primary/30 min-w-[180px]"
             >
-              Uygulamayı İndir
+              <AnimatePresence mode='wait'>
+                {comingSoon ? (
+                  <motion.span
+                    key="soon"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    Çok Yakında 🚀
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="default"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    Uygulamayı İndir
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </motion.button>
 
             {/* Mobile Menu Button */}
@@ -145,9 +180,30 @@ export default function Navigation() {
                     hidden: { x: 20, opacity: 0 },
                     show: { x: 0, opacity: 1 }
                   }}
-                  className="px-6 py-3 gradient-primary text-white rounded-xl font-bold text-center shadow-lg shadow-emerald-primary/30"
+                  onClick={handleDownloadClick}
+                  className="px-6 py-3 gradient-primary text-white rounded-xl font-bold text-center shadow-lg shadow-emerald-primary/30 min-h-[50px] flex items-center justify-center"
                 >
-                  Uygulamayı İndir
+                  <AnimatePresence mode='wait'>
+                    {comingSoon ? (
+                      <motion.span
+                        key="soon"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                      >
+                        Çok Yakında 🚀
+                      </motion.span>
+                    ) : (
+                      <motion.span
+                        key="default"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                      >
+                        Uygulamayı İndir
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                 </motion.button>
               </motion.div>
             </motion.div>

@@ -76,12 +76,24 @@ module.exports = {
       },
       animation: {
         'float': 'float 3s ease-in-out infinite',
+        'float-slow': 'float 4s ease-in-out infinite',
+        'float-slower': 'float 5s ease-in-out infinite',
         'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'bounce-slow': 'bounce-slow 2s ease-in-out infinite',
+        'gradient-flow': 'gradient-flow 8s ease infinite',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-10px)' },
+        },
+        'bounce-slow': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+        'gradient-flow': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
         },
       },
     },

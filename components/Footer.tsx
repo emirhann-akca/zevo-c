@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Twitter, Instagram, Linkedin, Github } from 'lucide-react'
 
 const quickLinks = [
-  { name: 'Anasayfa', href: '#anasayfa' },
+  { name: 'Anasayfa', href: '#performans' },
   { name: 'Özellikler', href: '#ozellikler' },
   { name: 'Hakkımızda', href: '#hakkimizda' },
   { name: 'Ekip', href: '#ekip' }

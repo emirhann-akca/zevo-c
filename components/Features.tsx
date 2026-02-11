@@ -127,25 +127,35 @@ export default function Features() {
   }
 
   return (
-    <section id="ozellikler" className="py-24 px-6 bg-dark-primary">
-      <div className="max-w-7xl mx-auto">
+    <section id="ozellikler" className="relative min-h-screen py-12 lg:py-16 px-6 bg-[#0a0e1a] flex flex-col justify-center overflow-hidden">
+      {/* Sadece ortaya subtle glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, transparent 70%)',
+            filter: 'blur(80px)'
+          }}
+        />
+      </div>
+      <div className="max-w-[580px] mx-auto w-full">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-8"
         >
-          <h2 className="text-5xl font-bold text-white mb-4">
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-2">
             Neler <span className="text-emerald-primary">Sunuyoruz?</span>
           </h2>
-          <p className="text-xl text-text-muted max-w-3xl mx-auto">
+          <p className="text-base lg:text-lg text-text-muted">
             ZEVO ile antrenmanlarını bir üst seviyeye taşı
           </p>
         </motion.div>
 
-        {/* Feature Grid - EXACT 2-1-2 Layout from Mobile App */}
-        <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+        {/* Feature Grid - Compact 2-1-2 Layout */}
+        <div className="grid grid-cols-2 gap-3 mx-auto">
           {/* Row 1: Antrenman + Beslenme (2 squares) */}
           {features.slice(0, 2).map((feature, index) => {
             const Icon = feature.icon
@@ -155,23 +165,24 @@ export default function Features() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.02, y: -4 }}
-                whileTap={{ scale: 0.98 }}
+                transition={{ delay: index * 0.1, duration: 0.4 }}
+                whileHover={{ scale: 1.06, boxShadow: '0 0 40px rgba(16,185,129,0.5)' }}
+                whileTap={{ scale: 0.97 }}
+                style={{ transition: 'none' }}
                 onClick={() => setSelectedFeature(feature)}
-                className="gradient-primary rounded-2xl p-4 aspect-[4/3] flex flex-col justify-between text-left cursor-pointer group shadow-lg shadow-emerald-primary/20 hover:shadow-emerald-primary/40 transition-all"
+                className="relative gradient-primary rounded-xl p-3 aspect-[5/3] flex flex-col justify-between text-left cursor-pointer group shadow-[0_0_25px_rgba(16,185,129,0.35)]"
               >
                 {/* Icon Container - Matte */}
-                <div className="w-10 h-10 matte-icon rounded-xl flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-white" />
+                <div className="w-9 h-9 matte-icon rounded-lg flex items-center justify-center">
+                  <Icon className="w-4 h-4 text-white" />
                 </div>
 
                 {/* Bottom Content */}
                 <div>
-                  <h3 className="text-lg font-bold text-white mb-1">
+                  <h3 className="text-base font-bold text-white">
                     {feature.title}
                   </h3>
-                  <ChevronRight className="w-5 h-5 text-white/80" />
+                  <ChevronRight className="w-4 h-4 text-white/80" />
                 </div>
               </motion.button>
             )
@@ -186,20 +197,20 @@ export default function Features() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                whileHover={{ scale: 1.02, y: -4 }}
-                whileTap={{ scale: 0.98 }}
+                transition={{ delay: 0.2, duration: 0.4 }}
+                whileHover={{ scale: 1.06, boxShadow: '0 0 40px rgba(16,185,129,0.5)' }}
+                whileTap={{ scale: 0.97 }}
+                style={{ transition: 'none' }}
                 onClick={() => setSelectedFeature(feature)}
-                className="gradient-primary rounded-2xl p-4 col-span-2 flex items-center justify-between text-left cursor-pointer group shadow-lg shadow-emerald-primary/20 hover:shadow-emerald-primary/40 transition-all"
+                className="relative gradient-primary rounded-xl p-3 col-span-2 flex items-center justify-between text-left cursor-pointer group shadow-[0_0_25px_rgba(16,185,129,0.35)]"
               >
-                <div className="flex items-center gap-3">
-                  {/* Icon Container - Matte */}
-                  <div className="w-10 h-10 matte-icon rounded-xl flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-white" />
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 matte-icon rounded-lg flex items-center justify-center">
+                    <Icon className="w-4 h-4 text-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-white">{feature.title}</h3>
+                  <h3 className="text-base font-bold text-white">{feature.title}</h3>
                 </div>
-                <ChevronRight className="w-5 h-5 text-white/80" />
+                <ChevronRight className="w-4 h-4 text-white/80" />
               </motion.button>
             )
           })}
@@ -213,23 +224,22 @@ export default function Features() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: (index + 3) * 0.1 }}
-                whileHover={{ scale: 1.02, y: -4 }}
-                whileTap={{ scale: 0.98 }}
+                transition={{ delay: index * 0.1, duration: 0.4 }}
+                whileHover={{ scale: 1.06, boxShadow: '0 0 40px rgba(16,185,129,0.5)' }}
+                whileTap={{ scale: 0.97 }}
+                style={{ transition: 'none' }}
                 onClick={() => setSelectedFeature(feature)}
-                className="gradient-primary rounded-2xl p-4 aspect-[4/3] flex flex-col justify-between text-left cursor-pointer group shadow-lg shadow-emerald-primary/20 hover:shadow-emerald-primary/40 transition-all"
+                className="relative gradient-primary rounded-xl p-3 aspect-[5/3] flex flex-col justify-between text-left cursor-pointer group shadow-[0_0_25px_rgba(16,185,129,0.35)]"
               >
-                {/* Icon Container - Matte */}
-                <div className="w-10 h-10 matte-icon rounded-xl flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-white" />
+                <div className="w-9 h-9 matte-icon rounded-lg flex items-center justify-center">
+                  <Icon className="w-4 h-4 text-white" />
                 </div>
 
-                {/* Bottom Content */}
                 <div>
-                  <h3 className="text-lg font-bold text-white mb-1">
+                  <h3 className="text-base font-bold text-white">
                     {feature.title}
                   </h3>
-                  <ChevronRight className="w-5 h-5 text-white/80" />
+                  <ChevronRight className="w-4 h-4 text-white/80" />
                 </div>
               </motion.button>
             )
@@ -237,7 +247,7 @@ export default function Features() {
         </div>
       </div>
 
-      {/* Detail Modal - Dark Theme */}
+      {/* Detail Modal - Premium Design */}
       <AnimatePresence>
         {selectedFeature && (
           <>
@@ -247,87 +257,93 @@ export default function Features() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedFeature(null)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100]"
             />
 
-            {/* Modal */}
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Modal Container */}
+            <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 pointer-events-none">
               <motion.div
-                {...getAnimation(selectedFeature.animation)}
-                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                className="bg-dark-secondary rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/10"
+                initial={{ opacity: 0, scale: 0.9, y: 20, filter: 'blur(10px)' }}
+                animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, scale: 0.95, y: 20, filter: 'blur(10px)', transition: { duration: 0.2 } }}
+                transition={{ type: 'spring', duration: 0.5, bounce: 0.3 }}
+                className="pointer-events-auto w-full max-w-2xl bg-[#0f172a] border border-white/10 rounded-3xl shadow-2xl shadow-emerald-500/10 overflow-hidden relative"
               >
-                {/* Header */}
-                <div className="sticky top-0 gradient-primary p-6 rounded-t-3xl">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 matte-icon rounded-2xl flex items-center justify-center">
-                        {selectedFeature.icon && <selectedFeature.icon className="w-8 h-8 text-white" />}
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold text-white mb-1">
-                          {selectedFeature.title}
-                        </h3>
-                        <p className="text-white/80 text-sm">
-                          {selectedFeature.shortDescription}
-                        </p>
-                      </div>
+                {/* Background Glow Effects */}
+                <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-emerald-500/10 to-transparent pointer-events-none" />
+                <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedFeature(null)}
+                  className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors z-10"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+
+                {/* Content Container */}
+                <div className="relative p-8">
+                  {/* Header Section */}
+                  <div className="flex items-start gap-6 mb-8">
+                    {/* Icon Box */}
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
+                      {selectedFeature.icon && <selectedFeature.icon className="w-10 h-10 text-white" />}
                     </div>
 
-                    <button
-                      onClick={() => setSelectedFeature(null)}
-                      className="w-10 h-10 matte-icon rounded-xl flex items-center justify-center hover:bg-black/20 transition-colors"
+                    <div>
+                      <h3 className="text-3xl font-bold text-white mb-2">
+                        {selectedFeature.title}
+                      </h3>
+                      <p className="text-emerald-400 font-medium">
+                        {selectedFeature.shortDescription}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="space-y-8">
+                    {/* Description */}
+                    <div>
+                      <h4 className="text-sm font-bold text-white/50 uppercase tracking-wider mb-3">
+                        NASIL ÇALIŞIR?
+                      </h4>
+                      <p className="text-white/80 leading-relaxed text-lg">
+                        {selectedFeature.detailedDescription}
+                      </p>
+                    </div>
+
+                    {/* Benefits Grid */}
+                    <div>
+                      <h4 className="text-sm font-bold text-white/50 uppercase tracking-wider mb-4">
+                        AVANTAJLAR
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {selectedFeature.benefits.map((benefit, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors"
+                          >
+                            <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                            <span className="text-white/90 text-sm font-medium">{benefit}</span>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Footer CTA */}
+                  <div className="mt-8 pt-6 border-t border-white/10">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-shadow"
                     >
-                      <X className="w-5 h-5 text-white" />
-                    </button>
+                      Hemen Başla
+                    </motion.button>
                   </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  {/* Description */}
-                  <div className="mb-6">
-                    <h4 className="text-lg font-bold text-white mb-3">
-                      Nasıl Çalışır?
-                    </h4>
-                    <p className="text-text-muted leading-relaxed">
-                      {selectedFeature.detailedDescription}
-                    </p>
-                  </div>
-
-                  {/* Benefits */}
-                  <div>
-                    <h4 className="text-lg font-bold text-white mb-3">
-                      Avantajlar
-                    </h4>
-                    <div className="space-y-3">
-                      {selectedFeature.benefits.map((benefit, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="flex items-start gap-3 p-3 bg-emerald-primary/10 rounded-xl border border-emerald-primary/20"
-                        >
-                          <div className="w-6 h-6 bg-emerald-primary rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                          </div>
-                          <p className="text-text-muted text-sm">{benefit}</p>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* CTA */}
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full mt-6 px-6 py-4 gradient-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-emerald-primary/30 transition-shadow"
-                  >
-                    Hemen Dene
-                  </motion.button>
                 </div>
               </motion.div>
             </div>

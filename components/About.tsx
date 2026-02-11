@@ -29,7 +29,7 @@ export default function About() {
                 vizyoner bir girişime dönüştü. Amacımız sadece bir uygulama yapmak değil;
                 yapay zeka ve verinin gücünü kullanarak, amatör ruhları profesyonel bir
                 kariyere taşıyan{' '}
-                <span className="text-emerald-primary font-semibold">'Sporun LinkedIn'i'</span>
+                <span className="text-emerald-primary font-semibold">&apos;Sporun LinkedIn&apos;i&apos;</span>
                 ni inşa etmek.
               </p>
             </div>
