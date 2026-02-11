@@ -23,7 +23,7 @@ const features = [
   {
     icon: TrendingUp,
     title: 'Gelişim Takibi',
-    desc: 'Haftalık progress raporları ve hedef belirleme',
+    desc: 'Haftalık gelişim raporları ve hedef belirleme',
     gradient: 'from-blue-500 to-cyan-500'
   },
   {
@@ -304,8 +304,8 @@ export default function AICoach() {
             <SectionHeader
               badge="AI Coach"
               icon={<Brain className="w-4 h-4 text-emerald-400" />}
-              title={<>Kişisel <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">AI Koçun</span></>}
-              description={<>Sadece ne yapman gerektiğini söylemez, <span className="text-white/90 font-medium">nasıl yapman gerektiğini gösterir.</span> Hatalarını anında fark eder ve sesli/görsel geri bildirim verir.</>}
+              title={<>Kişisel <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">AI Koç</span></>}
+              description={<>Sadece ne yapacağını söylemez, nasıl yapacağını da gösterir. Hatalarını yargılamaz, doğrusunu öğretir. Aklına takılan her soruyu cevaplayan, gelişim yolculuğundaki antrenörün.</>}
               align="left"
               className="mb-8"
             />

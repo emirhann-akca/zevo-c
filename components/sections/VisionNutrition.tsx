@@ -27,8 +27,8 @@ const features = [
   },
   {
     icon: Target,
-    title: 'Türk Mutfağı Uzmanı',
-    desc: 'Yüzlerce Türk yemeği veritabanıyla %95 doğruluk oranı',
+    title: 'Geniş Veri Tabanı',
+    desc: 'Binlerce yemek ve besin türünü anında tanır.',
     gradient: 'from-cyan-500 to-emerald-500'
   }
 ]
@@ -170,8 +170,8 @@ export default function VisionNutrition() {
             <SectionHeader
               icon={<Camera className="w-4 h-4" />}
               badge="Vision AI"
-              title={<>Yemeğini Tarat,{' '}<span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">Besinlerini Öğren</span></>}
-              description={<>Yemeğinin fotoğrafını çek, <span className="text-white/90 font-medium">ZEVO besin değerlerini anında hesaplasın.</span> Computer vision teknolojisi ile Türk mutfağında uzmanlaşmış AI modeli.</>}
+              title={<>Tabağını Tarat,{' '}<span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">İçindekini Gör</span></>}
+              description={<>Yemeğinin fotoğrafını çek, Zevo makro ve mikro değerlerini anında hesaplasın. Görüntü işleme teknolojisiyle beslenmeni şansa bırakma, hedeflerine uygun beslen.</>}
             />
 
             {/* Feature Cards */}

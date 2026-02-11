@@ -49,7 +49,7 @@ const BONES = [
 
 const FEATURES = [
     { icon: Eye, label: 'Gerçek Zamanlı İskelet Takibi', desc: 'Kamera açıkken anlık analiz', color: 'green' },
-    { icon: Shield, label: 'Postür Düzeltme', desc: 'Yanlış form anında uyarı', color: 'amber' },
+    { icon: Shield, label: 'Hata Düzeltme', desc: 'Yanlış form anında uyarı', color: 'amber' },
     { icon: RefreshCw, label: 'Otomatik Sayım', desc: 'Tekrarları sen değil, yapay zeka sayar', color: 'blue' },
 ]
 
@@ -287,7 +287,7 @@ export default function AIMotionSection() {
                         <SectionHeader
                             badge="Yapay Zeka Motoru"
                             title={<>Hareketini <br /> <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">Analiz Et.</span></>}
-                            description="Kameranı aç, harekete başla. Yapay zeka vücudunu tarar, her tekrarı sayar, her hatayı yakalar."
+                            description="Kameranı aç, harekete başla. Yapay zeka seni tarar, her tekrarı sayar, hatalarını yakalar. Artık sen de profesyonelsin."
                             align="left"
                             className="mb-8"
                         />

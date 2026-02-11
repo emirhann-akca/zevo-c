@@ -251,11 +251,11 @@ export default function HeroSection() {
                     </div>
 
                     <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-2 leading-[1.05]">
-                        Performansını
+                        Antrenörün Cebinde
                     </h1>
                     <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-7 leading-[1.05]">
                         <span className="bg-gradient-to-r from-[#22c55e] to-[#10DC78] bg-clip-text text-transparent">
-                            Geliştir
+                            Olsa Nasıl Olurdu
                         </span>
                     </h1>
 

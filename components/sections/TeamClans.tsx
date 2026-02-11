@@ -363,8 +363,8 @@ export default function TeamClans() {
                         <SectionHeader
                             icon={<Users className="w-4 h-4" />}
                             badge="Ekipler"
-                            title={<>Klanını Kur,{' '}<span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">Birlikte Fethet</span></>}
-                            description={<>Arkadaşlarınla{' '}<span className="text-white/90 font-medium">ekipler kur, görevleri tamamla, etkinliklere katıl.</span>{' '}Birlikte antrenman yap, birbirinizi motive edin ve liderlik tablosunda yükselin.</>}
+                            title={<>Klanını Kur,{' '}<span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">Ekibini Zirveye Taşı</span></>}
+                            description={<>Arkadaşlarınla ekipler kur, görevleri tamamla, etkinliklere katıl. Birlikte antrenman yap, birbirini motive et. Takım ruhuyla liderlik tablosunda yüksel, zirve sizin olsun.</>}
                         />
 
                         {/* Feature Cards */}
