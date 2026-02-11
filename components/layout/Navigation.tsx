@@ -3,13 +3,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
-
-const navItems = [
-  { name: 'Anasayfa', href: '#performans' },
-  { name: 'Özellikler', href: '#ozellikler' },
-  { name: 'Hakkımızda', href: '#hakkimizda' },
-  { name: 'Ekip', href: '#ekipler' },
-]
+import { NAV_LINKS } from '@/lib/constants'
+import ComingSoonButton from '@/components/ui/ComingSoonButton'
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -51,9 +46,9 @@ export default function Navigation() {
         initial={{ y: -100 }}
         animate={{ y: (isVisible || isMobileMenuOpen) ? 0 : -100 }}
         transition={{ duration: 0.3 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-          ? 'glass-header border-b border-white/10 shadow-lg'
-          : 'bg-transparent'
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled
+          ? 'glass-header border-white/10 shadow-lg'
+          : 'bg-transparent border-transparent'
           }`}
       >
         <div className="max-w-7xl mx-auto px-6">
@@ -72,7 +67,7 @@ export default function Navigation() {
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-8">
-              {navItems.map((item) => (
+              {NAV_LINKS.map((item) => (
                 <motion.button
                   key={item.name}
                   onClick={() => scrollToSection(item.href)}
@@ -86,34 +81,10 @@ export default function Navigation() {
             </div>
 
             {/* CTA Button - Desktop */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleDownloadClick}
-              className="hidden md:block px-6 py-3 gradient-primary text-white rounded-xl font-bold shadow-lg shadow-emerald-primary/30 min-w-[180px]"
-            >
-              <AnimatePresence mode='wait'>
-                {comingSoon ? (
-                  <motion.span
-                    key="soon"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                  >
-                    Çok Yakında 🚀
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="default"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                  >
-                    Uygulamayı İndir
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.button>
+            {/* CTA Button - Desktop */}
+            <ComingSoonButton className="hidden md:flex">
+              Uygulamayı İndir
+            </ComingSoonButton>
 
             {/* Mobile Menu Button */}
             <button
@@ -161,7 +132,7 @@ export default function Navigation() {
                 animate="show"
                 className="flex flex-col space-y-6"
               >
-                {navItems.map((item) => (
+                {NAV_LINKS.map((item) => (
                   <motion.button
                     key={item.name}
                     variants={{
@@ -175,36 +146,9 @@ export default function Navigation() {
                   </motion.button>
                 ))}
 
-                <motion.button
-                  variants={{
-                    hidden: { x: 20, opacity: 0 },
-                    show: { x: 0, opacity: 1 }
-                  }}
-                  onClick={handleDownloadClick}
-                  className="px-6 py-3 gradient-primary text-white rounded-xl font-bold text-center shadow-lg shadow-emerald-primary/30 min-h-[50px] flex items-center justify-center"
-                >
-                  <AnimatePresence mode='wait'>
-                    {comingSoon ? (
-                      <motion.span
-                        key="soon"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                      >
-                        Çok Yakında 🚀
-                      </motion.span>
-                    ) : (
-                      <motion.span
-                        key="default"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                      >
-                        Uygulamayı İndir
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </motion.button>
+                <ComingSoonButton className="w-full text-center">
+                  Uygulamayı İndir
+                </ComingSoonButton>
               </motion.div>
             </motion.div>
           </motion.div>

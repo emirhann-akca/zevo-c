@@ -23,6 +23,16 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @layer utilities {
@@ -205,4 +215,75 @@ body {
 
 .scroll-indicator {
   animation: scroll-bounce 2s ease-in-out infinite;
+}
+
+/* ================================
+   NEW VISUAL UPGRADES
+   ================================ */
+
+/* 1. MESH GRADIENT ANIMATION */
+.mesh-gradient-bg {
+  background-color: #0a0e1a;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(16, 220, 120, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 220, 120, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
+  background-size: 140% 140%;
+  animation: mesh-pulse 15s ease-in-out infinite alternate;
+}
+
+@keyframes mesh-pulse {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+/* 2. TOPOGRAPHIC LINES (Optional subtle texture) */
+.topo-lines {
+  background-image: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 19px,
+      rgba(16, 220, 120, 0.03) 20px),
+    repeating-linear-gradient(90deg,
+      transparent,
+      transparent 19px,
+      rgba(16, 220, 120, 0.03) 20px);
+  background-size: 40px 40px;
+}
+
+/* 3. PHONE RIM LIGHT */
+.phone-rim-light {
+  box-shadow:
+    inset 0 0 4px 1px rgba(255, 255, 255, 0.6),
+    /* Sharp inner edge */
+    0 0 15px rgba(16, 220, 120, 0.3),
+    /* Soft outer glow */
+    0 0 30px rgba(16, 220, 120, 0.1);
+  /* Wide dispersion */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* 4. INTENSE GLOW (Behind Phone) */
+.intense-glow {
+  background: radial-gradient(circle, rgba(16, 220, 120, 0.6) 0%, rgba(16, 220, 120, 0) 70%);
+  filter: blur(40px);
+  mix-blend-mode: screen;
+}
+
+/* 5. HERO BACKGROUND PULSE */
+@keyframes bgPulse {
+
+  0%,
+  100% {
+    background-position: 0% 0%;
+  }
+
+  50% {
+    background-position: 100% 100%;
+  }
 }

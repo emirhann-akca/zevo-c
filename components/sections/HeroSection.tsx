@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { Play, ChevronDown, ChevronRight, Star } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import TechBackground from '@/components/effects/TechBackground'
+import ComingSoonButton from '@/components/ui/ComingSoonButton'
 
 // ================================
 // CODEWAY-STYLE HERO SECTION
@@ -23,10 +24,11 @@ export default function HeroSection() {
     const introOverlayRef = useRef<HTMLDivElement>(null)
     const phoneBorderRef = useRef<HTMLDivElement>(null)
     const contentLeftRef = useRef<HTMLDivElement>(null)
+    const glowRef = useRef<HTMLDivElement>(null)
+
 
 
     const [ready, setReady] = useState(false)
-    const [comingSoon, setComingSoon] = useState(false)
 
     useEffect(() => {
         setReady(true)
@@ -42,6 +44,7 @@ export default function HeroSection() {
                     // Başlangıç durumları
                     gsap.set(phoneBorderRef.current, { autoAlpha: 0, scale: 1.05 })
                     gsap.set(contentLeftRef.current, { autoAlpha: 0, x: -40 })
+                    gsap.set(glowRef.current, { autoAlpha: 0, scale: 0.5 })
 
 
                     // Ana timeline
@@ -77,9 +80,25 @@ export default function HeroSection() {
                         duration: 0.2,
                     }, 0.2)
 
+                    // Glow efekti başlangıcı (zayıf)
+                    tl.to(glowRef.current, {
+                        autoAlpha: 0.4,
+                        scale: 1,
+                        duration: 0.3
+                    }, 0.2)
+
                     // FAZ 3: Sağa kayma (40-60%)
                     tl.to(videoBoxRef.current, {
                         x: () => window.innerWidth * 0.18,
+                        duration: 0.2,
+                        ease: 'power2.inOut',
+                    }, 0.4)
+
+                    // Glow da telefonla birlikte kayıyor ama biraz daha genişliyor (WOW EFEKTİ)
+                    tl.to(glowRef.current, {
+                        x: () => window.innerWidth * 0.18,
+                        scale: 1.5,
+                        autoAlpha: 0.8, // Daha parlak
                         duration: 0.2,
                         ease: 'power2.inOut',
                     }, 0.4)
@@ -99,12 +118,6 @@ export default function HeroSection() {
                             0.58
                         )
                     }
-
-
-
-                    return () => {
-                        ScrollTrigger.getAll().forEach(st => st.kill())
-                    }
                 })
 
                 // Mobil
@@ -118,6 +131,7 @@ export default function HeroSection() {
                     gsap.set(introOverlayRef.current, { autoAlpha: 0 })
                     gsap.set(phoneBorderRef.current, { autoAlpha: 1, scale: 1 })
                     gsap.set(contentLeftRef.current, { autoAlpha: 1, x: 0 })
+                    gsap.set(glowRef.current, { autoAlpha: 0.5, scale: 1 }) // Mobilde sabit glow
                 })
             }, wrapperRef)
 
@@ -140,6 +154,17 @@ export default function HeroSection() {
             >
                 {/* Arka plan */}
                 <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e1a] via-[#0d1829] to-[#0a0e1a]" />
+
+                {/* TEKNOLOJİK EFEKTLER: Pixel Rain & Circuits */}
+                <TechBackground />
+
+                {/* YENİ: ANA GLOW EFEKTİ (Telefun arkasında hareket edecek) */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div
+                        ref={glowRef}
+                        className="w-[320px] h-[500px] intense-glow rounded-full opacity-0"
+                    />
+                </div>
 
                 {/* VIDEO BOX */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -239,38 +264,12 @@ export default function HeroSection() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 mb-7">
-                        <motion.button
-                            onClick={() => {
-                                setComingSoon(true);
-                                setTimeout(() => setComingSoon(false), 2000);
-                            }}
+                        <ComingSoonButton
                             className="px-8 py-4 bg-gradient-to-r from-[#22c55e] to-[#10DC78] text-black font-bold rounded-2xl flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-emerald-500/20 transition-all min-w-[200px]"
                         >
-                            <AnimatePresence mode='wait'>
-                                {comingSoon ? (
-                                    <motion.span
-                                        key="soon"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        className="flex items-center gap-2"
-                                    >
-                                        Çok Yakında 🚀
-                                    </motion.span>
-                                ) : (
-                                    <motion.span
-                                        key="default"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        className="flex items-center gap-2"
-                                    >
-                                        Şimdi Başla
-                                        <ChevronRight className="w-5 h-5" />
-                                    </motion.span>
-                                )}
-                            </AnimatePresence>
-                        </motion.button>
+                            Şimdi Başla
+                            <ChevronRight className="w-5 h-5" />
+                        </ComingSoonButton>
                         <button className="px-8 py-4 bg-white/5 border border-white/10 text-white font-semibold rounded-2xl flex items-center gap-2 justify-center hover:bg-white/10 transition-all">
                             <Play className="w-5 h-5" />
                             Demo
@@ -293,16 +292,7 @@ export default function HeroSection() {
                 </div>
             </div>
 
-            <style jsx>{`
-        @keyframes bgPulse {
-          0%, 100% { background-position: 0% 0%; }
-          50% { background-position: 100% 100%; }
-        }
-        @keyframes floatY {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-      `}</style>
+
         </div>
     )
 }

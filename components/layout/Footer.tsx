@@ -2,13 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Twitter, Instagram, Linkedin, Github } from 'lucide-react'
-
-const quickLinks = [
-  { name: 'Anasayfa', href: '#performans' },
-  { name: 'Özellikler', href: '#ozellikler' },
-  { name: 'Hakkımızda', href: '#hakkimizda' },
-  { name: 'Ekip', href: '#ekip' }
-]
+import { NAV_LINKS } from '@/lib/constants'
 
 const socialLinks = [
   { name: 'Twitter', icon: Twitter, href: '#' },
@@ -54,7 +48,7 @@ export default function Footer() {
             >
               <h3 className="text-white font-semibold text-lg mb-4">Hızlı Geçiş</h3>
               <ul className="space-y-2">
-                {quickLinks.map((link, i) => (
+                {NAV_LINKS.map((link, i) => (
                   <li key={i}>
                     <motion.a
                       href={link.href}

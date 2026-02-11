@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import SectionHeader from '@/components/ui/SectionHeader'
 
 export default function About() {
   return (
@@ -14,25 +15,28 @@ export default function About() {
             viewport={{ once: true }}
             className="space-y-8"
           >
-            <h2 className="text-5xl font-bold text-white">
-              <span className="text-emerald-primary">Hakkımızda</span>
-            </h2>
-
-            <div className="space-y-6 text-lg text-text-muted leading-relaxed">
-              <p>
-                Biz, kod satırlarını spor sahalarına taşıyan tutkulu{' '}
-                <span className="text-white font-semibold">bilgisayar mühendisleriyiz.</span>
-              </p>
-
-              <p>
-                Bir yurt odasında filizlenen Zevo, bugün sporu teknolojiyle birleştiren
-                vizyoner bir girişime dönüştü. Amacımız sadece bir uygulama yapmak değil;
-                yapay zeka ve verinin gücünü kullanarak, amatör ruhları profesyonel bir
-                kariyere taşıyan{' '}
-                <span className="text-emerald-primary font-semibold">&apos;Sporun LinkedIn&apos;i&apos;</span>
-                ni inşa etmek.
-              </p>
-            </div>
+            <SectionHeader
+              badge="Biz Kimiz?"
+              title={<span className="text-emerald-primary">Hakkımızda</span>}
+              description={
+                <div className="space-y-6">
+                  <p>
+                    Biz, kod satırlarını spor sahalarına taşıyan tutkulu{' '}
+                    <span className="text-white font-semibold">bilgisayar mühendisleriyiz.</span>
+                  </p>
+                  <p>
+                    Bir yurt odasında filizlenen Zevo, bugün sporu teknolojiyle birleştiren
+                    vizyoner bir girişime dönüştü. Amacımız sadece bir uygulama yapmak değil;
+                    yapay zeka ve verinin gücünü kullanarak, amatör ruhları profesyonel bir
+                    kariyere taşıyan{' '}
+                    <span className="text-emerald-primary font-semibold">&apos;Sporun LinkedIn&apos;i&apos;</span>
+                    ni inşa etmek.
+                  </p>
+                </div>
+              }
+              align="left"
+              className="mb-8"
+            />
 
             {/* Mission Card */}
             <motion.div

@@ -3,16 +3,20 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { X, Dumbbell, Apple, Brain, Users, Trophy, ChevronRight } from 'lucide-react'
+import EnergyCircuitBackground from '@/components/effects/EnergyCircuitBackground'
+import SectionHeader from '@/components/ui/SectionHeader'
+import ComingSoonButton from '@/components/ui/ComingSoonButton'
 
 interface Feature {
   id: number;
-  icon: any;
+  icon: React.ElementType;
   title: string;
   shortDescription: string;
   detailedDescription: string;
   benefits: string[];
   animation: 'fade' | 'slide' | 'scale' | 'rotate';
   layout: 'square' | 'full';
+  targetSection?: string;
 }
 
 export default function Features() {
@@ -31,7 +35,8 @@ export default function Features() {
         'Hedeflerine en kısa yoldan ulaşmanı sağlayan optimizasyon',
       ],
       animation: 'fade',
-      layout: 'square'
+      layout: 'square',
+      targetSection: 'hareket-analizi'
     },
     {
       id: 2,
@@ -45,7 +50,8 @@ export default function Features() {
         'Günlük beslenme raporları ve öneriler'
       ],
       animation: 'slide',
-      layout: 'square'
+      layout: 'square',
+      targetSection: 'beslenme'
     },
     {
       id: 3,
@@ -59,7 +65,8 @@ export default function Features() {
         'Sesli koçluk ve motivasyon'
       ],
       animation: 'scale',
-      layout: 'full'
+      layout: 'full',
+      targetSection: 'ai-koc'
     },
     {
       id: 4,
@@ -87,47 +94,16 @@ export default function Features() {
         'Kazandıkça açılan özel rozetler ve ödüller'
       ],
       animation: 'fade',
-      layout: 'square'
-    }
+      layout: 'square',
+      targetSection: 'pvp-arena'
+    },
   ]
-
-  const getAnimation = (type: string) => {
-    switch (type) {
-      case 'fade':
-        return {
-          initial: { opacity: 0 },
-          animate: { opacity: 1 },
-          exit: { opacity: 0 }
-        }
-      case 'slide':
-        return {
-          initial: { x: 100, opacity: 0 },
-          animate: { x: 0, opacity: 1 },
-          exit: { x: -100, opacity: 0 }
-        }
-      case 'scale':
-        return {
-          initial: { scale: 0.8, opacity: 0 },
-          animate: { scale: 1, opacity: 1 },
-          exit: { scale: 0.8, opacity: 0 }
-        }
-      case 'rotate':
-        return {
-          initial: { rotateY: 90, opacity: 0 },
-          animate: { rotateY: 0, opacity: 1 },
-          exit: { rotateY: -90, opacity: 0 }
-        }
-      default:
-        return {
-          initial: { opacity: 0 },
-          animate: { opacity: 1 },
-          exit: { opacity: 0 }
-        }
-    }
-  }
 
   return (
     <section id="ozellikler" className="relative min-h-screen py-12 lg:py-16 px-6 bg-[#0a0e1a] flex flex-col justify-center overflow-hidden">
+      {/* Energy Circuit Effect */}
+      <EnergyCircuitBackground />
+
       {/* Sadece ortaya subtle glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div
@@ -138,21 +114,17 @@ export default function Features() {
           }}
         />
       </div>
+
       <div className="max-w-[580px] mx-auto w-full">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-8"
-        >
-          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-2">
-            Neler <span className="text-emerald-primary">Sunuyoruz?</span>
-          </h2>
-          <p className="text-base lg:text-lg text-text-muted">
-            ZEVO ile antrenmanlarını bir üst seviyeye taşı
-          </p>
-        </motion.div>
+        <div className="mb-8">
+          <SectionHeader
+            badge="Özellikler"
+            title={<>Neler <span className="text-emerald-primary">Sunuyoruz?</span></>}
+            description="ZEVO ile antrenmanlarını bir üst seviyeye taşı"
+            align="center"
+          />
+        </div>
 
         {/* Feature Grid - Compact 2-1-2 Layout */}
         <div className="grid grid-cols-2 gap-3 mx-auto">
@@ -336,13 +308,20 @@ export default function Features() {
 
                   {/* Footer CTA */}
                   <div className="mt-8 pt-6 border-t border-white/10">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                    <ComingSoonButton
+                      onClick={() => {
+                        const target = selectedFeature.targetSection
+                        if (target) {
+                          setSelectedFeature(null)
+                          setTimeout(() => {
+                            document.getElementById(target)?.scrollIntoView({ behavior: 'smooth' })
+                          }, 300)
+                        }
+                      }}
                       className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-shadow"
                     >
                       Hemen Başla
-                    </motion.button>
+                    </ComingSoonButton>
                   </div>
                 </div>
               </motion.div>

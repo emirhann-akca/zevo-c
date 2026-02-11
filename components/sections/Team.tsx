@@ -26,7 +26,7 @@ const team = [
 
 export default function Team() {
   return (
-    <section id="ekipler" className="relative py-24 px-6 bg-dark-primary">
+    <section id="ekibimiz" className="relative py-24 px-6 bg-dark-primary">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div

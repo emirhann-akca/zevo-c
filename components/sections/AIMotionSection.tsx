@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState, useMemo } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { Eye, Shield, RefreshCw, Check, AlertTriangle } from 'lucide-react'
+import ConnectedPointsBackground from '@/components/effects/ConnectedPointsBackground'
+import SectionHeader from '@/components/ui/SectionHeader'
 
 // ================================
 // AI MOTION SECTION - CINEMATIC
@@ -61,64 +62,147 @@ export default function AIMotionSection() {
     const sectionRef = useRef<HTMLDivElement>(null)
     const phoneRef = useRef<HTMLDivElement>(null)
     const [mounted, setMounted] = useState(false)
-    const [poseProgress, setPoseProgress] = useState(0) // 0 = standing, 1 = squat
     const [postureCorrect, setPostureCorrect] = useState(true)
-    const [repCount, setRepCount] = useState(0)
-    const [kneeAngle, setKneeAngle] = useState(175)
+    const [isVisible, setIsVisible] = useState(false) // Visibility state
 
-    // Pose animation - smooth transition
+    // Refs for animation state (avoiding Re-renders)
+    const poseProgressRef = useRef(0)
+    const repCountRef = useRef(0)
+
+    // Refs for DOM elements
+    const kneeTextRef = useRef<HTMLParagraphElement>(null)
+    const kneeIconRef = useRef<HTMLSpanElement>(null)
+    const repTextRef = useRef<HTMLSpanElement>(null)
+    const repBarRef = useRef<HTMLDivElement>(null)
+
+    // SVG Refs
+    const jointsRef = useRef<(SVGCircleElement | null)[]>([])
+    const bonesRef = useRef<(SVGLineElement | null)[]>([])
+
+    // Visibility Observer
     useEffect(() => {
-        if (!mounted) return
+        if (!mounted || !sectionRef.current) return
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsVisible(entry.isIntersecting)
+            },
+            {
+                threshold: 0.15,
+                rootMargin: "-50px 0px"
+            }
+        )
+
+        observer.observe(sectionRef.current)
+        return () => observer.disconnect()
+    }, [mounted])
+
+    // Pose animation - smooth transition via RAF and Direct DOM Manipulation
+    useEffect(() => {
+        if (!mounted || !isVisible) return // Pause when not visible
 
         let animationFrame: number
         const startTime = Date.now()
         const cycleDuration = 2000 // 2 seconds cycle
+        let lastFrameTime = 0
+        const fpsInterval = 1000 / 30 // 30 FPS cap
 
-        const animate = () => {
-            const elapsed = Date.now() - startTime
-            const cyclePosition = (elapsed % (cycleDuration * 2)) / cycleDuration
+        const updateSkeleton = (progress: number) => {
+            // Calculate all joint positions
+            const currentJoints = JOINTS_DATA.map(j => ({
+                id: j.id,
+                x: j.standing.x + (j.squat.x - j.standing.x) * progress,
+                y: j.standing.y + (j.squat.y - j.standing.y) * progress,
+            }))
 
-            let progress: number
-            if (cyclePosition <= 1) {
-                progress = easeInOutCubic(cyclePosition)
-            } else {
-                progress = 1 - easeInOutCubic(cyclePosition - 1)
+            // Update Joints (Circles)
+            JOINTS_DATA.forEach((j, i) => {
+                const el = jointsRef.current[i]
+                if (el) {
+                    el.setAttribute('cx', currentJoints[i].x.toString())
+                    el.setAttribute('cy', currentJoints[i].y.toString())
+                }
+            })
+
+            // Update Bones (Lines)
+            BONES.forEach((bonePair, i) => {
+                const el = bonesRef.current[i]
+                if (el) {
+                    const from = currentJoints.find(j => j.id === bonePair[0])
+                    const to = currentJoints.find(j => j.id === bonePair[1])
+                    if (from && to) {
+                        el.setAttribute('x1', from.x.toString())
+                        el.setAttribute('y1', from.y.toString())
+                        el.setAttribute('x2', to.x.toString())
+                        el.setAttribute('y2', to.y.toString())
+                    }
+                }
+            })
+
+            // Update Knee Angle UI
+            const angle = Math.round(175 - (85 * progress))
+            if (kneeTextRef.current) {
+                kneeTextRef.current.innerHTML = `${angle}° <span class="${angle < 120 ? 'text-green-400' : 'text-gray-500'}">${angle < 120 ? '✓' : ''}</span>`
             }
-
-            setPoseProgress(progress)
-            setKneeAngle(Math.round(175 - (85 * progress)))
-
-            animationFrame = requestAnimationFrame(animate)
         }
 
-        animate()
+        const animate = (timestamp: number) => {
+            animationFrame = requestAnimationFrame(animate)
+
+            const elapsedFrame = timestamp - lastFrameTime
+
+            if (elapsedFrame > fpsInterval) {
+                lastFrameTime = timestamp - (elapsedFrame % fpsInterval)
+
+                const elapsed = Date.now() - startTime
+                const cyclePosition = (elapsed % (cycleDuration * 2)) / cycleDuration
+
+                let progress: number
+                if (cyclePosition <= 1) {
+                    progress = easeInOutCubic(cyclePosition)
+                } else {
+                    progress = 1 - easeInOutCubic(cyclePosition - 1)
+                }
+
+                poseProgressRef.current = progress
+                updateSkeleton(progress)
+            }
+        }
+
+        animationFrame = requestAnimationFrame(animate)
 
         return () => cancelAnimationFrame(animationFrame)
-    }, [mounted])
+    }, [mounted, isVisible])
 
     // Rep counter - increment on each squat cycle
     useEffect(() => {
-        if (!mounted) return
+        if (!mounted || !isVisible) return // Pause when not visible
         const interval = setInterval(() => {
-            setRepCount(r => r < 12 ? r + 1 : 1)
+            const currentRep = repCountRef.current < 12 ? repCountRef.current + 1 : 1
+            repCountRef.current = currentRep
+
+            // Update UI directly
+            if (repTextRef.current) repTextRef.current.innerText = currentRep.toString()
+            if (repBarRef.current) repBarRef.current.style.width = `${(currentRep / 12) * 100}%`
+
         }, 4000)
         return () => clearInterval(interval)
-    }, [mounted])
+    }, [mounted, isVisible])
 
-    // Posture toggle
+    // Posture toggle - Keep this as state since it's infrequent and affects classNames significantly
     useEffect(() => {
-        if (!mounted) return
+        if (!mounted || !isVisible) return // Pause when not visible
         const interval = setInterval(() => {
             setPostureCorrect(false)
             setTimeout(() => setPostureCorrect(true), 2000)
         }, 6000)
         return () => clearInterval(interval)
-    }, [mounted])
+    }, [mounted, isVisible])
 
     // GSAP animations
     useEffect(() => {
         setMounted(true)
-        gsap.registerPlugin(ScrollTrigger)
+        setMounted(true)
 
         const timer = setTimeout(() => {
             if (!sectionRef.current) return
@@ -182,18 +266,6 @@ export default function AIMotionSection() {
         return () => clearTimeout(timer)
     }, [])
 
-    // Interpolated joint positions
-    const jointPositions = useMemo(() => {
-        return JOINTS_DATA.map(j => ({
-            id: j.id,
-            r: j.r,
-            x: j.standing.x + (j.squat.x - j.standing.x) * poseProgress,
-            y: j.standing.y + (j.squat.y - j.standing.y) * poseProgress,
-        }))
-    }, [poseProgress])
-
-    const getJoint = (id: string) => jointPositions.find(j => j.id === id)!
-
     if (!mounted) {
         return <div className="min-h-screen bg-[#0a0e1a]" />
     }
@@ -201,38 +273,24 @@ export default function AIMotionSection() {
     return (
         <section
             ref={sectionRef}
+            id="hareket-analizi"
             className="relative min-h-screen bg-[#0a0e1a] py-16 lg:py-20 flex items-center overflow-hidden"
         >
+            <ConnectedPointsBackground />
 
-            <div className="max-w-[1280px] mx-auto px-6 lg:px-8 w-full">
+            <div className="max-w-[1280px] mx-auto px-6 lg:px-8 w-full relative z-10">
                 <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
                     {/* ================== LEFT COLUMN ================== */}
                     <div className="ai-left w-full lg:w-[45%] space-y-6">
 
-                        {/* Badge */}
-                        <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-4 py-1.5">
-                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                            <span className="text-green-400 text-xs font-semibold tracking-wider uppercase">Yapay Zeka Motoru</span>
-                        </div>
-
-                        {/* Heading */}
-                        <div>
-                            <h2 className="text-[44px] lg:text-[56px] font-extrabold text-white leading-[1.1] tracking-tight">
-                                Hareketini
-                            </h2>
-                            <h2 className="text-[44px] lg:text-[56px] font-extrabold leading-[1.1] tracking-tight">
-                                <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">
-                                    Analiz Et.
-                                </span>
-                            </h2>
-                        </div>
-
-                        {/* Description */}
-                        <p className="text-[#9ca3af] text-base lg:text-lg leading-relaxed max-w-md">
-                            Kameranı aç, harekete başla. Yapay zeka vücudunu tarar,
-                            her tekrarı sayar, her hatayı yakalar.
-                        </p>
+                        <SectionHeader
+                            badge="Yapay Zeka Motoru"
+                            title={<>Hareketini <br /> <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">Analiz Et.</span></>}
+                            description="Kameranı aç, harekete başla. Yapay zeka vücudunu tarar, her tekrarı sayar, her hatayı yakalar."
+                            align="left"
+                            className="mb-8"
+                        />
 
                         {/* Metric cards */}
                         <div className="flex gap-3">
@@ -271,8 +329,6 @@ export default function AIMotionSection() {
                     {/* ================== RIGHT COLUMN - PHONE ================== */}
                     <div className="w-full lg:w-[55%] flex justify-center relative">
 
-
-
                         {/* Phone mockup - smaller to fit screen */}
                         <div
                             ref={phoneRef}
@@ -298,29 +354,20 @@ export default function AIMotionSection() {
 
                             {/* SVG Skeleton - animated */}
                             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 280 520">
-                                <defs>
-                                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                                        <feGaussianBlur stdDeviation="3" result="blur" />
-                                        <feMerge>
-                                            <feMergeNode in="blur" />
-                                            <feMergeNode in="blur" />
-                                            <feMergeNode in="SourceGraphic" />
-                                        </feMerge>
-                                    </filter>
-                                </defs>
-
                                 {/* Bone lines */}
                                 {BONES.map(([fromId, toId], i) => {
-                                    const from = getJoint(fromId)
-                                    const to = getJoint(toId)
+                                    // Initial render positions (standing)
+                                    const from = JOINTS_DATA.find(j => j.id === fromId)!.standing
+                                    const to = JOINTS_DATA.find(j => j.id === toId)!.standing
                                     return (
                                         <line
                                             key={i}
+                                            ref={(el) => { bonesRef.current[i] = el }}
                                             x1={from.x}
                                             y1={from.y}
                                             x2={to.x}
                                             y2={to.y}
-                                            stroke="rgba(34, 197, 94, 0.4)"
+                                            stroke="rgba(34, 197, 94, 0.6)"
                                             strokeWidth="2"
                                             strokeLinecap="round"
                                         />
@@ -328,14 +375,15 @@ export default function AIMotionSection() {
                                 })}
 
                                 {/* Joint dots */}
-                                {jointPositions.map((joint) => (
+                                {JOINTS_DATA.map((joint, i) => (
                                     <circle
                                         key={joint.id}
-                                        cx={joint.x}
-                                        cy={joint.y}
-                                        r={joint.r}
+                                        ref={(el) => { jointsRef.current[i] = el }}
+                                        cx={joint.standing.x}
+                                        cy={joint.standing.y}
+                                        r={joint.r + 1}
                                         fill="#22c55e"
-                                        filter="url(#glow)"
+                                        fillOpacity="0.8"
                                     />
                                 ))}
                             </svg>
@@ -358,8 +406,8 @@ export default function AIMotionSection() {
                             <div className="phone-ui absolute z-10" style={{ top: '58%', right: '8px' }}>
                                 <div className="bg-black/70 backdrop-blur rounded-lg px-2 py-1 border border-white/10">
                                     <p className="text-[8px] text-white/40">DİZ AÇISI</p>
-                                    <p className="text-white text-xs font-bold">
-                                        {kneeAngle}° <span className={kneeAngle < 120 ? 'text-green-400' : 'text-gray-500'}>{kneeAngle < 120 ? '✓' : ''}</span>
+                                    <p className="text-white text-xs font-bold" ref={kneeTextRef}>
+                                        175° <span className="text-gray-500"></span>
                                     </p>
                                 </div>
                             </div>
@@ -369,13 +417,14 @@ export default function AIMotionSection() {
                                 <div className="bg-black/70 backdrop-blur rounded-lg px-2 py-1.5 border border-white/10">
                                     <p className="text-[8px] text-white/40 mb-0.5">TEKRAR</p>
                                     <div className="flex items-baseline gap-0.5">
-                                        <span className="text-green-400 text-lg font-bold">{repCount}</span>
+                                        <span ref={repTextRef} className="text-green-400 text-lg font-bold">0</span>
                                         <span className="text-white/30 text-[10px]">/ 12</span>
                                     </div>
                                     <div className="h-1 w-12 bg-white/10 rounded-full mt-1 overflow-hidden">
                                         <div
+                                            ref={repBarRef}
                                             className="h-full bg-green-500 rounded-full transition-all duration-300"
-                                            style={{ width: `${(repCount / 12) * 100}%` }}
+                                            style={{ width: '0%' }}
                                         />
                                     </div>
                                 </div>
