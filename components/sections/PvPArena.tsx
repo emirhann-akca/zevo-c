@@ -162,7 +162,13 @@ export default function PvPArena() {
                       }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-white text-sm font-medium">{player.name}</span>
+                      <div className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold ${i === 0
+                          ? 'bg-emerald-500 text-[#0a0e1a] shadow-[0_0_10px_rgba(16,220,120,0.3)]'
+                          : 'bg-white/5 text-white/50 border border-white/5'
+                        }`}>
+                        {i + 1}
+                      </div>
+                      <span className={`text-sm font-medium ${i === 0 ? 'text-white' : 'text-white/80'}`}>{player.name}</span>
                     </div>
                     <span className={`text-sm font-bold tabular-nums ${i === 0 ? 'text-[#22c55e]' : 'text-gray-400'}`}>
                       {player.score.toLocaleString()} puan

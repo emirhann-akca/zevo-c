@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { Users, Trophy, Zap, Heart, Shield, Crown, Star, Target, Swords } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Users, Trophy, Zap, Heart, Shield, Swords } from 'lucide-react'
 import SectionHeader from '@/components/ui/SectionHeader'
 import PhoneMockup from '@/components/ui/PhoneMockup'
 
@@ -11,19 +11,28 @@ const clanFeatures = [
         icon: Trophy,
         title: 'Klan Görevleri',
         desc: 'Birlikte hedeflere ulaşın, adım yarışları ve antrenman mücadeleleri',
-        gradient: 'from-emerald-500 to-teal-500',
+        iconColor: 'text-emerald-400',
+        bgColor: 'bg-emerald-500/10',
+        borderColor: 'border-emerald-500/20',
+        shadowClass: 'group-hover:shadow-[0_8px_20px_-4px_rgba(52,211,153,0.3)]'
     },
     {
         icon: Zap,
         title: 'Canlı Etkinlikler',
         desc: 'Haftalık turnuvalar, XP ödülleri ve liderlik tablosu',
-        gradient: 'from-teal-500 to-cyan-500',
+        iconColor: 'text-teal-400',
+        bgColor: 'bg-teal-500/10',
+        borderColor: 'border-teal-500/20',
+        shadowClass: 'group-hover:shadow-[0_8px_20px_-4px_rgba(45,212,191,0.3)]'
     },
     {
         icon: Heart,
         title: 'Takım Ruhu',
         desc: 'Grup sohbet, motivasyon ve birlikte ilerleme takibi',
-        gradient: 'from-cyan-500 to-emerald-500',
+        iconColor: 'text-cyan-400',
+        bgColor: 'bg-cyan-500/10',
+        borderColor: 'border-cyan-500/20',
+        shadowClass: 'group-hover:shadow-[0_8px_20px_-4px_rgba(34,211,238,0.3)]'
     },
 ]
 
@@ -106,7 +115,7 @@ export default function TeamClans() {
             id="ekipler"
             className="relative min-h-screen py-24 lg:py-20 px-6 bg-[#0a0e1a] overflow-hidden flex items-center"
         >
-            {/* ─── Background (static gradients + grid) ─── */}
+            {/* ─── Background (Static Efficient Gradients) ─── */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <div
                     className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] opacity-15"
@@ -140,32 +149,32 @@ export default function TeamClans() {
                     >
                         <PhoneMockup>
                             {/* ─── Clan Screen Content ─── */}
-                            <div className="relative w-full h-full bg-gradient-to-b from-[#0c1425] to-[#0a0e1a] pt-14 px-3">
+                            <div className="relative w-full h-full bg-[#0a0e1a] pt-14 px-3 flex flex-col">
                                 {/* Clan Header */}
-                                <div className="flex items-center gap-2 mb-3">
-                                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-lg">
+                                <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-xl">
                                         🐺
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-white font-bold text-xs truncate">
+                                        <div className="text-white font-bold text-sm truncate">
                                             Alpha Wolves
                                         </div>
-                                        <div className="text-emerald-400 text-[9px] font-medium">
+                                        <div className="text-emerald-400 text-[10px] font-medium">
                                             Seviye 12 • 28 Üye
                                         </div>
                                     </div>
-                                    <div className="px-2 py-0.5 bg-emerald-500/20 rounded-full">
-                                        <span className="text-emerald-400 text-[8px] font-bold">#3</span>
+                                    <div className="px-2 py-1 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                                        <span className="text-emerald-400 text-[9px] font-bold">#3</span>
                                     </div>
                                 </div>
 
                                 {/* XP Progress */}
-                                <div className="mb-3">
-                                    <div className="flex justify-between text-[8px] mb-1">
+                                <div className="mb-4">
+                                    <div className="flex justify-between text-[9px] mb-1.5 px-1">
                                         <span className="text-white/40">Klan XP</span>
                                         <span className="text-emerald-400 font-bold">8,450 / 10,000</span>
                                     </div>
-                                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                    <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                                         <div
                                             className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 origin-left"
                                             style={{
@@ -177,29 +186,29 @@ export default function TeamClans() {
                                 </div>
 
                                 {/* Members */}
-                                <div className="mb-3">
-                                    <div className="text-[9px] text-white/50 font-medium mb-1.5">
+                                <div className="mb-4 flex-1">
+                                    <div className="text-[10px] text-white/40 font-bold uppercase tracking-wider mb-2 px-1">
                                         Aktif Üyeler
                                     </div>
-                                    <div className="space-y-1">
+                                    <div className="space-y-1.5">
                                         {clanMembers.map((m, i) => (
                                             <div
                                                 key={i}
-                                                className="flex items-center gap-2 p-1.5 bg-white/[0.03] rounded-lg"
+                                                className="flex items-center gap-3 p-2 bg-white/[0.02] border border-white/5 rounded-xl hover:bg-white/[0.04] transition-colors"
                                                 style={{
                                                     opacity: isVisible ? 1 : 0,
                                                     transform: isVisible ? 'translateX(0)' : 'translateX(-8px)',
                                                     transition: `all 0.4s cubic-bezier(0.22, 1, 0.36, 1) ${0.3 + i * 0.1}s`,
                                                 }}
                                             >
-                                                <span className="text-base">{m.avatar}</span>
+                                                <span className="text-lg bg-white/5 w-8 h-8 rounded-lg flex items-center justify-center">{m.avatar}</span>
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="text-[9px] text-white font-medium truncate">
+                                                    <div className="text-[10px] text-white font-medium truncate">
                                                         {m.name}
                                                     </div>
-                                                    <div className="text-[7px] text-white/30">{m.role}</div>
+                                                    <div className="text-[8px] text-white/30">{m.role}</div>
                                                 </div>
-                                                <div className="text-[8px] text-emerald-400 font-bold">
+                                                <div className="text-[9px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded text-center">
                                                     Lv.{m.level}
                                                 </div>
                                             </div>
@@ -208,32 +217,32 @@ export default function TeamClans() {
                                 </div>
 
                                 {/* Active Quests */}
-                                <div>
-                                    <div className="text-[9px] text-white/50 font-medium mb-1.5">
+                                <div className="mb-20">
+                                    <div className="text-[10px] text-white/40 font-bold uppercase tracking-wider mb-2 px-1">
                                         Aktif Görevler
                                     </div>
                                     {clanQuests.map((q, i) => (
                                         <div
                                             key={i}
-                                            className="p-2 bg-white/[0.03] rounded-lg mb-1.5 border border-white/5"
+                                            className="p-3 bg-white/[0.02] rounded-xl mb-2 border border-white/5"
                                             style={{
                                                 opacity: isVisible ? 1 : 0,
                                                 transform: isVisible ? 'translateY(0)' : 'translateY(8px)',
                                                 transition: `all 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${0.6 + i * 0.15}s`,
                                             }}
                                         >
-                                            <div className="flex items-center justify-between mb-1">
-                                                <div className="flex items-center gap-1.5">
-                                                    <span className="text-xs">{q.icon}</span>
-                                                    <span className="text-[8px] text-white font-medium">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm">{q.icon}</span>
+                                                    <span className="text-[9px] text-white font-medium">
                                                         {q.title}
                                                     </span>
                                                 </div>
-                                                <span className="text-[7px] text-emerald-400 font-bold">
+                                                <span className="text-[8px] text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">
                                                     {q.reward}
                                                 </span>
                                             </div>
-                                            <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                                            <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                                                 <div
                                                     className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-400 origin-left"
                                                     style={{
@@ -244,27 +253,24 @@ export default function TeamClans() {
                                                     }}
                                                 />
                                             </div>
-                                            <div className="text-right text-[7px] text-white/30 mt-0.5">
-                                                %{q.progress}
-                                            </div>
                                         </div>
                                     ))}
                                 </div>
 
                                 {/* Bottom Nav */}
-                                <div className="absolute bottom-8 left-3 right-3 flex justify-around py-2 bg-white/[0.04] rounded-xl border border-white/5">
+                                <div className="absolute bottom-6 left-3 right-3 flex justify-around py-3 bg-[#0f172a] rounded-2xl border border-white/10 shadow-lg z-10">
                                     {[
                                         { icon: Users, label: 'Üyeler', active: false },
                                         { icon: Shield, label: 'Klan', active: true },
                                         { icon: Swords, label: 'Savaş', active: false },
                                     ].map((nav, i) => (
-                                        <div key={i} className="flex flex-col items-center gap-0.5">
+                                        <div key={i} className="flex flex-col items-center gap-1 group cursor-pointer">
                                             <nav.icon
-                                                className={`w-3.5 h-3.5 ${nav.active ? 'text-emerald-400' : 'text-white/30'
+                                                className={`w-4 h-4 transition-colors ${nav.active ? 'text-emerald-400' : 'text-white/30 group-hover:text-white/50'
                                                     }`}
                                             />
                                             <span
-                                                className={`text-[7px] font-medium ${nav.active ? 'text-emerald-400' : 'text-white/30'
+                                                className={`text-[8px] font-medium transition-colors ${nav.active ? 'text-emerald-400' : 'text-white/30 group-hover:text-white/50'
                                                     }`}
                                             >
                                                 {nav.label}
@@ -274,89 +280,11 @@ export default function TeamClans() {
                                 </div>
                             </div>
                         </PhoneMockup>
-
-                        {/* ─── Floating Info Cards (hidden on mobile) ─── */}
-                        {/* Left — Active Members */}
-                        <div
-                            className={`hidden md:flex absolute z-20 bg-[#0f172a]/95 rounded-xl p-3 border border-white/10 items-center gap-2.5 transition-all duration-500 ${isVisible
-                                ? 'opacity-100 translate-x-0 scale-100'
-                                : 'opacity-0 -translate-x-8 scale-90'
-                                }`}
-                            style={{ left: '-40px', top: '120px', width: '145px', transitionDelay: '0.5s' }}
-                        >
-                            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                                <Users className="w-4 h-4 text-emerald-400" />
-                            </div>
-                            <div>
-                                <div className="text-sm font-extrabold text-white">1,247</div>
-                                <div className="text-[9px] text-white/40">Çevrimiçi</div>
-                            </div>
-                        </div>
-
-                        {/* Left — Clan Level */}
-                        <div
-                            className={`hidden md:flex absolute z-20 bg-[#0f172a]/95 rounded-xl p-3 border border-white/10 items-center gap-2.5 transition-all duration-500 ${isVisible
-                                ? 'opacity-100 translate-x-0 scale-100'
-                                : 'opacity-0 -translate-x-8 scale-90'
-                                }`}
-                            style={{ left: '-30px', top: '230px', width: '140px', transitionDelay: '0.65s' }}
-                        >
-                            <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                                <Crown className="w-4 h-4 text-cyan-400" />
-                            </div>
-                            <div>
-                                <div className="text-sm font-extrabold text-white">Lv.12</div>
-                                <div className="text-[9px] text-white/40">Klan Seviyesi</div>
-                            </div>
-                        </div>
-
-                        {/* Right — Weekly Rank */}
-                        <div
-                            className={`hidden md:flex absolute z-20 bg-[#0f172a]/95 rounded-xl p-3 border border-white/10 items-center gap-2.5 transition-all duration-500 ${isVisible
-                                ? 'opacity-100 translate-x-0 scale-100'
-                                : 'opacity-0 translate-x-8 scale-90'
-                                }`}
-                            style={{ right: '-35px', top: '140px', width: '140px', transitionDelay: '0.6s' }}
-                        >
-                            <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                                <Star className="w-4 h-4 text-amber-400" />
-                            </div>
-                            <div>
-                                <div className="text-sm font-extrabold text-white">#3</div>
-                                <div className="text-[9px] text-white/40">Haftalık Sıra</div>
-                            </div>
-                        </div>
-
-                        {/* Right — XP Earned */}
-                        <div
-                            className={`hidden md:flex absolute z-20 bg-[#0f172a]/95 rounded-xl p-3 border border-white/10 items-center gap-2.5 transition-all duration-500 ${isVisible
-                                ? 'opacity-100 translate-x-0 scale-100'
-                                : 'opacity-0 translate-x-8 scale-90'
-                                }`}
-                            style={{ right: '-25px', top: '250px', width: '140px', transitionDelay: '0.75s' }}
-                        >
-                            <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                                <Target className="w-4 h-4 text-purple-400" />
-                            </div>
-                            <div>
-                                <div className="text-sm font-extrabold text-white">8,450</div>
-                                <div className="text-[9px] text-white/40">Toplam XP</div>
-                            </div>
-                        </div>
-
-                        {/* Floating Badge */}
-                        <div
-                            className={`absolute -top-3 -left-2 lg:left-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-full font-bold text-xs shadow-[0_0_20px_rgba(16,220,120,0.3)] flex items-center gap-1.5 z-10 animate-bounce-slow transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'
-                                }`}
-                        >
-                            <Shield className="w-3.5 h-3.5" />
-                            Clan Wars
-                        </div>
                     </div>
 
                     {/* ════════════ RIGHT — CONTENT ════════════ */}
                     <div
-                        className={`relative lg:order-last transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                        className={`relative lg:order-last pl-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
                             }`}
                         style={{ transitionDelay: '0.15s' }}
                     >
@@ -365,72 +293,34 @@ export default function TeamClans() {
                             badge="Ekipler"
                             title={<>Ekibini Kur,{' '}<span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">Birlikte Zirveye Ulaş.</span></>}
                             description={<>Arkadaşlarınla ekipler kur, görevleri tamamla, etkinliklere katıl. Birlikte antrenman yap, birbirini motive et. Takım ruhuyla liderlik tablosunda yüksel, zirve sizin olsun.</>}
+                            align='left'
+                            className="mb-8"
                         />
 
-                        {/* Feature Cards */}
-                        <div className="space-y-3 mb-8">
+                        {/* Feature Cards - AICoach/VisionNutrition Style */}
+                        <div className="space-y-4 mb-10">
                             {clanFeatures.map((item, i) => (
-                                <div
-                                    key={i}
-                                    className="group flex gap-3 items-center p-3 bg-white/[0.03] border border-white/5 rounded-xl transition-all duration-300 cursor-pointer clan-card"
-                                    style={{
-                                        opacity: isVisible ? 1 : 0,
-                                        transform: isVisible ? 'translateX(0)' : 'translateX(20px)',
-                                        transition: `opacity 0.5s ease ${0.3 + i * 0.12}s, transform 0.5s ease ${0.3 + i * 0.12}s`,
-                                    }}
-                                >
-                                    <div
-                                        className={`w-10 h-10 bg-gradient-to-br ${item.gradient} rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110`}
-                                    >
-                                        <item.icon className="w-5 h-5 text-white" />
+                                <div key={i} className="flex items-center gap-4 group cursor-default">
+                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${item.bgColor} border ${item.borderColor} transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg ${item.shadowClass} flex-shrink-0`}>
+                                        <item.icon className={`w-7 h-7 ${item.iconColor}`} />
                                     </div>
-                                    <div className="flex-1">
-                                        <div className="font-bold text-white text-sm mb-0.5 group-hover:text-emerald-400 transition-colors duration-300">
-                                            {item.title}
-                                        </div>
-                                        <div className="text-xs text-white/50">{item.desc}</div>
-                                    </div>
-                                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1">
-                                        <svg
-                                            className="w-4 h-4 text-white/60"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M9 5l7 7-7 7"
-                                            />
-                                        </svg>
+                                    <div>
+                                        <p className={`text-base font-bold text-white group-hover:${item.iconColor} transition-colors`}>{item.title}</p>
+                                        <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Stats Row — 2x2 on mobile, 4-col on desktop */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {/* Stats Row - Clean Text Style */}
+                        <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6">
                             {stats.map((stat, i) => (
-                                <div
-                                    key={i}
-                                    className="relative group text-center p-3 bg-gradient-to-br from-white/[0.05] to-transparent border border-white/10 rounded-xl overflow-hidden clan-stat-card"
-                                    style={{
-                                        opacity: isVisible ? 1 : 0,
-                                        transform: isVisible ? 'translateY(0)' : 'translateY(12px)',
-                                        transition: `opacity 0.5s ease ${0.5 + i * 0.1}s, transform 0.5s ease ${0.5 + i * 0.1}s`,
-                                    }}
-                                >
-                                    {/* Hover glow — pseudo-element via border color */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                    <div className="relative">
-                                        <div className="text-xl lg:text-2xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                                            {animatedStats[i]}
-                                            {stat.suffix}
-                                        </div>
-                                        <div className="text-[10px] text-white/40 mt-0.5 font-medium">
-                                            {stat.label}
-                                        </div>
+                                <div key={i} className="text-left group cursor-default">
+                                    <div className="text-xl lg:text-2xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">
+                                        {animatedStats[i]}{stat.suffix}
+                                    </div>
+                                    <div className="text-[10px] text-white/40 font-medium uppercase tracking-wide group-hover:text-white/60 transition-colors">
+                                        {stat.label}
                                     </div>
                                 </div>
                             ))}
@@ -438,23 +328,6 @@ export default function TeamClans() {
                     </div>
                 </div>
             </div>
-
-            {/* Scoped styles */}
-            <style jsx>{`
-        .clan-card:hover {
-          background: rgba(255, 255, 255, 0.06);
-          border-color: rgba(16, 220, 120, 0.3);
-          transform: translateX(4px);
-        }
-        .clan-stat-card:hover {
-          border-color: rgba(16, 220, 120, 0.3);
-          transform: scale(1.05);
-        }
-        .clan-card,
-        .clan-stat-card {
-          will-change: transform;
-        }
-      `}</style>
         </section>
     )
 }

@@ -1,24 +1,47 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Brain, Zap, Target, TrendingUp, Volume2, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
+import { Brain, Zap, Target, TrendingUp, Volume2, MessageCircle, MoreHorizontal, Send, Eye } from 'lucide-react'
 import SectionHeader from '@/components/ui/SectionHeader'
 
 const features = [
   {
-    icon: Target,
+    icon: Eye,
     title: 'Gerçek Zamanlı Düzeltme',
     desc: 'Her hareketi analiz eder, anında geri bildirim verir',
-    gradient: 'from-emerald-500 to-teal-500'
+    iconColor: 'text-emerald-400',
+    bgColor: 'bg-emerald-500/10',
+    borderColor: 'border-emerald-500/20',
+    shadowClass: 'group-hover:shadow-[0_8px_20px_-4px_rgba(52,211,153,0.3)]'
   },
   {
     icon: TrendingUp,
     title: 'Gelişim Takibi',
     desc: 'Haftalık gelişim raporları ve hedef belirleme',
-    gradient: 'from-blue-500 to-cyan-500'
+    iconColor: 'text-blue-400',
+    bgColor: 'bg-blue-500/10',
+    borderColor: 'border-blue-500/20',
+    shadowClass: 'group-hover:shadow-[0_8px_20px_-4px_rgba(96,165,250,0.3)]'
   },
 
 ]
+
+// ... (existing code)
+
+{/* Feature Cards - Moved Up */ }
+<div className="space-y-4">
+  {features.map((item, i) => (
+    <div key={i} className="flex items-center gap-4 group">
+      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${item.bgColor} border ${item.borderColor} transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg ${item.shadowClass}`}>
+        <item.icon className={`w-7 h-7 ${item.iconColor}`} />
+      </div>
+      <div>
+        <p className={`text-base font-bold text-white group-hover:${item.iconColor} transition-colors`}>{item.title}</p>
+        <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
+      </div>
+    </div>
+  ))}
+</div>
 
 const stats = [
   { value: '94%', label: 'Doğruluk', icon: Zap },
@@ -296,41 +319,38 @@ export default function AICoach() {
             <SectionHeader
               badge="AI Coach"
               icon={<Brain className="w-4 h-4 text-emerald-400" />}
-              title={<>Kişisel <span className="text-gradient-emerald">AI Koç</span></>}
+              title={<>Kişisel <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">AI Koç</span></>}
               description="Sadece ne yapacağını söylemez, nasıl yapacağını da gösterir. Hatalarını yargılamaz, doğrusunu öğretir. Aklına takılan her soruyu cevaplayan, gelişim yolculuğundaki antrenörün."
               align="left"
-              className="mb-8"
+              className="mb-0"
             />
 
             {/* Feature Cards */}
+
+            {/* Stats Row - Moved Up */}
+
+            {/* Feature Cards - Moved Up */}
             <div className="space-y-4">
               {features.map((item, i) => (
-                <div
-                  key={i}
-                  className="group flex gap-4 items-start p-4 bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-emerald-500/20 rounded-2xl transition-all duration-300"
-                >
-                  <div className={`w-12 h-12 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
-                    <item.icon className="w-6 h-6 text-white" />
+                <div key={i} className="flex items-center gap-4 group">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${item.bgColor} border ${item.borderColor} transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg ${item.shadowClass}`}>
+                    <item.icon className={`w-6 h-6 ${item.iconColor}`} />
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-white text-base mb-1 group-hover:text-emerald-400 transition-colors">{item.title}</h4>
-                    <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
+                  <div>
+                    <p className={`text-base font-bold text-white group-hover:${item.iconColor} transition-colors`}>{item.title}</p>
+                    <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Stats Row */}
-            {/* Stats Row - Moved Up */}
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/5 mt-6">
+            {/* Stats Row - Moved Down with left alignment */}
+            <div className="flex items-center gap-8 lg:gap-12">
               {stats.map((stat, i) => (
-                <div
-                  key={i}
-                  className="text-center"
-                >
-                  <div className="text-2xl lg:text-3xl font-extrabold text-white mb-1">{stat.value}</div>
-                  <div className="flex items-center justify-center gap-1.5 text-xs text-white/40 font-medium uppercase tracking-wide">
-                    <stat.icon className="w-3.5 h-3.5 text-emerald-500" />
+                <div key={i} className="text-left group">
+                  <div className="text-xl lg:text-2xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{stat.value}</div>
+                  <div className="flex items-center justify-start gap-1.5 text-[10px] text-white/40 font-medium uppercase tracking-wide group-hover:text-white/60 transition-colors">
+                    <stat.icon className="w-3 h-3 text-emerald-500" />
                     {stat.label}
                   </div>
                 </div>
@@ -340,7 +360,7 @@ export default function AICoach() {
             {/* CTA Button */}
             <a
               href="/chat"
-              className="mt-6 w-full flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold rounded-2xl hover:shadow-xl hover:shadow-emerald-500/20 transition-all text-lg"
+              className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold rounded-2xl hover:shadow-xl hover:shadow-emerald-500/20 transition-all text-lg"
             >
               Şimdi Dene
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

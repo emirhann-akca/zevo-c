@@ -280,20 +280,6 @@ export default function AIMotionSection() {
                             className="mb-8"
                         />
 
-                        {/* Metric cards */}
-                        <div className="flex gap-3">
-                            {[
-                                { value: '17', label: 'Eklem Noktası' },
-                                { value: '30+', label: 'FPS Analiz' },
-                                { value: '<50', label: 'ms Gecikme' },
-                            ].map((stat) => (
-                                <div key={stat.label} className="bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 flex-1">
-                                    <p className="text-green-400 text-xl font-bold">{stat.value}</p>
-                                    <p className="text-white/40 text-[10px] mt-0.5">{stat.label}</p>
-                                </div>
-                            ))}
-                        </div>
-
                         {/* Feature list */}
                         <div className="space-y-3">
                             {FEATURES.map((feature) => (
@@ -309,6 +295,20 @@ export default function AIMotionSection() {
                                         <p className="text-white text-sm font-medium">{feature.label}</p>
                                         <p className="text-white/30 text-xs">{feature.desc}</p>
                                     </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Metric cards */}
+                        <div className="flex gap-3">
+                            {[
+                                { value: '17', label: 'Eklem Noktası' },
+                                { value: '30+', label: 'FPS Analiz' },
+                                { value: '<50', label: 'ms Gecikme' },
+                            ].map((stat) => (
+                                <div key={stat.label} className="flex-1">
+                                    <p className="text-green-400 text-3xl font-bold">{stat.value}</p>
+                                    <p className="text-white/40 text-[10px] uppercase tracking-wider mt-1">{stat.label}</p>
                                 </div>
                             ))}
                         </div>
