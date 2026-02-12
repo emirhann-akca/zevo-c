@@ -246,18 +246,6 @@ export default function AIMotionSection() {
                     },
                 })
 
-                gsap.from('.float-card', {
-                    scale: 0.8,
-                    opacity: 0,
-                    duration: 0.6,
-                    stagger: 0.2,
-                    ease: 'back.out(2)',
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: 'top 35%',
-                        toggleActions: 'play none none reverse',
-                    },
-                })
             }, sectionRef)
 
             return () => ctx.revert()
@@ -287,7 +275,7 @@ export default function AIMotionSection() {
                         <SectionHeader
                             badge="Yapay Zeka Motoru"
                             title={<>Hareketini <br /> <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">Analiz Et.</span></>}
-                            description="Kameranı aç, harekete başla. Yapay zeka seni tarar, her tekrarı sayar, hatalarını yakalar. Artık sen de profesyonelsin."
+                            description="Tek ihtiyacın bir kamera. Kameranı aç, harekete başla. Yapay zeka gerisini halleder. Seni tarar, tekrarlarını sayar ve hatalarını anında yakalar. Gelişimini şansa bırakma."
                             align="left"
                             className="mb-8"
                         />
@@ -464,50 +452,12 @@ export default function AIMotionSection() {
                             </div>
                         </div>
 
-                        {/* ============ FLOATING CARDS ============ */}
-                        <div
-                            className="float-card absolute -top-2 -right-2 lg:-right-12 bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] rounded-xl px-3 py-2 shadow-xl"
-                            style={{ animation: 'float1 3s ease-in-out infinite' }}
-                        >
-                            <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 bg-green-500/20 rounded-lg flex items-center justify-center">
-                                    <span className="text-xs">🧠</span>
-                                </div>
-                                <div>
-                                    <p className="text-white text-[10px] font-semibold">AI Motor Aktif</p>
-                                    <p className="text-green-400 text-[9px]">30 FPS • 12ms</p>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div
-                            className="float-card absolute -bottom-2 -left-2 lg:-left-12 bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] rounded-xl px-3 py-2 shadow-xl"
-                            style={{ animation: 'float2 3.5s ease-in-out infinite' }}
-                        >
-                            <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 bg-amber-500/20 rounded-lg flex items-center justify-center">
-                                    <span className="text-xs">📊</span>
-                                </div>
-                                <div>
-                                    <p className="text-white text-[10px] font-semibold">Analiz Raporu</p>
-                                    <p className="text-white/40 text-[9px]">Form: 94/100</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
 
-            <style jsx>{`
-        @keyframes float1 {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
-        }
-        @keyframes float2 {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
-        }
-      `}</style>
+
         </section>
     )
 }

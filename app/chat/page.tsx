@@ -1,0 +1,357 @@
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+
+// --- Types ---
+interface Message {
+    role: 'user' | 'ai';
+    content: string;
+}
+
+// --- Mock Data ---
+const MOCK_RESPONSES: string[] = [
+    "Antrenman verilerini analiz ettim.\n\nBugünkü squat performansın oldukça iyi görünüyor. Diz açın 85° ile doğru seviyede.\n\nBirkaç önerim var:\n• Topuk basıncını dengele\n• İniş hızını biraz yavaşlat\n• Nefes tekniğine dikkat et",
+    "Beslenme planını inceledim.\n\nGünlük kalori hedefe %78 ulaşmışsın — 1,847 / 2,400 kcal.\n\nProtein alımın iyi seviyede (142g). Önerilerim:\n• Karbonhidrat alımını artır\n• Antrenman öncesi öğünü öne al\n• Su tüketimini 3L'ye çıkar",
+    "Haftalık gelişim raporun hazır.\n\nBu hafta 4 antrenman tamamladın.\n\n• Bench Press: +5kg ilerleme\n• Squat: Form %8 iyileşti\n• Kardiyo: VO2 Max stabil\n\nGenel olarak hedefinin %80'indesin.",
+    "Form analizini tamamladım.\n\nDeadlift formunda düzeltme önerileri:\n\n• Sırt pozisyonu: Hafif lordoz koru\n• Kavrama genişliği: 2cm daralt\n• Kilitlenme: Kalçayı daha aktif kullan"
+];
+
+const SUGGESTIONS = [
+    "Antrenman planı oluştur",
+    "Beslenme analizi yap",
+    "Gelişim raporumu göster",
+    "Form düzeltme öner"
+];
+
+const HISTORY_ITEMS = [
+    "Squat form analizi",
+    "Haftalık beslenme planı",
+    "Kardiyo programı"
+];
+
+export default function ChatPage() {
+    // --- State ---
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [input, setInput] = useState('');
+    const [isTyping, setIsTyping] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // --- Refs ---
+    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // --- Effects ---
+
+    // Auto-resize textarea
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = '24px'; // Reset height
+            textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+        }
+    }, [input]);
+
+    // Scroll to bottom
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages, isTyping]);
+
+    // --- Handlers ---
+
+    const handleSendMessage = async (text: string = input) => {
+        if (!text.trim()) return;
+
+        // Add user message
+        const newMessage: Message = { role: 'user', content: text.trim() };
+        setMessages(prev => [...prev, newMessage]);
+        setInput('');
+        setIsTyping(true);
+
+        // Find appropriate response (mock logic)
+        let responseText = MOCK_RESPONSES[messages.length % MOCK_RESPONSES.length];
+
+        if (text.includes("Antrenman")) responseText = MOCK_RESPONSES[0];
+        else if (text.includes("Beslenme")) responseText = MOCK_RESPONSES[1];
+        else if (text.includes("Gelişim")) responseText = MOCK_RESPONSES[2];
+        else if (text.includes("Form")) responseText = MOCK_RESPONSES[3];
+
+        // Simulate network delay
+        setTimeout(() => {
+            setMessages(prev => [...prev, { role: 'ai', content: responseText }]);
+            setIsTyping(false);
+        }, 1500);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
+    };
+
+    // --- Components ---
+
+    const Sidebar = () => (
+        <div className={`
+      fixed top-0 left-0 h-screen w-[260px] bg-[#050b14] border-r border-white/[0.04] p-4 z-40
+      transition-transform duration-200 ease-in-out
+      ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      lg:translate-x-0
+      shadow-2xl shadow-black/50
+    `}>
+            {/* Top Part */}
+            <div className="flex items-center">
+                <span className="text-lg font-semibold text-white tracking-tight">ZEVO</span>
+                <span className="w-2 h-2 bg-[#10DC78] rounded-full inline-block ml-1 shadow-[0_0_10px_rgba(16,220,120,0.5)]"></span>
+            </div>
+
+            <button
+                onClick={() => {
+                    setMessages([]);
+                    setIsTyping(false);
+                    if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                }}
+                className="mt-6 w-full py-2.5 px-3 flex items-center gap-3 text-sm text-white/80 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg transition-colors group border border-white/[0.02]"
+            >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/40 group-hover:text-[#10DC78] transition-colors">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Yeni Sohbet
+            </button>
+
+            {/* History */}
+            <div className="mt-8">
+                <h3 className="text-[11px] uppercase tracking-wider text-white/30 font-medium mb-2 px-2">Bugün</h3>
+                <div className="space-y-1">
+                    {HISTORY_ITEMS.map((item, i) => (
+                        <div
+                            key={i}
+                            className="px-3 py-2 text-sm text-white/50 hover:text-white/90 hover:bg-white/[0.03] rounded-lg transition-colors cursor-pointer truncate"
+                        >
+                            {item}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Bottom */}
+            <div className="absolute bottom-0 left-0 w-full p-4 border-t border-white/[0.04] bg-[#050b14]">
+                <a href="/" className="flex items-center gap-2 text-xs text-white/40 hover:text-[#10DC78] transition-colors">
+                    <span>←</span> Ana Sayfa
+                </a>
+            </div>
+        </div>
+    );
+
+    const MobileHeader = () => (
+        <div className="lg:hidden fixed top-4 left-4 z-50">
+            <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="text-white/60 hover:text-white transition-colors p-2 bg-[#0A1628]/50 backdrop-blur-md rounded-lg border border-white/10"
+            >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    {isSidebarOpen ? (
+                        <><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></>
+                    ) : (
+                        <><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></>
+                    )}
+                </svg>
+            </button>
+        </div>
+    );
+
+    const MessageBubble = ({ msg }: { msg: Message }) => {
+        const isUser = msg.role === 'user';
+        const content = isUser ? msg.content : (
+            <div className="whitespace-pre-line">
+                {msg.content.split('\n').map((line, i) => {
+                    if (line.trim().startsWith('•')) {
+                        return (
+                            <div key={i} className="flex items-start pl-1 mb-1">
+                                <span className="mr-2 text-[#10DC78]">•</span>
+                                <span>{line.trim().substring(1).trim()}</span>
+                            </div>
+                        );
+                    }
+                    return <span key={i}>{line}{'\n'}</span>;
+                })}
+            </div>
+        );
+
+        return (
+            <div
+                className="py-6 border-b border-white/[0.04] animate-[fadeIn_0.4s_ease-out] flex"
+                style={{
+                    animationFillMode: 'forwards',
+                    animation: 'fadeIn 0.4s ease-out, slideUp 0.4s ease-out'
+                }}
+            >
+                {/* Avatar */}
+                <div className="flex-shrink-0">
+                    {isUser ? (
+                        <div className="w-8 h-8 rounded-full bg-[#10DC78]/20 flex items-center justify-center border border-[#10DC78]/30 shadow-[0_0_15px_rgba(16,220,120,0.1)]">
+                            <span className="text-xs font-bold text-[#10DC78]">S</span>
+                        </div>
+                    ) : (
+                        <div className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.06]">
+                            <span className="text-xs font-bold text-[#10DC78]">Z</span>
+                        </div>
+                    )}
+                </div>
+
+                {/* Content */}
+                <div className={`ml-4 text-[15px] leading-relaxed ${isUser ? 'text-white/95' : 'text-white/80'}`}>
+                    {content}
+                </div>
+
+                <style jsx>{`
+          @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+          @keyframes slideUp { from { transform: translateY(8px); } to { transform: translateY(0); } }
+        `}</style>
+            </div>
+        );
+    };
+
+    const TypingIndicator = () => (
+        <div className="py-6 border-b border-white/[0.04] flex animate-[fadeIn_0.4s_ease-out]">
+            <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.06]">
+                    <span className="text-xs font-bold text-[#10DC78]">Z</span>
+                </div>
+            </div>
+            <div className="ml-4 flex items-center gap-1 h-8">
+                <div className="w-1.5 h-1.5 bg-[#10DC78]/40 rounded-full animate-[typingBounce_0.6s_infinite_ease-in-out_0s]"></div>
+                <div className="w-1.5 h-1.5 bg-[#10DC78]/60 rounded-full animate-[typingBounce_0.6s_infinite_ease-in-out_0.15s]"></div>
+                <div className="w-1.5 h-1.5 bg-[#10DC78]/80 rounded-full animate-[typingBounce_0.6s_infinite_ease-in-out_0.3s]"></div>
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="min-h-screen bg-[#0A1628] text-white font-sans subpixel-antialiased selection:bg-[#10DC78] selection:text-[#0A1628] overflow-hidden">
+
+            {/* Background Ambience */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-[#10DC78] opacity-[0.03] blur-[100px]"></div>
+                <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#0EA968] opacity-[0.02] blur-[120px]"></div>
+            </div>
+
+            {/* Mobile Overlay */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
+            <Sidebar />
+            <MobileHeader />
+
+            <main className="lg:ml-[260px] min-h-screen relative flex flex-col z-10">
+                {messages.length === 0 ? (
+                    /* Empty State */
+                    <div className="flex-1 flex flex-col items-center justify-center px-4 pb-20 fade-in-up">
+                        <div className="mb-10 text-center relative">
+                            <div className="absolute -inset-10 bg-[#10DC78] opacity-[0.05] blur-3xl rounded-full pointer-events-none"></div>
+                            <h1 className="text-[56px] font-bold text-white tracking-tight leading-tight drop-shadow-lg">
+                                Merhaba
+                            </h1>
+                            <h2 className="text-[56px] font-bold text-white/20 tracking-tight leading-tight">
+                                Sana nasıl yardımcı olabilirim?
+                            </h2>
+                        </div>
+
+                        <div className="w-full max-w-2xl mx-auto mb-6">
+                            <div className="bg-[#121b2e]/80 backdrop-blur-xl rounded-2xl border border-white/[0.08] overflow-hidden flex items-end shadow-lg transition-all focus-within:border-[#10DC78]/50 focus-within:ring-1 focus-within:ring-[#10DC78]/20">
+                                <textarea
+                                    ref={textareaRef}
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder="Mesajınızı yazın..."
+                                    className="w-full bg-transparent text-[15px] text-white/90 placeholder:text-white/30 placeholder:normal-case resize-none outline-none border-none py-4 px-5 min-h-[56px] max-h-[120px]"
+                                    rows={1}
+                                />
+                                <button
+                                    onClick={() => handleSendMessage()}
+                                    className={`
+                      mr-3 mb-3 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300
+                      ${input.trim() ? 'bg-[#10DC78] text-[#0A1628] shadow-[0_0_15px_rgba(16,220,120,0.4)] hover:bg-[#0EA968] transform hover:scale-105' : 'bg-white/[0.05] text-white/20'}
+                    `}
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Chips */}
+                        <div className="flex flex-wrap gap-2.5 justify-center max-w-2xl">
+                            {SUGGESTIONS.map((chip, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => handleSendMessage(chip)}
+                                    className="text-[13px] font-medium text-white/60 bg-white/[0.03] border border-white/[0.08] rounded-full px-5 py-2.5 hover:border-[#10DC78]/50 hover:text-[#10DC78] hover:bg-[#10DC78]/5 transition-all cursor-pointer backdrop-blur-sm"
+                                >
+                                    {chip}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    /* Active State */
+                    <>
+                        <div className="flex-1 max-w-3xl w-full mx-auto pt-8 pb-40 px-4">
+                            {messages.map((msg, idx) => (
+                                <MessageBubble key={idx} msg={msg} />
+                            ))}
+                            {isTyping && <TypingIndicator />}
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Fixed Input Bar */}
+                        <div className="fixed bottom-0 lg:left-[260px] left-0 right-0 p-6 bg-gradient-to-t from-[#0A1628] via-[#0A1628]/95 to-transparent z-20">
+                            <div className="max-w-3xl w-full mx-auto">
+                                <div className="bg-[#121b2e]/90 backdrop-blur-xl rounded-2xl border border-white/[0.08] overflow-hidden flex items-end shadow-2xl shadow-black/20 focus-within:border-[#10DC78]/40 transition-colors">
+                                    <textarea
+                                        ref={(el) => {
+                                            if (el) {
+                                                el.style.height = '24px'; // Reset
+                                                el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+                                                textareaRef.current = el;
+                                            }
+                                        }}
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                                        onKeyDown={handleKeyDown}
+                                        placeholder="Mesajınızı yazın..."
+                                        className="w-full bg-transparent text-[15px] text-white/90 placeholder:text-white/30 placeholder:normal-case resize-none outline-none border-none py-4 px-5 min-h-[56px] max-h-[120px]"
+                                        rows={1}
+                                        autoFocus
+                                    />
+                                    <button
+                                        onClick={() => handleSendMessage()}
+                                        className={`
+                        mr-3 mb-3 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300
+                        ${input.trim() ? 'bg-[#10DC78] text-[#0A1628] shadow-[0_0_15px_rgba(16,220,120,0.4)] hover:bg-[#0EA968] transform hover:scale-105' : 'bg-white/[0.05] text-white/20'}
+                      `}
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div className="text-[11px] text-white/20 text-center mt-3 font-medium tracking-wide">
+                                    ZEVO AI hata yapabilir. Önemli bilgileri kontrol edin.
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </main>
+        </div>
+    );
+}

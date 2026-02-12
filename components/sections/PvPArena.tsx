@@ -59,20 +59,23 @@ export default function PvPArena() {
           )
         }
 
-        // Telefon fade-in
+        // Telefon fade-in + 360° rotation on first view
         gsap.fromTo(
           phoneRef.current,
-          { opacity: 0, x: 50, scale: 0.95 },
+          { opacity: 0, x: 50, scale: 0.95, rotationY: 360, transformPerspective: 1000 },
           {
             opacity: 1,
             x: 0,
             scale: 1,
+            rotationY: -5,
+            rotationX: 2,
+            transformPerspective: 1000,
             duration: 0.8,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: sectionRef.current,
               start: 'top 70%',
-              toggleActions: 'play none none reverse',
+              once: true,
             },
           }
         )
@@ -131,7 +134,7 @@ export default function PvPArena() {
               badge="PVP ARENA"
               icon={<span className="text-base">⚔️</span>}
               title={<>Gerçek Rakip. <br /> <span className="bg-gradient-to-r from-[#22c55e] to-[#f59e0b] bg-clip-text text-transparent">Gerçek Zamanlı.</span></>}
-              description="Arkadaşlarınla yarış, liderlik tablosunda yüksel. Hız düellosu, kalori yarışı veya takım savaşı — sen seç."
+              description="Arkadaşını davet et ya da rastgele rakip bul. Hız düellosu, kalori yarışı veya takım savaşı. Modu sen seç, kazanan sahada belli olsun."
               align="left"
               className="mb-8"
             />
@@ -183,9 +186,6 @@ export default function PvPArena() {
             <div
               ref={phoneRef}
               className="relative"
-              style={{
-                transform: 'perspective(1000px) rotateY(-5deg) rotateX(2deg)',
-              }}
             >
               {/* Glow */}
               <div
@@ -198,93 +198,85 @@ export default function PvPArena() {
               />
 
               <PhoneMockup className="h-[580px] w-[280px]">
-                {/* Status Bar */}
-                <div className="flex justify-between items-center px-5 pt-8 pb-2">
-                  <span className="text-white text-xs font-medium">9:41</span>
-                  <div className="flex items-center gap-1">
-                    <div className="w-4 h-2 border border-white/60 rounded-sm">
-                      <div className="w-3 h-1.5 bg-green-500 rounded-sm" />
+                <div className="flex flex-col h-full w-full">
+                  {/* Green Header */}
+                  <div className="mt-14 bg-gradient-to-r from-green-600 to-green-500 mx-3 rounded-xl px-4 py-2.5 flex justify-between items-center">
+                    <div>
+                      <p className="text-white/70 text-[9px] font-medium">CANLI MAÇ</p>
+                      <p className="text-white text-sm font-bold">PvP Arena</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-white/20 rounded-full px-2.5 py-1">
+                      <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                      <span className="text-white text-[9px] font-bold">LIVE</span>
                     </div>
                   </div>
-                </div>
 
-                {/* Green Header */}
-                <div className="bg-gradient-to-r from-green-600 to-green-500 mx-3 rounded-xl px-4 py-2.5 flex justify-between items-center">
-                  <div>
-                    <p className="text-white/70 text-[9px] font-medium">CANLI MAÇ</p>
-                    <p className="text-white text-sm font-bold">PvP Arena</p>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white/20 rounded-full px-2.5 py-1">
-                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                    <span className="text-white text-[9px] font-bold">LIVE</span>
-                  </div>
-                </div>
-
-                {/* VS Section */}
-                <div className="flex items-center justify-center gap-6 py-5 px-4">
-                  {/* Sen */}
-                  <div className="text-center">
-                    <div className="w-11 h-11 rounded-full border-2 border-green-500 bg-green-500/20 flex items-center justify-center mb-1">
-                      <span className="text-white text-base font-bold">S</span>
+                  {/* VS Section */}
+                  <div className="flex items-center justify-center gap-6 py-5 px-4">
+                    {/* Sen */}
+                    <div className="text-center">
+                      <div className="w-11 h-11 rounded-full border-2 border-green-500 bg-green-500/20 flex items-center justify-center mb-1">
+                        <span className="text-white text-base font-bold">S</span>
+                      </div>
+                      <p className="text-white text-[10px]">Sen</p>
+                      <p className="text-green-400 text-xl font-bold">12</p>
                     </div>
-                    <p className="text-white text-[10px]">Sen</p>
-                    <p className="text-green-400 text-xl font-bold">12</p>
-                  </div>
 
-                  {/* VS */}
-                  <div className="text-white/30 text-base font-bold">VS</div>
+                    {/* VS */}
+                    <div className="text-white/30 text-base font-bold">VS</div>
 
-                  {/* Rakip */}
-                  <div className="text-center">
-                    <div className="w-11 h-11 rounded-full border-2 border-gray-600 bg-gray-600/20 flex items-center justify-center mb-1">
-                      <span className="text-white text-base font-bold">R</span>
+                    {/* Rakip */}
+                    <div className="text-center">
+                      <div className="w-11 h-11 rounded-full border-2 border-gray-600 bg-gray-600/20 flex items-center justify-center mb-1">
+                        <span className="text-white text-base font-bold">R</span>
+                      </div>
+                      <p className="text-white text-[10px]">Rakip</p>
+                      <p className="text-white/70 text-xl font-bold">11</p>
                     </div>
-                    <p className="text-white text-[10px]">Rakip</p>
-                    <p className="text-white/70 text-xl font-bold">11</p>
                   </div>
-                </div>
 
-                {/* Progress Bar */}
-                <div className="px-4 mb-2">
-                  <div className="flex justify-between text-[9px] text-white/50 mb-1">
-                    <span>İlerleme</span>
-                    <span>%75</span>
-                  </div>
-                  <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full w-3/4 bg-gradient-to-r from-green-500 to-emerald-400 rounded-full" />
-                  </div>
-                </div>
-
-                {/* Stats Row */}
-                <div className="flex justify-around px-3 py-2.5 border-t border-white/5">
-                  <div className="text-center">
-                    <p className="text-white/40 text-[8px]">SÜRE</p>
-                    <p className="text-white text-[11px] font-bold">02:34</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-white/40 text-[8px]">KALORİ</p>
-                    <p className="text-green-400 text-[11px] font-bold">156</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-white/40 text-[8px]">HIZ</p>
-                    <p className="text-white text-[11px] font-bold">8.2</p>
-                  </div>
-                </div>
-
-                {/* Mini Activity */}
-                <div className="flex-1 flex items-center justify-center px-3 pb-3">
-                  <div className="w-full h-full bg-white/[0.02] rounded-xl border border-white/5 flex items-center justify-center gap-3">
-                    {/* Skeleton dots */}
-                    <div className="relative w-12 h-16">
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full" />
-                      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-green-500/80 rounded-full" />
-                      <div className="absolute top-3 left-0 w-1.5 h-1.5 bg-green-500/60 rounded-full" />
-                      <div className="absolute top-3 right-0 w-1.5 h-1.5 bg-green-500/60 rounded-full" />
-                      <div className="absolute top-7 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-green-500/80 rounded-full" />
-                      <div className="absolute bottom-1 left-1 w-1.5 h-1.5 bg-green-500/60 rounded-full" />
-                      <div className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-green-500/60 rounded-full" />
+                  {/* Progress Bar */}
+                  <div className="px-4 mb-2">
+                    <div className="flex justify-between text-[9px] text-white/50 mb-1">
+                      <span>İlerleme</span>
+                      <span>%75</span>
                     </div>
-                    <p className="text-white/20 text-[8px]">Hareket Analizi</p>
+                    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full w-3/4 bg-gradient-to-r from-green-500 to-emerald-400 rounded-full" />
+                    </div>
+                  </div>
+
+                  {/* Stats Row */}
+                  <div className="flex justify-around px-3 py-2.5 border-t border-white/5">
+                    <div className="text-center">
+                      <p className="text-white/40 text-[8px]">SÜRE</p>
+                      <p className="text-white text-[11px] font-bold">02:34</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-white/40 text-[8px]">KALORİ</p>
+                      <p className="text-green-400 text-[11px] font-bold">156</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-white/40 text-[8px]">HIZ</p>
+                      <p className="text-white text-[11px] font-bold">8.2</p>
+                    </div>
+                  </div>
+
+                  {/* Mini Activity */}
+                  <div className="flex-1 flex items-center justify-center px-3 pb-3">
+                    <div className="w-full h-full bg-white/[0.02] rounded-xl border border-white/5 flex items-center justify-center gap-3">
+                      {/* Skeleton dots */}
+                      <div className="relative w-12 h-16">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full" />
+                        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-green-500/80 rounded-full" />
+                        <div className="absolute top-3 left-0 w-1.5 h-1.5 bg-green-500/60 rounded-full" />
+                        <div className="absolute top-3 right-0 w-1.5 h-1.5 bg-green-500/60 rounded-full" />
+                        <div className="absolute top-7 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-green-500/80 rounded-full" />
+                        <div className="absolute bottom-1 left-1 w-1.5 h-1.5 bg-green-500/60 rounded-full" />
+                        <div className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-green-500/60 rounded-full" />
+                      </div>
+                      <p className="text-white/20 text-[8px]">Hareket Analizi</p>
+                    </div>
                   </div>
                 </div>
               </PhoneMockup>

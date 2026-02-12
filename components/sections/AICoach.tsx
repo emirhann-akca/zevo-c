@@ -1,17 +1,8 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { Brain, ThumbsUp, ThumbsDown, Sparkles, Zap, Target, TrendingUp, Volume2, MessageCircle } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
+import { Brain, Zap, Target, TrendingUp, Volume2, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
 import SectionHeader from '@/components/ui/SectionHeader'
-import PhoneMockup from '@/components/ui/PhoneMockup'
-
-const messages = [
-  { type: 'user', text: 'Şut tekniğimi nasıl geliştirebilirim?', time: '14:32' },
-  { type: 'ai', text: 'Bilek açınızı analiz ettim. 15° daha yukarı kaldırmanız rotasyonu %23 artıracak. Video göndereceğim.', time: '14:33' },
-  { type: 'user', text: 'Bugünkü performansım nasıldı?', time: '14:35' },
-  { type: 'ai', text: 'Harika! Bugün 847 kalori yaktın ve 3 kişisel rekor kırdın. Devam et! 💪', time: '14:36' },
-]
 
 const features = [
   {
@@ -26,12 +17,7 @@ const features = [
     desc: 'Haftalık gelişim raporları ve hedef belirleme',
     gradient: 'from-blue-500 to-cyan-500'
   },
-  {
-    icon: Volume2,
-    title: 'Sesli Koçluk',
-    desc: 'Antrenman sırasında sesli talimatlar ve motivasyon',
-    gradient: 'from-purple-500 to-pink-500'
-  }
+
 ]
 
 const stats = [
@@ -40,333 +26,329 @@ const stats = [
   { value: '24/7', label: 'Aktif Destek', icon: MessageCircle },
 ]
 
-export default function AICoach() {
-  const [activeMessage, setActiveMessage] = useState(0)
-  const [isTyping, setIsTyping] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
-  const sectionRef = useRef<HTMLElement>(null)
+interface ScriptStep {
+  type: 'user' | 'ai' | 'typing'
+  text?: string
+  delay: number
+}
 
-  // Visibility Check
+export default function AICoach() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
+  const [isChatStarted, setIsChatStarted] = useState(false)
+  const [messages, setMessages] = useState<Array<{ type: 'user' | 'ai', text: string }>>([])
+  const [isTyping, setIsTyping] = useState(false)
+
+  // Intersection Observer
   useEffect(() => {
     if (!sectionRef.current) return
     const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.1, rootMargin: '50px' }
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting)
+        if (!entry.isIntersecting) {
+          // Reset when out of view
+          setMessages([])
+          setIsTyping(false)
+          setIsChatStarted(false)
+        }
+      },
+      { threshold: 0.15, rootMargin: '-50px 0px' }
     )
     observer.observe(sectionRef.current)
     return () => observer.disconnect()
   }, [])
 
+  // Parchment Animation Delay
   useEffect(() => {
-    if (!isVisible) return
-
-    let timeout: NodeJS.Timeout
-
-    const interval = setInterval(() => {
-      setIsTyping(true)
-      timeout = setTimeout(() => {
-        setIsTyping(false)
-        setActiveMessage(prev => (prev + 1) % messages.length)
-      }, 1500)
-    }, 4000)
-
-    return () => {
-      clearInterval(interval)
-      if (timeout) clearTimeout(timeout)
+    if (isVisible) {
+      const timer = setTimeout(() => {
+        setIsChatStarted(true)
+      }, 600) // Wait for 600ms open animation
+      return () => clearTimeout(timer)
     }
   }, [isVisible])
 
-  return (
-    <section ref={sectionRef} id="ai-koc" className="relative py-16 lg:py-20 px-6 bg-[#0a0e1a] overflow-hidden">
-      <style>{`
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
-        }
-      `}</style>
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
 
-      {/* Animated Background Elements (Only animate if visible) */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Floating orb 1 - Optimized */}
-        <motion.div
-          className="absolute top-20 left-[10%] w-72 h-72 rounded-full will-change-transform"
-          style={{
-            background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0) 70%)',
-          }}
-          animate={isVisible ? {
-            y: [0, -30, 0],
-            scale: [1, 1.1, 1],
-          } : {}}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        {/* Floating orb 2 - Optimized */}
-        <motion.div
-          className="absolute bottom-20 right-[15%] w-96 h-96 rounded-full will-change-transform"
-          style={{
-            background: 'radial-gradient(circle, rgba(20, 184, 166, 0.12) 0%, rgba(20, 184, 166, 0) 70%)',
-          }}
-          animate={isVisible ? {
-            y: [0, 40, 0],
-            scale: [1, 0.9, 1],
-          } : {}}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
+  // Auto-scroll to bottom (without page jump)
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+    }
+  }, [messages, isTyping])
+
+  // Chat Loop Logic
+  useEffect(() => {
+    if (!isChatStarted) return
+
+    let timeouts: NodeJS.Timeout[] = []
+    let currentStep = 0
+    let mounted = true
+
+    const script: ScriptStep[] = [
+      { type: 'user', text: 'Bugün bacak antrenmanı yaptım, form kontrolüm nasıldı?', delay: 1000 },
+      { type: 'typing', delay: 1500 },
+      { type: 'ai', text: 'Squat formunu analiz ettim 📊 Diz açın 85° ile mükemmel seviyede. Ancak topuk kalkışında %12 sapma var. Düzeltme videosu hazırladım.', delay: 200 }, // Fast response after typing
+      { type: 'user', text: 'Kalori hedefime ne kadar yakınım?', delay: 2000 },
+      { type: 'typing', delay: 1500 },
+      { type: 'ai', text: 'Günlük hedefe %78 ulaştın 🔥 1,847 / 2,400 kcal. Protein alımın hedefin üstünde (142g), harika gidiyorsun!', delay: 200 } // Fast response after typing
+    ]
+
+    const runScript = () => {
+      if (!mounted) return
+
+      // Reset start
+      if (currentStep === 0) {
+        setMessages([])
+        setIsTyping(false)
+      }
+
+      if (currentStep >= script.length) {
+        // Loop finished, wait 4s then restart
+        const restartTimeout = setTimeout(() => {
+          if (!mounted) return
+          setMessages([])
+          currentStep = 0
+          runScript()
+        }, 4000)
+        timeouts.push(restartTimeout)
+        return
+      }
+
+      const step = script[currentStep]
+
+      if (step.type === 'typing') {
+        setIsTyping(true)
+        const timeout = setTimeout(() => {
+          if (!mounted) return
+          setIsTyping(false)
+          currentStep++
+          runScript()
+        }, step.delay)
+        timeouts.push(timeout)
+      } else {
+        const timeout = setTimeout(() => {
+          if (!mounted) return
+          setMessages(prev => [...prev, { type: step.type as 'user' | 'ai', text: step.text! }])
+          currentStep++
+          runScript()
+        }, step.delay)
+        timeouts.push(timeout)
+      }
+    }
+
+    runScript()
+
+    return () => {
+      mounted = false
+      timeouts.forEach(clearTimeout)
+    }
+  }, [isChatStarted])
+
+
+  return (
+    <section ref={sectionRef} id="yapay-zeka-kocu" className="relative py-20 lg:py-24 px-6 bg-[#0a0e1a] overflow-hidden">
+
+      {/* Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-teal-500/10 rounded-full blur-[100px]" />
       </div>
 
-      <div className="max-w-6xl mx-auto relative">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="flex flex-col lg:flex-row gap-16 items-center">
 
-          {/* ==================== LEFT - ENHANCED CHAT DEMO ==================== */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative"
-          >
-            {/* Decorative glow behind chat */}
-            {/* Decorative glow behind chat - Optimized (No Blur) */}
-            <div
-              className="absolute -inset-4 rounded-[40px] opacity-40"
-              style={{
-                background: 'radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, transparent 60%)',
-              }}
-            />
+          {/* ==================== LEFT - CHAT PANEL (%55-60) ==================== */}
+          <div className="w-full lg:w-[55%] order-first">
+            <div className="relative w-full max-w-[520px] mx-auto lg:mx-0">
 
-            {/* Chat Container - Wrapped in PhoneMockup */}
-            <PhoneMockup className="w-full max-w-sm mx-auto" glowColor="rgba(16, 185, 129, 0.15)">
-              <div className="h-full flex flex-col pt-12 px-2 bg-gradient-to-b from-[#0a0e1a] to-[#0d1221]">
-                {/* Shine effect */}
-                <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
-                  <div
-                    className="absolute -top-1/2 -left-1/2 w-full h-full"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%)'
-                    }}
-                  />
-                </div>
+              {/* Professional Ambient Glow - High Performance (No Blur) */}
+              <div
+                className="absolute -inset-px rounded-[24px] z-0 pointer-events-none transition-opacity duration-500"
+                style={{
+                  background: `
+                    radial-gradient(80% 80% at 50% -20%, rgba(16, 220, 120, 0.15) 0%, transparent 60%),
+                    radial-gradient(60% 60% at 100% 100%, rgba(20, 184, 166, 0.1) 0%, transparent 50%),
+                    radial-gradient(40% 40% at 0% 80%, rgba(16, 220, 120, 0.05) 0%, transparent 50%)
+                  `,
+                }}
+              />
 
-                {/* Shine effect */}
-                <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
-                  <div
-                    className="absolute -top-1/2 -left-1/2 w-full h-full"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%)'
-                    }}
-                  />
-                </div>
+              {/* Outer Bloom Layer - Creates depth behind the card */}
+              <div
+                className="absolute -inset-12 rounded-[60px] -z-10 pointer-events-none opacity-40"
+                style={{
+                  background: `
+                     radial-gradient(circle at 50% 40%, rgba(16, 220, 120, 0.12) 0%, transparent 70%)
+                   `
+                }}
+              />
+
+              {/* Subtle Border Gradient Accent */}
+              <div
+                className="absolute -inset-[1px] rounded-[25px] pointer-events-none opacity-40 z-0"
+                style={{
+                  background: 'linear-gradient(160deg, rgba(16,220,120,0.3) 0%, transparent 20%, transparent 80%, rgba(20,184,166,0.2) 100%)',
+                }}
+              />
+
+              {/* Chat Container */}
+              <div
+                className={`relative bg-[#0a0e1a]/80 border border-white/10 rounded-3xl p-6 min-h-[420px] flex flex-col shadow-2xl backdrop-blur-none origin-top`}
+                style={{
+                  transform: isVisible ? 'scaleY(1)' : 'scaleY(0)',
+                  opacity: isVisible ? 1 : 0,
+                  transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease'
+                }}
+              >
 
                 {/* Header */}
-                <div className="relative flex items-center gap-4 mb-6 pb-5 border-b border-white/10">
-                  <motion.div
-                    className="relative w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    {/* Animated gradient background - Optimized to pause */}
-                    <motion.div
-                      className="absolute inset-0"
-                      style={{
-                        background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 50%, #06b6d4 100%)'
-                      }}
-                      animate={isVisible ? {
-                        filter: ['hue-rotate(0deg)', 'hue-rotate(90deg)', 'hue-rotate(0deg)']
-                      } : {}}
-                      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                    />
-                    <Brain className="w-5 h-5 text-white relative z-10" />
-
-                    {/* Sparkle effect */}
-                    <motion.div
-                      className="absolute top-1 right-1"
-                      animate={isVisible ? { scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] } : {}}
-                      transition={{ duration: 4, repeat: Infinity }}
-                    >
-                      <Sparkles className="w-3 h-3 text-white/80" />
-                    </motion.div>
-                  </motion.div>
-
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-white text-sm">AI Coach</h3>
-                      <span className="px-1.5 py-0.5 bg-emerald-500/20 rounded-full text-[8px] font-semibold text-emerald-400 uppercase tracking-wider">Pro</span>
+                <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10 shrink-0">
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600">
+                      <Brain className="w-6 h-6 text-white" />
                     </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <div className="relative flex items-center justify-center w-2 h-2">
-                        <div className="w-2 h-2 bg-emerald-400 rounded-full z-10" />
-                        <motion.div
-                          className="absolute inset-0 bg-emerald-400 rounded-full"
-                          animate={isVisible ? { scale: [1, 3], opacity: [0.4, 0] } : {}}
-                          transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                        />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-white text-base">AI Coach</h3>
+                        <span className="px-2 py-0.5 bg-emerald-500/20 rounded-full text-[10px] font-bold text-emerald-400 uppercase tracking-wider">PRO</span>
                       </div>
-                      <span className="text-xs text-emerald-400/80">Aktif • Yanıt süresi ~1s</span>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                        <span className="text-xs text-emerald-400/80 font-medium">Aktif • Yanıt süresi ~1s</span>
+                      </div>
                     </div>
                   </div>
+                  <MoreHorizontal className="text-white/20 w-6 h-6" />
                 </div>
 
-                {/* Chat Messages */}
-                <div className="space-y-3 mb-4 min-h-[180px]">
-                  {messages.slice(0, activeMessage + 1).map((msg, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ duration: 0.4, ease: "easeOut" }}
-                      className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                {/* Messages Area - Bottom Aligned */}
+                <div ref={messagesContainerRef} className="min-h-[380px] space-y-4 mb-4 overflow-hidden flex flex-col">
+                  {messages.map((msg, idx) => (
+                    <div
+                      key={`${idx}-${msg.text.slice(0, 10)}`}
+                      className={`flex w-full ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                      style={{
+                        animation: 'chatIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        opacity: 0,
+                      }}
                     >
-                      <motion.div
-                        className={`max-w-[85%] relative group ${msg.type === 'user'
-                          ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 rounded-2xl rounded-br-sm'
-                          : 'bg-white/[0.06] border border-white/10 rounded-2xl rounded-bl-sm'
-                          } p-4`}
-                        whileHover={{ scale: 1.01 }}
-                      >
+                      <div className={`flex gap-3 max-w-[85%] ${msg.type === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                        {/* Avatar for AI */}
                         {msg.type === 'ai' && (
-                          <div className="absolute -left-2 -top-2 w-6 h-6 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center shadow-lg">
-                            <Brain className="w-3 h-3 text-white" />
+                          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-1">
+                            <Brain className="w-4 h-4 text-emerald-400" />
                           </div>
                         )}
-                        <p className="text-white text-xs leading-relaxed">{msg.text}</p>
-                        {msg.type === 'ai' && (
-                          <div className="flex gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button className="text-emerald-400 hover:bg-emerald-500/20 rounded-lg p-1 transition-all hover:scale-110">
-                              <ThumbsUp className="w-3 h-3" />
-                            </button>
-                            <button className="text-red-400 hover:bg-red-500/20 rounded-lg p-1 transition-all hover:scale-110">
-                              <ThumbsDown className="w-3 h-3" />
-                            </button>
-                          </div>
-                        )}
-                      </motion.div>
-                    </motion.div>
+
+                        {/* Bubble */}
+                        <div className={`
+                                            p-3.5 rounded-2xl text-sm leading-relaxed
+                                            ${msg.type === 'user'
+                            ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-br-none shadow-lg shadow-emerald-500/10'
+                            : 'bg-white/5 border border-white/10 text-white/90 rounded-bl-none'
+                          }
+                                        `}>
+                          {msg.text}
+                        </div>
+                      </div>
+                    </div>
                   ))}
 
                   {/* Typing Indicator */}
                   {isTyping && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="flex items-center gap-3"
-                    >
-                      <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
-                        <Brain className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="bg-white/[0.06] border border-white/10 rounded-2xl rounded-bl-sm px-4 py-3">
-                        <div className="flex gap-1.5">
-                          {[0, 1, 2].map((i) => (
-                            <div
-                              key={i}
-                              className="w-2 h-2 bg-emerald-400 rounded-full"
-                              style={{
-                                animation: `bounce 0.6s infinite ease-in-out`,
-                                animationDelay: `${i * 0.15}s`,
-                                animationFillMode: 'both'
-                              }}
-                            />
-                          ))}
+                    <div className="flex w-full justify-start animate-fade-in">
+                      <div className="flex gap-3 max-w-[85%]">
+                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-1">
+                          <Brain className="w-4 h-4 text-emerald-400" />
+                        </div>
+                        <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-bl-none flex items-center gap-1.5 h-12">
+                          <div className="w-1.5 h-1.5 bg-emerald-400/60 rounded-full animate-typing-dot" style={{ animationDelay: '0s' }} />
+                          <div className="w-1.5 h-1.5 bg-emerald-400/60 rounded-full animate-typing-dot" style={{ animationDelay: '0.2s' }} />
+                          <div className="w-1.5 h-1.5 bg-emerald-400/60 rounded-full animate-typing-dot" style={{ animationDelay: '0.4s' }} />
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   )}
                 </div>
 
                 {/* Input Area */}
-                <div className="relative">
-                  <div className="flex items-center gap-3 bg-white/[0.04] border border-white/10 rounded-2xl px-4 py-3">
+                <div className="relative mt-auto shrink-0">
+                  <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full p-1.5 pl-5">
                     <input
                       type="text"
                       placeholder="Koçuna bir şey sor..."
                       className="flex-1 bg-transparent text-white text-sm placeholder:text-white/30 outline-none"
-                      readOnly
+                      disabled
                     />
-                    <motion.button
-                      className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/25"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Sparkles className="w-5 h-5 text-white" />
-                    </motion.button>
+                    <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                      <Send className="w-4 h-4 text-white ml-0.5" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </PhoneMockup>
-          </motion.div>
 
-          {/* ==================== RIGHT - CONTENT ==================== */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            className="relative"
-          >
+              </div>
+            </div>
+          </div>
+
+          {/* ==================== RIGHT - CONTENT (%40-45) ==================== */}
+          <div className="w-full lg:w-[45%] space-y-8">
             <SectionHeader
               badge="AI Coach"
               icon={<Brain className="w-4 h-4 text-emerald-400" />}
-              title={<>Kişisel <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">AI Koç</span></>}
-              description={<>Sadece ne yapacağını söylemez, nasıl yapacağını da gösterir. Hatalarını yargılamaz, doğrusunu öğretir. Aklına takılan her soruyu cevaplayan, gelişim yolculuğundaki antrenörün.</>}
+              title={<>Kişisel <span className="text-gradient-emerald">AI Koç</span></>}
+              description="Sadece ne yapacağını söylemez, nasıl yapacağını da gösterir. Hatalarını yargılamaz, doğrusunu öğretir. Aklına takılan her soruyu cevaplayan, gelişim yolculuğundaki antrenörün."
               align="left"
               className="mb-8"
             />
 
             {/* Feature Cards */}
-            <div className="space-y-3 mb-6">
+            <div className="space-y-4">
               {features.map((item, i) => (
-                <motion.div
+                <div
                   key={i}
-                  initial={{ opacity: 0, x: 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15, duration: 0.5 }}
-                  whileHover={{ x: 6, scale: 1.01 }}
-                  className="group flex gap-3 items-center p-3 bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 hover:border-white/10 rounded-xl transition-all cursor-pointer"
+                  className="group flex gap-4 items-start p-4 bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-emerald-500/20 rounded-2xl transition-all duration-300"
                 >
-                  <div className={`w-10 h-10 bg-gradient-to-br ${item.gradient} rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow flex-shrink-0`}>
-                    <item.icon className="w-5 h-5 text-white" />
+                  <div className={`w-12 h-12 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
+                    <item.icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="font-bold text-white text-sm mb-0.5 group-hover:text-emerald-400 transition-colors">{item.title}</div>
-                    <div className="text-xs text-white/50">{item.desc}</div>
+                    <h4 className="font-bold text-white text-base mb-1 group-hover:text-emerald-400 transition-colors">{item.title}</h4>
+                    <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
                   </div>
-                  <motion.div
-                    className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    <svg className="w-4 h-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </motion.div>
-                </motion.div>
+                </div>
               ))}
             </div>
 
             {/* Stats Row */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="grid grid-cols-3 gap-4"
-            >
+            {/* Stats Row - Moved Up */}
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/5 mt-6">
               {stats.map((stat, i) => (
-                <motion.div
+                <div
                   key={i}
-                  className="relative group text-center p-3 bg-gradient-to-br from-white/[0.05] to-transparent border border-white/10 rounded-xl overflow-hidden"
-                  whileHover={{ scale: 1.03, borderColor: 'rgba(16, 185, 129, 0.3)' }}
+                  className="text-center"
                 >
-                  {/* Hover glow */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                  <div className="relative">
-                    <stat.icon className="w-4 h-4 text-emerald-400/50 mx-auto mb-1" />
-                    <div className="text-xl lg:text-2xl font-extrabold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">{stat.value}</div>
-                    <div className="text-[10px] text-white/40 mt-0.5 font-medium">{stat.label}</div>
+                  <div className="text-2xl lg:text-3xl font-extrabold text-white mb-1">{stat.value}</div>
+                  <div className="flex items-center justify-center gap-1.5 text-xs text-white/40 font-medium uppercase tracking-wide">
+                    <stat.icon className="w-3.5 h-3.5 text-emerald-500" />
+                    {stat.label}
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
-          </motion.div>
+            </div>
+
+            {/* CTA Button */}
+            <a
+              href="/chat"
+              className="mt-6 w-full flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold rounded-2xl hover:shadow-xl hover:shadow-emerald-500/20 transition-all text-lg"
+            >
+              Şimdi Dene
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </a>
+          </div>
+
         </div>
       </div>
     </section>

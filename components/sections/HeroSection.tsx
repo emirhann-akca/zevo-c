@@ -251,24 +251,28 @@ export default function HeroSection() {
                     </div>
 
                     <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-2 leading-[1.05]">
-                        Antrenörün Cebinde
+                        Antrenörün
                     </h1>
                     <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-7 leading-[1.05]">
                         <span className="bg-gradient-to-r from-[#22c55e] to-[#10DC78] bg-clip-text text-transparent">
-                            Olsa Nasıl Olurdu
+                            Cebinde
                         </span>
                     </h1>
 
                     <p className="text-lg text-gray-400 mb-9 leading-relaxed max-w-md">
-                        Yapay zeka destekli performans analiziyle antrenmanlarını optimize et.
+                        Antrenmanını ölç, analiz et, geliştr
+                        <br />
+                        hepsi tek uygulamada.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 mb-7">
                         <ComingSoonButton
-                            className="px-8 py-4 bg-gradient-to-r from-[#22c55e] to-[#10DC78] text-black font-bold rounded-2xl flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-emerald-500/20 transition-all min-w-[200px]"
+                            className="px-8 py-4 bg-gradient-to-r from-[#22c55e] to-[#10DC78] text-black font-bold rounded-2xl flex items-center justify-center hover:shadow-xl hover:shadow-emerald-500/20 transition-all min-w-[200px]"
                         >
-                            Şimdi Başla
-                            <ChevronRight className="w-5 h-5" />
+                            <div className="flex items-center gap-2 whitespace-nowrap">
+                                Şimdi Başla
+                                <ChevronRight className="w-5 h-5" />
+                            </div>
                         </ComingSoonButton>
                         <button className="px-8 py-4 bg-white/5 border border-white/10 text-white font-semibold rounded-2xl flex items-center gap-2 justify-center hover:bg-white/10 transition-all">
                             <Play className="w-5 h-5" />
