@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Dumbbell, Apple, Brain, Users, Trophy, ChevronRight } from 'lucide-react'
 import EnergyCircuitBackground from '@/components/effects/EnergyCircuitBackground'
 import SectionHeader from '@/components/ui/SectionHeader'
@@ -98,6 +98,37 @@ export default function Features() {
       targetSection: 'pvp-arena'
     },
   ]
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash
+      if (hash === '#ozellikler-antrenman') {
+        setTimeout(() => {
+          setSelectedFeature(features[0])
+          window.history.replaceState(null, '', window.location.pathname)
+        }, 800)
+      }
+      if (hash === '#ozellikler-koc') {
+        setTimeout(() => {
+          setSelectedFeature(features[2])
+          window.history.replaceState(null, '', window.location.pathname)
+        }, 800)
+      }
+      if (hash === '#ozellikler-pvp') {
+        setTimeout(() => {
+          setSelectedFeature(features[4])
+          window.history.replaceState(null, '', window.location.pathname)
+        }, 800)
+      }
+    }
+
+    // Check on mount
+    handleHashChange()
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, []) // features array is constant inside component, effectively static
 
   return (
     <section id="ozellikler" className="relative min-h-screen py-12 lg:py-16 px-6 bg-[#0a0e1a] flex flex-col justify-center overflow-hidden">

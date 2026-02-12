@@ -20,8 +20,8 @@ const FEATURES = [
     },
     {
         id: '02',
-        title: 'Global Spor Ağı',
-        desc: 'Yetenekleriniz keşfedilmeyi bekliyor. Zevo ile performans verileriniz dijital bir kimliğe dönüşür. Kulüpler, scoutlar ve diğer sporcularla etkileşime geçin, kariyerinize yön verin.',
+        title: 'Kişisel Program',
+        desc: 'Sadece sana özel, performansınla şekillenen ve hedeflerinle optimize edilmiş akıllı bir antrenman deneyimi. Yapay zeka; vücut analizini ve verilerini işleyerek tahminlere değil, gerçeklere dayalı en uygun gelişim rotasını çizer.',
         icon: Users,
         color: 'text-purple-400',
         bg: 'bg-purple-500/20',
@@ -288,10 +288,27 @@ export default function WhyZevo() {
                                         {feature.desc}
                                     </p>
 
-                                    <div className={`mt-8 flex items-center gap-2 font-bold ${feature.color} opacity-0 transition-all duration-500 ${activeFeature === index ? 'opacity-100 translate-x-0' : '-translate-x-4'}`}>
+                                    <a
+                                        href={index === 0 ? "#ozellikler-antrenman" : index === 1 ? "#ozellikler-koc" : index === 2 ? "#ozellikler-pvp" : "#ozellikler"}
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            if (index === 0) {
+                                                window.location.hash = '#ozellikler-antrenman'
+                                            } else if (index === 1) {
+                                                window.location.hash = '#ozellikler-koc'
+                                            } else if (index === 2) {
+                                                window.location.hash = '#ozellikler-pvp'
+                                            }
+
+                                            document.getElementById('ozellikler')?.scrollIntoView({
+                                                behavior: 'smooth', block: 'start'
+                                            })
+                                        }}
+                                        className={`mt-8 flex items-center gap-2 font-bold ${feature.color} opacity-0 transition-all duration-500 cursor-pointer ${activeFeature === index ? 'opacity-100 translate-x-0' : '-translate-x-4'}`}
+                                    >
                                         <span>Detaylı İncele</span>
                                         <ChevronRight className="w-5 h-5" />
-                                    </div>
+                                    </a>
                                 </div>
                             </div>
                         ))}

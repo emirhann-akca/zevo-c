@@ -46,6 +46,7 @@ export default function ComingSoonButton({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
+                        className="flex items-center gap-2 whitespace-nowrap"
                     >
                         {comingSoonText}
                     </motion.span>
@@ -55,6 +56,7 @@ export default function ComingSoonButton({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
+                        className="flex items-center gap-2 whitespace-nowrap"
                     >
                         {children}
                     </motion.span>

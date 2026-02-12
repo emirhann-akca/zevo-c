@@ -12,15 +12,15 @@ import PhoneMockup from '@/components/ui/PhoneMockup'
 // ================================
 
 const LEADERBOARD = [
-  { rank: '🥇', name: 'Ahmet Y.', score: 2450 },
-  { rank: '🥈', name: 'Elif K.', score: 2280 },
-  { rank: '🥉', name: 'Mert D.', score: 2115 },
+  { name: 'Ahmet Y.', score: 2450 },
+  { name: 'Elif K.', score: 2280 },
+  { name: 'Mert D.', score: 2115 },
 ]
 
 const FEATURE_CHIPS = [
-  { emoji: '⚡', label: 'Hız Düellosu' },
-  { emoji: '🔥', label: 'Kalori Yarışı' },
-  { emoji: '👥', label: 'Takım Savaşı' },
+  { label: 'Hız Düellosu' },
+  { label: 'Kalori Yarışı' },
+  { label: 'Takım Savaşı' },
 ]
 
 export default function PvPArena() {
@@ -132,7 +132,7 @@ export default function PvPArena() {
 
             <SectionHeader
               badge="PVP ARENA"
-              icon={<span className="text-base">⚔️</span>}
+              icon={<span className="text-base"></span>}
               title={<>Gerçek Rakip. <br /> <span className="bg-gradient-to-r from-[#22c55e] to-[#f59e0b] bg-clip-text text-transparent">Gerçek Zamanlı.</span></>}
               description="Arkadaşını davet et ya da rastgele rakip bul. Hız düellosu, kalori yarışı veya takım savaşı. Modu sen seç, kazanan sahada belli olsun."
               align="left"
@@ -144,10 +144,9 @@ export default function PvPArena() {
               {FEATURE_CHIPS.map((chip) => (
                 <div
                   key={chip.label}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-white/[0.08] text-sm"
+                  className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-white/[0.08] text-sm hover:scale-105 hover:bg-emerald-500/10 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-300 cursor-pointer"
                 >
-                  <span>{chip.emoji}</span>
-                  <span className="text-white/80 font-medium">{chip.label}</span>
+                  <span className="text-white/80 font-medium group-hover:text-emerald-400 transition-colors duration-300">{chip.label}</span>
                 </div>
               ))}
             </div>
@@ -163,11 +162,10 @@ export default function PvPArena() {
                       }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-lg">{player.rank}</span>
                       <span className="text-white text-sm font-medium">{player.name}</span>
                     </div>
                     <span className={`text-sm font-bold tabular-nums ${i === 0 ? 'text-[#22c55e]' : 'text-gray-400'}`}>
-                      {scores[i].toLocaleString()} puan
+                      {player.score.toLocaleString()} puan
                     </span>
                   </div>
                 ))}
