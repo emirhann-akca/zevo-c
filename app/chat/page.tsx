@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 // --- Types ---
 interface Message {
@@ -8,14 +8,7 @@ interface Message {
     content: string;
 }
 
-// --- Mock Data ---
-const MOCK_RESPONSES: string[] = [
-    "Antrenman verilerini analiz ettim.\n\nBugünkü squat performansın oldukça iyi görünüyor. Diz açın 85° ile doğru seviyede.\n\nBirkaç önerim var:\n• Topuk basıncını dengele\n• İniş hızını biraz yavaşlat\n• Nefes tekniğine dikkat et",
-    "Beslenme planını inceledim.\n\nGünlük kalori hedefe %78 ulaşmışsın — 1,847 / 2,400 kcal.\n\nProtein alımın iyi seviyede (142g). Önerilerim:\n• Karbonhidrat alımını artır\n• Antrenman öncesi öğünü öne al\n• Su tüketimini 3L'ye çıkar",
-    "Haftalık gelişim raporun hazır.\n\nBu hafta 4 antrenman tamamladın.\n\n• Bench Press: +5kg ilerleme\n• Squat: Form %8 iyileşti\n• Kardiyo: VO2 Max stabil\n\nGenel olarak hedefinin %80'indesin.",
-    "Form analizini tamamladım.\n\nDeadlift formunda düzeltme önerileri:\n\n• Sırt pozisyonu: Hafif lordoz koru\n• Kavrama genişliği: 2cm daralt\n• Kilitlenme: Kalçayı daha aktif kullan"
-];
-
+// --- Constants ---
 const SUGGESTIONS = [
     "Antrenman planı oluştur",
     "Beslenme analizi yap",
@@ -33,12 +26,14 @@ export default function ChatPage() {
     // --- State ---
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
+    const [isStreaming, setIsStreaming] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     // --- Refs ---
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     // --- Effects ---
 
@@ -53,39 +48,157 @@ export default function ChatPage() {
     // Scroll to bottom
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, isTyping]);
+    }, [messages, isStreaming]);
+
+    // --- Build history for API ---
+    const buildApiHistory = useCallback((msgs: Message[]) => {
+        return msgs.map(m => ({
+            role: m.role === 'user' ? 'user' as const : 'model' as const,
+            content: m.content,
+        }));
+    }, []);
 
     // --- Handlers ---
 
-    const handleSendMessage = async (text: string = input) => {
-        if (!text.trim()) return;
+    const handleSendMessage = useCallback(async (text: string = input) => {
+        if (!text.trim() || isStreaming) return;
+
+        setError(null);
 
         // Add user message
-        const newMessage: Message = { role: 'user', content: text.trim() };
-        setMessages(prev => [...prev, newMessage]);
+        const userMessage: Message = { role: 'user', content: text.trim() };
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
         setInput('');
-        setIsTyping(true);
+        setIsStreaming(true);
 
-        // Find appropriate response (mock logic)
-        let responseText = MOCK_RESPONSES[messages.length % MOCK_RESPONSES.length];
+        // Prepare AI placeholder message
+        const aiPlaceholder: Message = { role: 'ai', content: '' };
+        setMessages(prev => [...prev, aiPlaceholder]);
 
-        if (text.includes("Antrenman")) responseText = MOCK_RESPONSES[0];
-        else if (text.includes("Beslenme")) responseText = MOCK_RESPONSES[1];
-        else if (text.includes("Gelişim")) responseText = MOCK_RESPONSES[2];
-        else if (text.includes("Form")) responseText = MOCK_RESPONSES[3];
+        // Abort controller for cancellation
+        const abortController = new AbortController();
+        abortControllerRef.current = abortController;
 
-        // Simulate network delay
-        setTimeout(() => {
-            setMessages(prev => [...prev, { role: 'ai', content: responseText }]);
-            setIsTyping(false);
-        }, 1500);
-    };
+        try {
+            const response = await fetch('/api/ai/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: text.trim(),
+                    history: buildApiHistory(messages), // previous messages (before this one)
+                    streaming: true,
+                }),
+                signal: abortController.signal,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `Hata: ${response.status}`);
+            }
+
+            if (!response.body) {
+                throw new Error('Streaming yanıt alınamadı.');
+            }
+
+            // Read SSE stream
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let accumulatedContent = '';
+            let buffer = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+
+                // Process SSE lines
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || ''; // Keep incomplete line in buffer
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed || !trimmed.startsWith('data: ')) continue;
+
+                    try {
+                        const jsonStr = trimmed.slice(6); // Remove "data: "
+                        const parsed = JSON.parse(jsonStr);
+
+                        if (parsed.type === 'chunk' && parsed.content) {
+                            accumulatedContent += parsed.content;
+                            // Update AI message with accumulated content
+                            setMessages(prev => {
+                                const updated = [...prev];
+                                const lastIdx = updated.length - 1;
+                                if (lastIdx >= 0 && updated[lastIdx].role === 'ai') {
+                                    updated[lastIdx] = { ...updated[lastIdx], content: accumulatedContent };
+                                }
+                                return updated;
+                            });
+                        } else if (parsed.type === 'error') {
+                            throw new Error(parsed.message || 'AI yanıt hatası');
+                        }
+                        // 'done' type: stream ended naturally
+                    } catch (parseErr) {
+                        // Skip malformed SSE lines
+                        if (parseErr instanceof SyntaxError) continue;
+                        throw parseErr;
+                    }
+                }
+            }
+
+            // If no content was received, show fallback
+            if (!accumulatedContent.trim()) {
+                setMessages(prev => {
+                    const updated = [...prev];
+                    const lastIdx = updated.length - 1;
+                    if (lastIdx >= 0 && updated[lastIdx].role === 'ai') {
+                        updated[lastIdx] = { ...updated[lastIdx], content: 'Yanıt alınamadı. Lütfen tekrar deneyin.' };
+                    }
+                    return updated;
+                });
+            }
+
+        } catch (err: any) {
+            if (err.name === 'AbortError') {
+                // User cancelled — remove empty AI message
+                setMessages(prev => {
+                    const updated = [...prev];
+                    const lastIdx = updated.length - 1;
+                    if (lastIdx >= 0 && updated[lastIdx].role === 'ai' && !updated[lastIdx].content) {
+                        updated.pop();
+                    }
+                    return updated;
+                });
+            } else {
+                const errorMsg = err.message || 'Beklenmeyen bir hata oluştu.';
+                setError(errorMsg);
+                // Update AI message with error
+                setMessages(prev => {
+                    const updated = [...prev];
+                    const lastIdx = updated.length - 1;
+                    if (lastIdx >= 0 && updated[lastIdx].role === 'ai') {
+                        updated[lastIdx] = { ...updated[lastIdx], content: `⚠️ ${errorMsg}` };
+                    }
+                    return updated;
+                });
+            }
+        } finally {
+            setIsStreaming(false);
+            abortControllerRef.current = null;
+        }
+    }, [input, isStreaming, messages, buildApiHistory]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSendMessage();
         }
+    };
+
+    const handleStopStreaming = () => {
+        abortControllerRef.current?.abort();
     };
 
     // --- Components ---
@@ -107,7 +220,9 @@ export default function ChatPage() {
             <button
                 onClick={() => {
                     setMessages([]);
-                    setIsTyping(false);
+                    setIsStreaming(false);
+                    setError(null);
+                    abortControllerRef.current?.abort();
                     if (window.innerWidth < 1024) setIsSidebarOpen(false);
                 }}
                 className="mt-6 w-full py-2.5 px-3 flex items-center gap-3 text-sm text-white/80 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg transition-colors group border border-white/[0.02]"
@@ -173,6 +288,21 @@ export default function ChatPage() {
                             </div>
                         );
                     }
+                    // Bold text formatting (**text**)
+                    if (line.includes('**')) {
+                        const parts = line.split(/(\*\*[^*]+\*\*)/g);
+                        return (
+                            <span key={i}>
+                                {parts.map((part, j) => {
+                                    if (part.startsWith('**') && part.endsWith('**')) {
+                                        return <strong key={j} className="text-white font-semibold">{part.slice(2, -2)}</strong>;
+                                    }
+                                    return <span key={j}>{part}</span>;
+                                })}
+                                {'\n'}
+                            </span>
+                        );
+                    }
                     return <span key={i}>{line}{'\n'}</span>;
                 })}
             </div>
@@ -227,6 +357,9 @@ export default function ChatPage() {
         </div>
     );
 
+    // Check if the last AI message is still empty (waiting for first chunk)
+    const isWaitingForFirstChunk = isStreaming && messages.length > 0 && messages[messages.length - 1].role === 'ai' && !messages[messages.length - 1].content;
+
     return (
         <div className="min-h-screen bg-[#0A1628] text-white font-sans subpixel-antialiased selection:bg-[#10DC78] selection:text-[#0A1628] overflow-hidden">
 
@@ -261,6 +394,13 @@ export default function ChatPage() {
                             </h2>
                         </div>
 
+                        {/* Error Banner */}
+                        {error && (
+                            <div className="w-full max-w-2xl mx-auto mb-4 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+                                {error}
+                            </div>
+                        )}
+
                         <div className="w-full max-w-2xl mx-auto mb-6">
                             <div className="bg-[#121b2e]/80 backdrop-blur-xl rounded-2xl border border-white/[0.08] overflow-hidden flex items-end shadow-lg transition-all focus-within:border-[#10DC78]/50 focus-within:ring-1 focus-within:ring-[#10DC78]/20">
                                 <textarea
@@ -274,9 +414,10 @@ export default function ChatPage() {
                                 />
                                 <button
                                     onClick={() => handleSendMessage()}
+                                    disabled={isStreaming}
                                     className={`
                       mr-3 mb-3 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300
-                      ${input.trim() ? 'bg-[#10DC78] text-[#0A1628] shadow-[0_0_15px_rgba(16,220,120,0.4)] hover:bg-[#0EA968] transform hover:scale-105' : 'bg-white/[0.05] text-white/20'}
+                      ${input.trim() && !isStreaming ? 'bg-[#10DC78] text-[#0A1628] shadow-[0_0_15px_rgba(16,220,120,0.4)] hover:bg-[#0EA968] transform hover:scale-105' : 'bg-white/[0.05] text-white/20'}
                     `}
                                 >
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -293,7 +434,8 @@ export default function ChatPage() {
                                 <button
                                     key={i}
                                     onClick={() => handleSendMessage(chip)}
-                                    className="text-[13px] font-medium text-white/60 bg-white/[0.03] border border-white/[0.08] rounded-full px-5 py-2.5 hover:border-[#10DC78]/50 hover:text-[#10DC78] hover:bg-[#10DC78]/5 transition-all cursor-pointer backdrop-blur-sm"
+                                    disabled={isStreaming}
+                                    className="text-[13px] font-medium text-white/60 bg-white/[0.03] border border-white/[0.08] rounded-full px-5 py-2.5 hover:border-[#10DC78]/50 hover:text-[#10DC78] hover:bg-[#10DC78]/5 transition-all cursor-pointer backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {chip}
                                 </button>
@@ -307,13 +449,19 @@ export default function ChatPage() {
                             {messages.map((msg, idx) => (
                                 <MessageBubble key={idx} msg={msg} />
                             ))}
-                            {isTyping && <TypingIndicator />}
+                            {isWaitingForFirstChunk && <TypingIndicator />}
                             <div ref={messagesEndRef} />
                         </div>
 
                         {/* Fixed Input Bar */}
                         <div className="fixed bottom-0 lg:left-[260px] left-0 right-0 p-6 bg-gradient-to-t from-[#0A1628] via-[#0A1628]/95 to-transparent z-20">
                             <div className="max-w-3xl w-full mx-auto">
+                                {/* Error Banner */}
+                                {error && (
+                                    <div className="mb-3 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+                                        {error}
+                                    </div>
+                                )}
                                 <div className="bg-[#121b2e]/90 backdrop-blur-xl rounded-2xl border border-white/[0.08] overflow-hidden flex items-end shadow-2xl shadow-black/20 focus-within:border-[#10DC78]/40 transition-colors">
                                     <textarea
                                         ref={(el) => {
@@ -331,21 +479,33 @@ export default function ChatPage() {
                                         rows={1}
                                         autoFocus
                                     />
-                                    <button
-                                        onClick={() => handleSendMessage()}
-                                        className={`
-                        mr-3 mb-3 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300
-                        ${input.trim() ? 'bg-[#10DC78] text-[#0A1628] shadow-[0_0_15px_rgba(16,220,120,0.4)] hover:bg-[#0EA968] transform hover:scale-105' : 'bg-white/[0.05] text-white/20'}
-                      `}
-                                    >
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                                        </svg>
-                                    </button>
+                                    {isStreaming ? (
+                                        <button
+                                            onClick={handleStopStreaming}
+                                            className="mr-3 mb-3 w-9 h-9 rounded-xl flex items-center justify-center bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all duration-300 border border-red-500/30"
+                                            title="Yanıtı durdur"
+                                        >
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                                <rect x="6" y="6" width="12" height="12" rx="2" />
+                                            </svg>
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleSendMessage()}
+                                            className={`
+                            mr-3 mb-3 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300
+                            ${input.trim() ? 'bg-[#10DC78] text-[#0A1628] shadow-[0_0_15px_rgba(16,220,120,0.4)] hover:bg-[#0EA968] transform hover:scale-105' : 'bg-white/[0.05] text-white/20'}
+                          `}
+                                        >
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                            </svg>
+                                        </button>
+                                    )}
                                 </div>
                                 <div className="text-[11px] text-white/20 text-center mt-3 font-medium tracking-wide">
-                                    ZEVO AI hata yapabilir. Önemli bilgileri kontrol edin.
+                                    ZEVO AI · Gemini 2.0 Flash ile güçlendirildi
                                 </div>
                             </div>
                         </div>

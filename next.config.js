@@ -5,6 +5,7 @@ const nextConfig = {
   },
   experimental: {
     optimizeCss: true,
+    serverComponentsExternalPackages: ['@google-cloud/vertexai'],
   },
 }
 
