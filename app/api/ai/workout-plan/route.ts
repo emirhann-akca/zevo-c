@@ -1,9 +1,18 @@
+/**
+ * ZEVO Workout Plan API Route
+ * 
+ * Security: Rate limiting (5/min), input sanitization, error sanitization
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getVertexAIService } from '@/lib/ai/vertex-ai-web.service';
-import { checkRateLimit } from '@/lib/ai/rate-limiter';
+import { validateApiRequest, sanitizeErrorForClient } from '@/lib/ai/security';
+import { sanitizeMessage } from '@/lib/ai/sanitize';
 
 export const runtime = 'nodejs';
 export const maxDuration = 90;
+
+const ENDPOINT = '/api/ai/workout-plan';
 
 const WORKOUT_SCHEMA = {
     type: 'object',
@@ -59,20 +68,16 @@ const WORKOUT_SCHEMA = {
 
 export async function POST(request: NextRequest) {
     try {
-        // Rate limiting
-        const clientIP =
-            request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
-        if (!checkRateLimit(clientIP, 10, 60000)) {
-            return NextResponse.json(
-                { error: 'Çok fazla istek gönderildi. Lütfen biraz bekleyin.' },
-                { status: 429 }
-            );
-        }
-
         const body = await request.json();
         const { sportType, level, goals, injuries, daysPerWeek } = body;
 
-        // Validate
+        // ── Security validation pipeline ──
+        const security = validateApiRequest(request, ENDPOINT, sportType);
+        if (!security.passed) {
+            return security.response!;
+        }
+
+        // ── Input validation ──
         if (!sportType || !level || !goals?.length) {
             return NextResponse.json(
                 { error: 'Spor türü, seviye ve hedefler gereklidir.' },
@@ -80,14 +85,20 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Sanitize text inputs
+        const cleanSport = sanitizeMessage(sportType);
+        const cleanLevel = sanitizeMessage(level);
+        const cleanGoals = (goals as string[]).map((g: string) => sanitizeMessage(g));
+        const cleanInjuries = injuries ? (injuries as string[]).map((i: string) => sanitizeMessage(i)) : [];
+
         const vertexAI = getVertexAIService();
 
         const prompt = `Şu kriterlere göre bir antrenman planı oluştur:
-- Spor türü: ${sportType}
-- Seviye: ${level}
-- Hedefler: ${goals.join(', ')}
+- Spor türü: ${cleanSport}
+- Seviye: ${cleanLevel}
+- Hedefler: ${cleanGoals.join(', ')}
 - Haftalık antrenman günü: ${daysPerWeek || 3}
-${injuries?.length ? `- Yaralanmalar: ${injuries.join(', ')} (bu yaralanmaları dikkate al)\n` : ''}
+${cleanInjuries.length ? `- Yaralanmalar: ${cleanInjuries.join(', ')} (bu yaralanmaları dikkate al)\n` : ''}
 8 haftalık, bilimsel ve güvenli bir antrenman planı oluştur.`;
 
         const workoutPlan = await vertexAI.generateStructured(
@@ -98,8 +109,9 @@ ${injuries?.length ? `- Yaralanmalar: ${injuries.join(', ')} (bu yaralanmaları 
         return NextResponse.json(workoutPlan);
     } catch (error) {
         console.error('Workout plan API error:', error);
+        const clientError = sanitizeErrorForClient(error, 'Antrenman planı oluşturulurken bir hata oluştu.');
         return NextResponse.json(
-            { error: 'Antrenman planı oluşturulurken bir hata oluştu.' },
+            { error: clientError.message },
             { status: 500 }
         );
     }

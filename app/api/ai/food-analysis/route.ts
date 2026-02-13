@@ -1,9 +1,19 @@
+/**
+ * ZEVO Food Analysis API Route
+ * 
+ * Security: Rate limiting (10/min), threat detection, image validation,
+ * body size limit (15MB), error sanitization
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getVertexAIService } from '@/lib/ai/vertex-ai-web.service';
-import { checkRateLimit } from '@/lib/ai/rate-limiter';
+import { validateApiRequest, sanitizeErrorForClient } from '@/lib/ai/security';
+import { validateImageBase64, validateImageMimeType } from '@/lib/ai/sanitize';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
+
+const ENDPOINT = '/api/ai/food-analysis';
 
 function buildNutritionPrompt(userProfile?: any): string {
     let prompt = `Sen Zevo'nun AI Diyetisyenisin. Yemek fotoğraflarından KAPSAMLI beslenme analizi yaparsın.
@@ -74,19 +84,16 @@ SADECE JSON DÖNDÜR, BAŞKA HİÇBİR ŞEY YAZMA!`;
 
 export async function POST(request: NextRequest) {
     try {
-        // Rate limiting
-        const clientIP =
-            request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
-        if (!checkRateLimit(clientIP, 20, 60000)) {
-            return NextResponse.json(
-                { error: 'Çok fazla istek gönderildi. Lütfen biraz bekleyin.' },
-                { status: 429 }
-            );
+        // ── Security validation pipeline ──
+        const security = validateApiRequest(request, ENDPOINT);
+        if (!security.passed) {
+            return security.response!;
         }
 
         const body = await request.json();
         const { imageBase64, mimeType, userProfile } = body;
 
+        // ── Image validation ──
         if (!imageBase64) {
             return NextResponse.json(
                 { error: 'Görüntü verisi gereklidir.' },
@@ -94,10 +101,17 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Validate image size (~10MB max in base64)
-        if (imageBase64.length > 13_000_000) {
+        const imageValidation = validateImageBase64(imageBase64);
+        if (!imageValidation.valid) {
             return NextResponse.json(
-                { error: 'Görüntü boyutu çok büyük. Lütfen daha küçük bir görüntü yükleyin.' },
+                { error: imageValidation.error || 'Geçersiz görüntü verisi.' },
+                { status: 400 }
+            );
+        }
+
+        if (mimeType && !validateImageMimeType(mimeType)) {
+            return NextResponse.json(
+                { error: 'Desteklenmeyen görüntü formatı. JPEG, PNG, GIF, WebP kullanın.' },
                 { status: 400 }
             );
         }
@@ -144,8 +158,9 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(analysis);
     } catch (error) {
         console.error('Food analysis API error:', error);
+        const clientError = sanitizeErrorForClient(error, 'Görüntü analizi yapılırken bir hata oluştu.');
         return NextResponse.json(
-            { error: 'Görüntü analizi yapılırken bir hata oluştu.' },
+            { error: clientError.message },
             { status: 500 }
         );
     }

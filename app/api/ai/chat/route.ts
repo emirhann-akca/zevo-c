@@ -1,28 +1,33 @@
+/**
+ * ZEVO AI Chat API Route
+ * 
+ * Security: Rate limiting (30/min), threat detection, input sanitization,
+ * error sanitization, streaming support
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getVertexAIService } from '@/lib/ai/vertex-ai-web.service';
 import { buildCoachSystemPrompt } from '@/lib/ai/build-system-prompt';
-import { checkRateLimit } from '@/lib/ai/rate-limiter';
+import { validateApiRequest, sanitizeErrorForClient, logSecurityEvent } from '@/lib/ai/security';
 import { sanitizeMessage, sanitizeHistory } from '@/lib/ai/sanitize';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
+const ENDPOINT = '/api/ai/chat';
+
 export async function POST(request: NextRequest) {
     try {
-        // Rate limiting
-        const clientIP =
-            request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
-        if (!checkRateLimit(clientIP, 30, 60000)) {
-            return NextResponse.json(
-                { error: 'Çok fazla istek gönderildi. Lütfen biraz bekleyin.' },
-                { status: 429 }
-            );
-        }
-
         const body = await request.json();
         const { message, history, sportType, injuries, streaming } = body;
 
-        // Validate
+        // ── Security validation pipeline ──
+        const security = validateApiRequest(request, ENDPOINT, message);
+        if (!security.passed) {
+            return security.response!;
+        }
+
+        // ── Input validation ──
         if (!message || typeof message !== 'string' || !message.trim()) {
             return NextResponse.json(
                 { error: 'Mesaj boş olamaz.' },
@@ -30,7 +35,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const cleanMessage = sanitizeMessage(message);
+        const cleanMessage = security.sanitizedMessage || sanitizeMessage(message);
         const cleanHistory = sanitizeHistory(history || []);
 
         // Build user profile for context detection
@@ -89,8 +94,9 @@ export async function POST(request: NextRequest) {
         });
     } catch (error) {
         console.error('AI Chat API error:', error);
+        const clientError = sanitizeErrorForClient(error, 'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.');
         return NextResponse.json(
-            { error: 'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.' },
+            { error: clientError.message },
             { status: 500 }
         );
     }

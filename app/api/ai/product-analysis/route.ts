@@ -1,9 +1,18 @@
+/**
+ * ZEVO Product Analysis API Route
+ * 
+ * Security: Rate limiting (15/min), input sanitization, error sanitization
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getVertexAIService } from '@/lib/ai/vertex-ai-web.service';
-import { checkRateLimit } from '@/lib/ai/rate-limiter';
+import { validateApiRequest, sanitizeErrorForClient } from '@/lib/ai/security';
+import { sanitizeMessage } from '@/lib/ai/sanitize';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
+
+const ENDPOINT = '/api/ai/product-analysis';
 
 const ANALYSIS_SCHEMA = {
     type: 'object',
@@ -31,19 +40,16 @@ const ANALYSIS_SCHEMA = {
 
 export async function POST(request: NextRequest) {
     try {
-        // Rate limiting
-        const clientIP =
-            request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
-        if (!checkRateLimit(clientIP, 20, 60000)) {
-            return NextResponse.json(
-                { error: 'Çok fazla istek gönderildi. Lütfen biraz bekleyin.' },
-                { status: 429 }
-            );
-        }
-
         const body = await request.json();
         const { product, userProfile, dailyIntake } = body;
 
+        // ── Security validation pipeline ──
+        const security = validateApiRequest(request, ENDPOINT, product?.name);
+        if (!security.passed) {
+            return security.response!;
+        }
+
+        // ── Input validation ──
         if (!product?.name) {
             return NextResponse.json(
                 { error: 'Ürün bilgisi gereklidir.' },
@@ -53,11 +59,12 @@ export async function POST(request: NextRequest) {
 
         const vertexAI = getVertexAIService();
 
-        // Build prompt (identical logic to mobile's buildDietitianPrompt)
+        // Build prompt with sanitized inputs
+        const cleanName = sanitizeMessage(product.name);
         let prompt =
             "Sen Zevo Fitness App'in profesyonel AI diyetisyenisin. Bu ürünü analiz et ve Zevo Score hesapla.\n\n";
-        prompt += `ÜRÜN BİLGİLERİ:\n- İsim: ${product.name}\n`;
-        if (product.brand) prompt += `- Marka: ${product.brand}\n`;
+        prompt += `ÜRÜN BİLGİLERİ:\n- İsim: ${cleanName}\n`;
+        if (product.brand) prompt += `- Marka: ${sanitizeMessage(product.brand)}\n`;
 
         if (product.nutritionFacts) {
             const nf = product.nutritionFacts;
@@ -69,11 +76,12 @@ export async function POST(request: NextRequest) {
             if (nf.fiber) prompt += `  - Lif: ${nf.fiber} g\n`;
             if (nf.sugar) prompt += `  - Şeker: ${nf.sugar} g\n`;
             if (nf.sodium) prompt += `  - Sodyum: ${nf.sodium} mg\n`;
-            if (nf.servingSize) prompt += `  - Porsiyon: ${nf.servingSize}\n`;
+            if (nf.servingSize) prompt += `  - Porsiyon: ${sanitizeMessage(nf.servingSize)}\n`;
         }
 
         if (product.ingredients?.length) {
-            prompt += `- İçindekiler: ${product.ingredients.join(', ')}\n`;
+            const cleanIngredients = (product.ingredients as string[]).map((i: string) => sanitizeMessage(i));
+            prompt += `- İçindekiler: ${cleanIngredients.join(', ')}\n`;
         }
 
         prompt += '\n';
@@ -140,8 +148,9 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(analysis);
     } catch (error) {
         console.error('Product analysis API error:', error);
+        const clientError = sanitizeErrorForClient(error, 'Ürün analizi yapılırken bir hata oluştu.');
         return NextResponse.json(
-            { error: 'Ürün analizi yapılırken bir hata oluştu.' },
+            { error: clientError.message },
             { status: 500 }
         );
     }
