@@ -17,10 +17,15 @@ interface Feature {
   animation: 'fade' | 'slide' | 'scale' | 'rotate';
   layout: 'square' | 'full';
   targetSection?: string;
+  listTitle?: string;
 }
 
 export default function Features() {
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null)
+
+
+
+
 
   const features: Feature[] = [
     {
@@ -28,12 +33,13 @@ export default function Features() {
       icon: Dumbbell,
       title: 'Antrenman',
       shortDescription: 'AI destekli antrenman programları',
-      detailedDescription: 'ZEVO\'nun yapay zeka teknolojisi, senin fiziksel durumunu, hedeflerini ve günlük formunu analiz ederek tamamen kişiselleştirilmiş antrenman programları oluşturur.',
+      detailedDescription: 'ZEVO\'nun yapay zeka algoritması, fiziksel verilerini ve anlık form durumunu işleyerek, gelişim sürecini yavaşlatan yaygın antrenman hatalarını elimine eder ve sana özel optimize edilmiş bir akış sunar.',
       benefits: [
-        'Günlük form analizine göre dinamik program ayarlaması',
-        'Yaralanma riskini minimize eden akıllı antrenman planı',
-        'Hedeflerine en kısa yoldan ulaşmanı sağlayan optimizasyon',
+        'Verimsiz ve Sabit Programlar: Gelişimi durduran, güncel formuna uymayan statik listeler.',
+        'Bilinçsiz Yüklenme ve Sakatlık: Vücudun sınırlarını analiz etmeden yapılan riskli planlamalar.',
+        'Hedefsiz Egzersiz Karmaşası: Hangi hareketin senin hedefine hizmet ettiğine dair belirsizlik.',
       ],
+      listTitle: 'SORUNLAR',
       animation: 'fade',
       layout: 'square',
       targetSection: 'hareket-analizi'
@@ -43,12 +49,14 @@ export default function Features() {
       icon: Apple,
       title: 'Beslenme',
       shortDescription: 'Kişiselleştirilmiş beslenme planı',
-      detailedDescription: 'Yediklerini yazmakla uğraşma! Tabağının fotoğrafını çek veya ürünün barkodunu okut, ZEVO yapay zeka ile besin değerlerini otomatik hesaplasın.',
+      detailedDescription: 'ZEVO, sadece kalorilerini saymaz; metabolizmana ve hedeflerine uygun dinamik bir beslenme planı oluşturur. Görsel analiz ve barkod teknolojisiyle yediklerini bu planla anlık olarak eşleştirerek, \'bugün ne yesem?\' belirsizliğini ve hesaplama karmaşasını elimine eden uçtan uca bir yönetim sunar.',
       benefits: [
-        'Saniyeler içinde kalori ve makro hesaplaması',
-        'Yüzlerce Türk yemeği veritabanı',
-        'Günlük beslenme raporları ve öneriler'
+        'Plansızlık ve Kararsızlık: Öğün saati geldiğinde yaşanan "Ne yemeliyim?" stresi ve bunun yol açtığı sağlıksız kaçamaklar.',
+        'Sürdürülemez Yasaklar: Gerçekçi olmayan katı listelerin yarattığı psikolojik baskı ve diyeti bozma eğilimi.',
+        'Zaman Alan Veri Girişi: Planı uygularken tek tek ürün aramanın yarattığı bıkkınlık ve takibi bırakma riski.',
+        'Dengesiz Makro Dağılımı: Rastgele beslenerek kalori hedefini tutturup, kas inşası için gereken protein dengesini kaçırmak.'
       ],
+      listTitle: 'SORUNLAR',
       animation: 'slide',
       layout: 'square',
       targetSection: 'beslenme'
@@ -58,12 +66,13 @@ export default function Features() {
       icon: Brain,
       title: 'Yapay Zeka Koç',
       shortDescription: 'Kişisel AI koçluk sistemi',
-      detailedDescription: 'Telefon kameran artık senin profesyonel koçun! İskelet takip sistemi, yaptığın hareketleri saniye saniye izler, sayar ve form hatalarını anında bildirir.',
+      detailedDescription: 'ZEVO\'nun görüntü işleme teknolojisi, telefon kamerasını kullanarak iskelet sistemini saniye saniye haritalar. Vücut açılarını ve hareket menzilini analiz ederek, seni sakatlayabilecek en ufak duruş bozukluğunu bile tespit eder ve anlık sesli komutlarla düzeltir.',
       benefits: [
-        'Milimetrik hassasiyette hareket takibi',
-        'Gerçek zamanlı form düzeltme önerileri',
-        'Sesli koçluk ve motivasyon'
+        'Görünmez Form Hataları: Dışarıdan bir göz olmadığı için fark edilmeyen yanlış açılar ve sakatlık riski.',
+        'Yarım ve Verimsiz Tekrar: Zorlandığında hareketin menzilinden çalarak gelişimi yavaşlatmak.',
+        'Odak ve Sayım Kaybı: "Kaçıncı tekrardayım?" karmaşasıyla zihinsel odağın bozulması.'
       ],
+      listTitle: 'SORUNLAR',
       animation: 'scale',
       layout: 'full',
       targetSection: 'ai-koc'
@@ -73,12 +82,13 @@ export default function Features() {
       icon: Users,
       title: 'Ekipler',
       shortDescription: 'Takım arkadaşlarınla antrenman',
-      detailedDescription: 'Arkadaşlarınla özel lig oluştur. Gerçek zamanlı skor takibi, liderlik tabloları ve başarım sistemi ile motivasyonun hiç düşmez.',
+      detailedDescription: 'ZEVO, antrenman verilerini analiz ederek arkadaşlarınla yarışabileceğin dinamik bir lig ortamı oluşturur. Bireysel performansını bir takım oyununa dönüştürerek, süreci şeffaf ve ölçülebilir bir rekabet ekosistemine taşır.',
       benefits: [
-        'Arkadaşlarınla özel lig oluşturma',
-        'Takım bazlı liderlik tabloları',
-        'Grup antrenman challenge\'ları'
+        'Hesap Verilebilirlik Eksikliği: Sürecini takip eden bir göz veya rakip olmadığı için antrenmanları kolayca ertelemek.',
+        'İzole ve Monoton Süreç: Tek başına çalışmanın zamanla yarattığı sıkıcılık ve rekabet eksikliği.',
+        'Kıyaslama Yetersizliği: Gelişimini başkalarıyla karşılaştıramadığın için gerçek potansiyelini ve seviyeni görememek.'
       ],
+      listTitle: 'SORUNLAR',
       animation: 'rotate',
       layout: 'square'
     },
@@ -87,12 +97,13 @@ export default function Features() {
       icon: Trophy,
       title: 'PvP Arena',
       shortDescription: 'Gerçek zamanlı rekabet',
-      detailedDescription: 'Sadece spor yapma, yarış! İster aynı branşta hız yarışı, ister farklı branşlarda 300 kaloriye ilk ulaşan kazansın modu.',
+      detailedDescription: 'ZEVO, antrenmanı dijital bir arenaya dönüştürür. Yapay zeka tabanlı iskelet takip sistemi, müsabaka sırasında tarafsız bir hakem gibi çalışır. Sadece nizami formda yapılan tekrarları geçerli sayarak, uzaktan rekabetteki güven ve adalet sorununu kökten çözer.',
       benefits: [
-        'Gerçek zamanlı PvP (oyuncu vs oyuncu) maçlar',
-        'Global ve yerel liderlik tabloları',
-        'Kazandıkça açılan özel rozetler ve ödüller'
+        'Hileli Rekabet: Kazanma hırsıyla hareketin formundan çalarak (yarım yaparak) elde edilen haksız puanlar.',
+        'Düşük Antrenman Yoğunluğu: Rakip baskısı olmadığı için sınırları zorlamadan, "konfor alanında" yapılan verimsiz çalışmalar.',
+        'Adaletsiz Eşleşme: Kendi seviyende olmayan rakiplerle yarışmanın yarattığı motivasyon kırılması ve dengesizlik.'
       ],
+      listTitle: 'SORUNLAR',
       animation: 'fade',
       layout: 'square',
       targetSection: 'pvp-arena'
@@ -310,15 +321,17 @@ export default function Features() {
                       <h4 className="text-sm font-bold text-white/50 uppercase tracking-wider mb-3">
                         NASIL ÇALIŞIR?
                       </h4>
-                      <p className="text-white/80 leading-relaxed text-lg">
-                        {selectedFeature.detailedDescription}
-                      </p>
+                      <div className="max-h-[140px] overflow-y-auto pr-2 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+                        <p className="text-white/80 leading-relaxed text-lg pb-4">
+                          {selectedFeature.detailedDescription}
+                        </p>
+                      </div>
                     </div>
 
                     {/* Benefits Grid */}
                     <div>
                       <h4 className="text-sm font-bold text-white/50 uppercase tracking-wider mb-4">
-                        AVANTAJLAR
+                        {selectedFeature.listTitle || 'AVANTAJLAR'}
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {selectedFeature.benefits.map((benefit, index) => (
@@ -330,7 +343,16 @@ export default function Features() {
                             className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors"
                           >
                             <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                            <span className="text-white/90 text-sm font-medium">{benefit}</span>
+                            <span className="text-white/90 text-sm font-medium">
+                              {benefit.includes(':') ? (
+                                <>
+                                  <span className="font-bold text-white block mb-0.5">{benefit.split(':')[0]}:</span>
+                                  <span className="text-white/70">{benefit.substring(benefit.indexOf(':') + 1)}</span>
+                                </>
+                              ) : (
+                                benefit
+                              )}
+                            </span>
                           </motion.div>
                         ))}
                       </div>

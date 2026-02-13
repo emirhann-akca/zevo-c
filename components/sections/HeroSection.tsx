@@ -260,7 +260,7 @@ export default function HeroSection() {
                     </h1>
 
                     <p className="text-lg text-gray-400 mb-9 leading-relaxed max-w-md">
-                        Antrenmanını ölç, analiz et, geliştr
+                        Antrenmanını ölç, analiz et, geliştir
                         <br />
                         hepsi tek uygulamada.
                     </p>

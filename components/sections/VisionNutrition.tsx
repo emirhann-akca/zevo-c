@@ -44,7 +44,7 @@ const features = [
 
 const stats = [
   { value: '%95', label: 'Doğruluk', icon: CheckCircle },
-  { value: '500+', label: 'Türk Yemeği', icon: Database },
+  { value: '5000+', label: 'Toplam Veri Sayısı', icon: Database },
   { value: '<2s', label: 'Analiz Süresi', icon: Zap },
 ]
 
