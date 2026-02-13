@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { X, Dumbbell, Apple, Brain, Users, Trophy, ChevronRight } from 'lucide-react'
+import { X, Dumbbell, Apple, Brain, Users, Trophy, ChevronRight, Activity, ShieldCheck, Target, TriangleAlert, CircleHelp, FileX, Shuffle, Camera, PieChart, Mic, TrendingUp } from 'lucide-react'
 import EnergyCircuitBackground from '@/components/effects/EnergyCircuitBackground'
 import SectionHeader from '@/components/ui/SectionHeader'
 import ComingSoonButton from '@/components/ui/ComingSoonButton'
@@ -13,19 +13,25 @@ interface Feature {
   title: string;
   shortDescription: string;
   detailedDescription: string;
-  benefits: string[];
+  problems?: {
+    title: string;
+    description: string;
+    icon: React.ElementType;
+  }[];
+  benefits: {
+    title: string;
+    description: string;
+    icon?: React.ElementType;
+  }[];
   animation: 'fade' | 'slide' | 'scale' | 'rotate';
   layout: 'square' | 'full';
   targetSection?: string;
   listTitle?: string;
+  problemTitle?: string;
 }
 
 export default function Features() {
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null)
-
-
-
-
 
   const features: Feature[] = [
     {
@@ -33,13 +39,43 @@ export default function Features() {
       icon: Dumbbell,
       title: 'Antrenman',
       shortDescription: 'AI destekli antrenman programları',
-      detailedDescription: 'ZEVO\'nun yapay zeka algoritması, fiziksel verilerini ve anlık form durumunu işleyerek, gelişim sürecini yavaşlatan yaygın antrenman hatalarını elimine eder ve sana özel optimize edilmiş bir akış sunar.',
-      benefits: [
-        'Verimsiz ve Sabit Programlar: Gelişimi durduran, güncel formuna uymayan statik listeler.',
-        'Bilinçsiz Yüklenme ve Sakatlık: Vücudun sınırlarını analiz etmeden yapılan riskli planlamalar.',
-        'Hedefsiz Egzersiz Karmaşası: Hangi hareketin senin hedefine hizmet ettiğine dair belirsizlik.',
+      detailedDescription: 'Fiziksel verilerini analiz eder, sana özel akış oluşturur.||Her gün. Otomatik.',
+      problems: [
+        {
+          title: 'Statik ve Verimsiz',
+          description: 'Güncel formunu yok sayan basmakalıp listeler.',
+          icon: FileX
+        },
+        {
+          title: 'Sakatlık Riski',
+          description: 'Vücut sınırlarını bilmeden yapılan bilinçsiz yüklenmeler.',
+          icon: TriangleAlert
+        },
+        {
+          title: 'Hedef Karmaşası',
+          description: 'Neye yaradığı belirsiz rastgele rotalar.',
+          icon: Shuffle
+        }
       ],
-      listTitle: 'SORUNLAR',
+      benefits: [
+        {
+          title: 'Dinamik ve Canlı Programlar',
+          description: 'Statik listeleri unut. Formuna göre anlık güncellenen, seninle yaşayan bir akış.',
+          icon: Activity
+        },
+        {
+          title: 'Akıllı Yüklenme ve Güvenlik',
+          description: 'Sınırlarını analiz eden AI ile sakatlık riskini minimize et, güvenle geliş.',
+          icon: ShieldCheck
+        },
+        {
+          title: 'Hedef Odaklı Netlik',
+          description: 'Karmaşa yok. Her hareketin seni hedefe götürdüğü net bir rota.',
+          icon: Target
+        },
+      ],
+      listTitle: 'ZEVO FARKI',
+      problemTitle: 'GELENEKSEL YÖNTEMLER NEDEN YETERSİZ?',
       animation: 'fade',
       layout: 'square',
       targetSection: 'hareket-analizi'
@@ -49,14 +85,43 @@ export default function Features() {
       icon: Apple,
       title: 'Beslenme',
       shortDescription: 'Kişiselleştirilmiş beslenme planı',
-      detailedDescription: 'ZEVO, sadece kalorilerini saymaz; metabolizmana ve hedeflerine uygun dinamik bir beslenme planı oluşturur. Görsel analiz ve barkod teknolojisiyle yediklerini bu planla anlık olarak eşleştirerek, \'bugün ne yesem?\' belirsizliğini ve hesaplama karmaşasını elimine eden uçtan uca bir yönetim sunar.',
-      benefits: [
-        'Plansızlık ve Kararsızlık: Öğün saati geldiğinde yaşanan "Ne yemeliyim?" stresi ve bunun yol açtığı sağlıksız kaçamaklar.',
-        'Sürdürülemez Yasaklar: Gerçekçi olmayan katı listelerin yarattığı psikolojik baskı ve diyeti bozma eğilimi.',
-        'Zaman Alan Veri Girişi: Planı uygularken tek tek ürün aramanın yarattığı bıkkınlık ve takibi bırakma riski.',
-        'Dengesiz Makro Dağılımı: Rastgele beslenerek kalori hedefini tutturup, kas inşası için gereken protein dengesini kaçırmak.'
+      detailedDescription: 'Sadece kalori saymaz. Metabolizmana ve hedeflerine uygun dinamik bir beslenme planı oluşturur.||Görsel analiz ve barkod teknolojisiyle. Anlık.',
+      problems: [
+        {
+          title: 'Plansızlık ve Kararsızlık',
+          description: '"Ne yesem?" stresi ve sağlıksız kaçamaklar.',
+          icon: CircleHelp
+        },
+        {
+          title: 'Sürdürülemez Yasaklar',
+          description: 'Katı diyetlerin yarattığı psikolojik baskı ve bozma eğilimi.',
+          icon: TriangleAlert
+        },
+        {
+          title: 'Dengesiz Makro Dağılımı',
+          description: 'Kaloriyi tutturup protein dengesini kaçırmak.',
+          icon: Shuffle
+        }
       ],
-      listTitle: 'SORUNLAR',
+      benefits: [
+        {
+          title: 'Dinamik Beslenme Planı',
+          description: 'Hedefine göre güncellenen, esnek bir beslenme akışı.',
+          icon: Activity
+        },
+        {
+          title: 'Görsel & Barkod Takip',
+          description: 'Fotoğraf çek veya barkod okut, gerisini AI halleder.',
+          icon: Camera
+        },
+        {
+          title: 'Akıllı Makro Dengesi',
+          description: 'Protein, yağ, karbonhidrat dengesini otomatik optimize eder.',
+          icon: PieChart
+        },
+      ],
+      listTitle: 'ZEVO FARKI',
+      problemTitle: 'Klasik Diyetler Neden İşe Yaramıyor?',
       animation: 'slide',
       layout: 'square',
       targetSection: 'beslenme'
@@ -66,13 +131,43 @@ export default function Features() {
       icon: Brain,
       title: 'Yapay Zeka Koç',
       shortDescription: 'Kişisel AI koçluk sistemi',
-      detailedDescription: 'ZEVO\'nun görüntü işleme teknolojisi, telefon kamerasını kullanarak iskelet sistemini saniye saniye haritalar. Vücut açılarını ve hareket menzilini analiz ederek, seni sakatlayabilecek en ufak duruş bozukluğunu bile tespit eder ve anlık sesli komutlarla düzeltir.',
-      benefits: [
-        'Görünmez Form Hataları: Dışarıdan bir göz olmadığı için fark edilmeyen yanlış açılar ve sakatlık riski.',
-        'Yarım ve Verimsiz Tekrar: Zorlandığında hareketin menzilinden çalarak gelişimi yavaşlatmak.',
-        'Odak ve Sayım Kaybı: "Kaçıncı tekrardayım?" karmaşasıyla zihinsel odağın bozulması.'
+      detailedDescription: 'Telefon kamerasıyla iskelet sistemini haritalandırır, form hatalarını tespit eder.||Anlık sesli komutlarla düzeltir.',
+      problems: [
+        {
+          title: 'Görünmez Form Hataları',
+          description: 'Fark edilmeyen yanlış açılar ve sakatlık riski.',
+          icon: CircleHelp
+        },
+        {
+          title: 'Yarım Tekrar',
+          description: 'Menzilden çalarak gelişimi yavaşlatmak.',
+          icon: TriangleAlert
+        },
+        {
+          title: 'Odak Kaybı',
+          description: 'Sürekli sayı sayarak zihinsel odağın bozulması.',
+          icon: Shuffle
+        }
       ],
-      listTitle: 'SORUNLAR',
+      benefits: [
+        {
+          title: 'Gerçek Zamanlı Form Analizi',
+          description: 'Vücut açılarını izler, hataları anında yakalar.',
+          icon: Activity
+        },
+        {
+          title: 'Sesli Koçluk',
+          description: 'Sesli komutlarla formu anında düzeltir.',
+          icon: Mic
+        },
+        {
+          title: 'Hareket Menzili Takibi',
+          description: 'Tekrarın tam menzilde yapıldığından emin olur.',
+          icon: Target
+        },
+      ],
+      listTitle: 'ZEVO FARKI',
+      problemTitle: 'Koçsuz Antrenman Neden Riskli?',
       animation: 'scale',
       layout: 'full',
       targetSection: 'ai-koc'
@@ -82,13 +177,43 @@ export default function Features() {
       icon: Users,
       title: 'Ekipler',
       shortDescription: 'Takım arkadaşlarınla antrenman',
-      detailedDescription: 'ZEVO, antrenman verilerini analiz ederek arkadaşlarınla yarışabileceğin dinamik bir lig ortamı oluşturur. Bireysel performansını bir takım oyununa dönüştürerek, süreci şeffaf ve ölçülebilir bir rekabet ekosistemine taşır.',
-      benefits: [
-        'Hesap Verilebilirlik Eksikliği: Sürecini takip eden bir göz veya rakip olmadığı için antrenmanları kolayca ertelemek.',
-        'İzole ve Monoton Süreç: Tek başına çalışmanın zamanla yarattığı sıkıcılık ve rekabet eksikliği.',
-        'Kıyaslama Yetersizliği: Gelişimini başkalarıyla karşılaştıramadığın için gerçek potansiyelini ve seviyeni görememek.'
+      detailedDescription: 'Antrenman verilerini analiz eder, arkadaşlarınla yarışabileceğin dinamik bir lig ortamı oluşturur.||Performansını takım oyununa dönüştürür.',
+      problems: [
+        {
+          title: 'Hesap Verilebilirlik',
+          description: 'Sürecini takip eden bir rakip olmadığı için ertelemek.',
+          icon: CircleHelp
+        },
+        {
+          title: 'İzole Süreç',
+          description: 'Tek başına çalışmanın yarattığı monotonluk ve rekabet eksikliği.',
+          icon: TriangleAlert
+        },
+        {
+          title: 'Kıyaslama Eksikliği',
+          description: 'Gelişimini karşılaştıramadığın için seviyeni görememek.',
+          icon: Shuffle
+        }
       ],
-      listTitle: 'SORUNLAR',
+      benefits: [
+        {
+          title: 'Dinamik Lig Sistemi',
+          description: 'Arkadaşlarınla haftalık sıralama ve rekabet ortamı.',
+          icon: Trophy
+        },
+        {
+          title: 'Takım Motivasyonu',
+          description: 'Birlikte hedef koy, birbirinizi takip et ve motive ol.',
+          icon: Users
+        },
+        {
+          title: 'Şeffaf Performans Takibi',
+          description: 'Gelişimini rakiplerle kıyasla, gerçek potansiyelini gör.',
+          icon: TrendingUp
+        },
+      ],
+      listTitle: 'ZEVO FARKI',
+      problemTitle: 'TEK BAŞINA ANTRENMAN NEDEN ZORLUYOR?',
       animation: 'rotate',
       layout: 'square'
     },
@@ -97,13 +222,43 @@ export default function Features() {
       icon: Trophy,
       title: 'PvP Arena',
       shortDescription: 'Gerçek zamanlı rekabet',
-      detailedDescription: 'ZEVO, antrenmanı dijital bir arenaya dönüştürür. Yapay zeka tabanlı iskelet takip sistemi, müsabaka sırasında tarafsız bir hakem gibi çalışır. Sadece nizami formda yapılan tekrarları geçerli sayarak, uzaktan rekabetteki güven ve adalet sorununu kökten çözer.',
-      benefits: [
-        'Hileli Rekabet: Kazanma hırsıyla hareketin formundan çalarak (yarım yaparak) elde edilen haksız puanlar.',
-        'Düşük Antrenman Yoğunluğu: Rakip baskısı olmadığı için sınırları zorlamadan, "konfor alanında" yapılan verimsiz çalışmalar.',
-        'Adaletsiz Eşleşme: Kendi seviyende olmayan rakiplerle yarışmanın yarattığı motivasyon kırılması ve dengesizlik.'
+      detailedDescription: 'Antrenmanı dijital bir arenaya dönüştürür, AI hakemliği ile tarafsızlık sağlar.||Uzaktan rekabette güven ve adalet sorununu çözer.',
+      problems: [
+        {
+          title: 'Hileli Rekabet',
+          description: 'Kazanma hırsıyla hareketin formunu bozarak elde edilen haksız puanlar.',
+          icon: CircleHelp
+        },
+        {
+          title: 'Düşük Yoğunluk',
+          description: 'Rakip baskısı olmadığı için sınırları zorlamayan verimsiz çalışmalar.',
+          icon: TriangleAlert
+        },
+        {
+          title: 'Adaletsiz Eşleşme',
+          description: 'Kendi seviyende olmayan rakiplerle yarışmanın yarattığı motivasyon kırılması.',
+          icon: Shuffle
+        }
       ],
-      listTitle: 'SORUNLAR',
+      benefits: [
+        {
+          title: 'Tarafsız AI Hakemliği',
+          description: 'Sadece nizami formda yapılan tekrarları geçerli sayar.',
+          icon: ShieldCheck
+        },
+        {
+          title: 'Dinamik Eşleşme',
+          description: 'Kendi seviyendeki rakiplerle adil ve rekabetçi müsabakalar.',
+          icon: Users
+        },
+        {
+          title: 'Gerçek Zamanlı Rekabet',
+          description: 'Mesafeleri ortadan kaldıran, anlık veri senkronizasyonu.',
+          icon: Activity
+        },
+      ],
+      listTitle: 'ZEVO FARKI',
+      problemTitle: 'Geleneksel Rekabet Neden Yetersiz?',
       animation: 'fade',
       layout: 'square',
       targetSection: 'pvp-arena'
@@ -149,10 +304,9 @@ export default function Features() {
       {/* Sadece ortaya subtle glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, transparent 70%)',
-            filter: 'blur(80px)'
+            background: 'radial-gradient(circle, rgba(16, 185, 129, 0.04) 0%, transparent 70%)'
           }}
         />
       </div>
@@ -271,21 +425,24 @@ export default function Features() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedFeature(null)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100]"
+              className="fixed inset-0 bg-black/90 z-[100]"
             />
 
             {/* Modal Container */}
             <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 pointer-events-none">
               <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 20, filter: 'blur(10px)' }}
-                animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, scale: 0.95, y: 20, filter: 'blur(10px)', transition: { duration: 0.2 } }}
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20, transition: { duration: 0.2 } }}
                 transition={{ type: 'spring', duration: 0.5, bounce: 0.3 }}
                 className="pointer-events-auto w-full max-w-2xl bg-[#0f172a] border border-white/10 rounded-3xl shadow-2xl shadow-emerald-500/10 overflow-hidden relative"
               >
                 {/* Background Glow Effects */}
                 <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-emerald-500/10 to-transparent pointer-events-none" />
-                <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+                <div
+                  className="absolute -top-20 -right-20 w-64 h-64 pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%)' }}
+                />
 
                 {/* Close Button */}
                 <button
@@ -308,51 +465,96 @@ export default function Features() {
                       <h3 className="text-3xl font-bold text-white mb-2">
                         {selectedFeature.title}
                       </h3>
-                      <p className="text-emerald-400 font-medium">
+                      <p className="text-emerald-400 font-medium mb-2">
                         {selectedFeature.shortDescription}
                       </p>
+                      {selectedFeature.problems && (
+                        <p className="text-gray-300 text-sm leading-relaxed max-w-md">
+                          {selectedFeature.detailedDescription.split('||')[0]}
+                          <span className="text-white font-semibold"> {selectedFeature.detailedDescription.split('||')[1]}</span>
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   {/* Body Content */}
-                  <div className="space-y-8">
-                    {/* Description */}
-                    <div>
-                      <h4 className="text-sm font-bold text-white/50 uppercase tracking-wider mb-3">
-                        NASIL ÇALIŞIR?
-                      </h4>
-                      <div className="max-h-[140px] overflow-y-auto pr-2 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
-                        <p className="text-white/80 leading-relaxed text-lg pb-4">
-                          {selectedFeature.detailedDescription}
-                        </p>
+                  <div className="space-y-6">
+                    {/* Description Section (Only if no problems, otherwise it is in header) */}
+                    {!selectedFeature.problems && (
+                      <div className="mb-4">
+                        <div className="max-h-[140px] overflow-y-auto pr-2 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+                          <p className="text-white/80 leading-relaxed text-lg pb-4">
+                            {selectedFeature.detailedDescription}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
-                    {/* Benefits Grid */}
-                    <div>
-                      <h4 className="text-sm font-bold text-white/50 uppercase tracking-wider mb-4">
-                        {selectedFeature.listTitle || 'AVANTAJLAR'}
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* Problems Section (Only if exists) */}
+                    {selectedFeature.problems && (
+                      <div className="mb-6">
+                        <h4 className="text-sm font-bold text-white/50 uppercase tracking-wider mb-2">
+                          {selectedFeature.problemTitle || 'SORUNLAR'}
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          {selectedFeature.problems.map((problem, index) => (
+                            <motion.div
+                              key={index}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="bg-white/5 border border-orange-500/10 rounded-xl p-3 flex flex-col gap-2 group hover:bg-white/10 transition-colors"
+                            >
+                              <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                                <problem.icon className="w-4 h-4 text-orange-400 group-hover:text-orange-400 transition-colors" />
+                              </div>
+                              <div>
+                                <h5 className="font-semibold text-white/90 text-sm mb-0.5">{problem.title}</h5>
+                                <p className="text-white/50 text-xs leading-relaxed">{problem.description}</p>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+
+                        {/* Separator Line */}
+                        <hr className="border-emerald-500/20 my-4" />
+                      </div>
+                    )}
+
+                    {/* Benefits List */}
+                    <div className="mb-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-emerald-500/50" />
+                        <h4 className="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 uppercase tracking-[0.2em]">
+                          {selectedFeature.listTitle || 'AVANTAJLAR'}
+                        </h4>
+                        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-emerald-500/50" />
+                      </div>
+                      <div className="flex flex-col gap-2">
                         {selectedFeature.benefits.map((benefit, index) => (
                           <motion.div
                             key={index}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 + (index * 0.1) }}
+                            className={`flex items-center gap-3 p-3 rounded-xl border transition-colors duration-200 group ${benefit.title === 'Akıllı Yüklenme ve Güvenlik'
+                              ? 'bg-emerald-500/10 border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.1)] scale-[1.01]'
+                              : 'bg-white/5 border-emerald-500/20 hover:border-emerald-500/40 hover:bg-emerald-500/5'
+                              }`}
                           >
-                            <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                            <span className="text-white/90 text-sm font-medium">
-                              {benefit.includes(':') ? (
-                                <>
-                                  <span className="font-bold text-white block mb-0.5">{benefit.split(':')[0]}:</span>
-                                  <span className="text-white/70">{benefit.substring(benefit.indexOf(':') + 1)}</span>
-                                </>
-                              ) : (
-                                benefit
-                              )}
-                            </span>
+                            {/* Icon if exists, or simple dot */}
+                            {benefit.icon ? (
+                              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0 group-hover:bg-emerald-500/20 transition-colors">
+                                <benefit.icon className="w-5 h-5 text-emerald-400" />
+                              </div>
+                            ) : (
+                              <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 ml-1" />
+                            )}
+
+                            <div className="flex-1 min-w-0">
+                              <h5 className="font-bold text-white text-sm mb-0.5">{benefit.title}{benefit.title ? ':' : ''}</h5>
+                              <p className="text-white/70 text-xs leading-relaxed">{benefit.description}</p>
+                            </div>
                           </motion.div>
                         ))}
                       </div>
