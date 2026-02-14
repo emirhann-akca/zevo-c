@@ -45,7 +45,7 @@ const features = [
 const stats = [
   { value: '%95', label: 'Doğruluk', icon: CheckCircle },
   { value: '5000+', label: 'Toplam Veri Sayısı', icon: Database },
-  { value: '<2s', label: 'Analiz Süresi', icon: Zap },
+  { value: '2s', label: 'Analiz Süresi', icon: Zap },
 ]
 
 const scanSteps = [

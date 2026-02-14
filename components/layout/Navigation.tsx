@@ -58,10 +58,7 @@ export default function Navigation() {
             whileHover={{ scale: 1.05 }}
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
-            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(16,220,120,0.3)] group-hover:shadow-[0_0_30px_rgba(16,220,120,0.5)] transition-shadow duration-300">
-              <span className="text-[#0a0e1a] font-black text-xl">Z</span>
-            </div>
-            <span className="text-2xl font-bold text-white tracking-tight">ZEVO</span>
+            <span className="text-3xl font-black tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]">ZEVO</span>
           </motion.div>
 
           {/* Desktop Menu - Modern & Clean */}

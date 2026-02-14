@@ -267,7 +267,7 @@ export default function HeroSection() {
 
                     <div className="flex flex-col sm:flex-row gap-4 mb-7">
                         <ComingSoonButton
-                            className="px-8 py-4 bg-gradient-to-r from-[#22c55e] to-[#10DC78] text-black font-bold rounded-2xl flex items-center justify-center hover:shadow-xl hover:shadow-emerald-500/20 transition-all min-w-[200px]"
+                            className="px-8 py-4 bg-gradient-to-r from-[#22c55e] to-[#10DC78] text-black font-bold rounded-2xl flex items-center justify-center hover:shadow-xl hover:shadow-emerald-500/20 transition-all min-w-[200px] border-none ring-0 outline-none"
                         >
                             <div className="flex items-center gap-2 whitespace-nowrap">
                                 Şimdi Başla
@@ -280,16 +280,15 @@ export default function HeroSection() {
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-3 text-sm text-gray-500 mb-9">
-                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                    <div className="flex items-center gap-3 text-sm text-gray-500 mb-9 pl-1">
                         <span>2.500+ sporcu güveniyor</span>
                     </div>
 
                     <div className="flex gap-10">
                         {STATS.map((stat, i) => (
-                            <div key={i}>
-                                <div className="text-3xl font-bold text-white">{stat.value}</div>
-                                <div className="text-sm text-gray-500">{stat.label}</div>
+                            <div key={i} className="group cursor-default">
+                                <div className="text-3xl font-bold text-white group-hover:text-emerald-400 transition-colors duration-300">{stat.value}</div>
+                                <div className="text-sm text-gray-500 group-hover:text-gray-400 transition-colors duration-300">{stat.label}</div>
                             </div>
                         ))}
                     </div>

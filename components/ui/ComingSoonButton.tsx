@@ -13,7 +13,7 @@ interface ComingSoonButtonProps extends HTMLMotionProps<"button"> {
 
 export default function ComingSoonButton({
     children,
-    comingSoonText = '10 Nisan 🚀',
+    comingSoonText = '10 Mart 🚀',
     className,
     delay = 2000,
     onClick,

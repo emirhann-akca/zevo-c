@@ -300,15 +300,18 @@ export default function AIMotionSection() {
                         </div>
 
                         {/* Metric cards */}
+                        {/* Metric cards */}
                         <div className="flex gap-3">
                             {[
                                 { value: '17', label: 'Eklem Noktası' },
                                 { value: '30+', label: 'FPS Analiz' },
-                                { value: '<50', label: 'ms Gecikme' },
+                                { value: '50', label: 'ms Gecikme' },
                             ].map((stat) => (
-                                <div key={stat.label} className="flex-1">
-                                    <p className="text-green-400 text-3xl font-bold">{stat.value}</p>
-                                    <p className="text-white/40 text-[10px] uppercase tracking-wider mt-1">{stat.label}</p>
+                                <div key={stat.label} className="flex-1 group cursor-default">
+                                    <p className="text-white group-hover:text-green-400 transition-colors duration-300 text-3xl font-bold flex items-center justify-center lg:justify-start gap-1">
+                                        {stat.value}
+                                    </p>
+                                    <p className="text-white/40 group-hover:text-white/60 transition-colors duration-300 text-[10px] uppercase tracking-wider mt-1">{stat.label}</p>
                                 </div>
                             ))}
                         </div>
@@ -418,13 +421,7 @@ export default function AIMotionSection() {
                                 </div>
                             </div>
 
-                            {/* Calorie counter */}
-                            <div className="phone-ui absolute bottom-14 right-2 z-10">
-                                <div className="bg-black/70 backdrop-blur rounded-lg px-2 py-1.5 border border-white/10">
-                                    <p className="text-[8px] text-white/40 mb-0.5">KALORİ</p>
-                                    <p className="text-white text-lg font-bold">156 <span className="text-white/30 text-[10px]">kcal</span></p>
-                                </div>
-                            </div>
+
 
                             {/* Posture status */}
                             <div className="phone-ui absolute bottom-2 left-2 right-2 z-10">

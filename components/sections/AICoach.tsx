@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Brain, Zap, Target, TrendingUp, Volume2, MessageCircle, MoreHorizontal, Send, Eye } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Brain, Zap, Target, TrendingUp, Volume2, MessageCircle, MoreHorizontal, Send, Eye, Bot, Sparkles } from 'lucide-react'
 import SectionHeader from '@/components/ui/SectionHeader'
 
 const features = [
@@ -10,18 +11,18 @@ const features = [
     title: 'Gerçek Zamanlı Düzeltme',
     desc: 'Her hareketi analiz eder, anında geri bildirim verir',
     iconColor: 'text-emerald-400',
-    bgColor: 'bg-emerald-500/10',
+    bgColor: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/5',
     borderColor: 'border-emerald-500/20',
-    shadowClass: 'group-hover:shadow-[0_8px_20px_-4px_rgba(52,211,153,0.3)]'
+    shadowClass: 'group-hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.3)]'
   },
   {
     icon: TrendingUp,
     title: 'Gelişim Takibi',
     desc: 'Haftalık gelişim raporları ve hedef belirleme',
-    iconColor: 'text-blue-400',
-    bgColor: 'bg-blue-500/10',
-    borderColor: 'border-blue-500/20',
-    shadowClass: 'group-hover:shadow-[0_8px_20px_-4px_rgba(96,165,250,0.3)]'
+    iconColor: 'text-emerald-400',
+    bgColor: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/5',
+    borderColor: 'border-emerald-500/20',
+    shadowClass: 'group-hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.3)]'
   },
 
 ]
@@ -185,6 +186,26 @@ export default function AICoach() {
           <div className="w-full lg:w-[55%] order-first">
             <div className="relative w-full max-w-[520px] mx-auto lg:mx-0">
 
+              {/* Talking AI Pulse Effect - Custom Image */}
+              <motion.div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] -z-20 pointer-events-none mix-blend-screen"
+                animate={{
+                  scale: [1, 1.15, 1],
+                  opacity: [0.4, 0.7, 0.4],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <img
+                  src="/assets/ai-core.png"
+                  alt="AI Core"
+                  className="w-full h-full object-contain blur-[2px]"
+                />
+              </motion.div>
+
               {/* Professional Ambient Glow - High Performance (No Blur) */}
               <div
                 className="absolute -inset-px rounded-[24px] z-0 pointer-events-none transition-opacity duration-500"
@@ -217,7 +238,7 @@ export default function AICoach() {
 
               {/* Chat Container */}
               <div
-                className={`relative bg-[#0a0e1a]/80 border border-white/10 rounded-3xl p-6 min-h-[420px] flex flex-col shadow-2xl backdrop-blur-none origin-top`}
+                className={`relative bg-[#0a0e1a] border border-white/10 rounded-3xl p-6 min-h-[420px] flex flex-col shadow-2xl backdrop-blur-none origin-top`}
                 style={{
                   transform: isVisible ? 'scaleY(1)' : 'scaleY(0)',
                   opacity: isVisible ? 1 : 0,
@@ -228,13 +249,13 @@ export default function AICoach() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10 shrink-0">
                   <div className="flex items-center gap-4">
-                    <div className="relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600">
-                      <Brain className="w-6 h-6 text-white" />
+                    <div className="relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_15px_-3px_rgba(16,185,129,0.2)]">
+                      <Sparkles className="w-6 h-6 text-emerald-400" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-white text-base">AI Coach</h3>
-                        <span className="px-2 py-0.5 bg-emerald-500/20 rounded-full text-[10px] font-bold text-emerald-400 uppercase tracking-wider">PRO</span>
+                        <h3 className="font-bold text-white text-base leading-none">AI Koç</h3>
+                        <span className="px-2 h-5 flex items-center justify-center bg-emerald-500/20 rounded-full text-[10px] font-bold text-emerald-400 uppercase tracking-wider leading-none mt-0.5">PRO</span>
                       </div>
                       <div className="flex items-center gap-1.5 mt-1">
                         <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
@@ -260,7 +281,7 @@ export default function AICoach() {
                         {/* Avatar for AI */}
                         {msg.type === 'ai' && (
                           <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-1">
-                            <Brain className="w-4 h-4 text-emerald-400" />
+                            <Sparkles className="w-4 h-4 text-emerald-400" />
                           </div>
                         )}
 
@@ -283,7 +304,7 @@ export default function AICoach() {
                     <div className="flex w-full justify-start animate-fade-in">
                       <div className="flex gap-3 max-w-[85%]">
                         <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-1">
-                          <Brain className="w-4 h-4 text-emerald-400" />
+                          <Sparkles className="w-4 h-4 text-emerald-400" />
                         </div>
                         <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-bl-none flex items-center gap-1.5 h-12">
                           <div className="w-1.5 h-1.5 bg-emerald-400/60 rounded-full animate-typing-dot" style={{ animationDelay: '0s' }} />
@@ -317,8 +338,8 @@ export default function AICoach() {
           {/* ==================== RIGHT - CONTENT (%40-45) ==================== */}
           <div className="w-full lg:w-[45%] space-y-8">
             <SectionHeader
-              badge="AI Coach"
-              icon={<Brain className="w-4 h-4 text-emerald-400" />}
+              badge="AI Koç"
+              icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
               title={<>Kişisel <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">AI Koç</span></>}
               description="Sadece ne yapacağını söylemez, nasıl yapacağını da gösterir. Hatalarını yargılamaz, doğrusunu öğretir. Aklına takılan her soruyu cevaplayan, gelişim yolculuğundaki antrenörün."
               align="left"
@@ -332,13 +353,14 @@ export default function AICoach() {
             {/* Feature Cards - Moved Up */}
             <div className="space-y-4">
               {features.map((item, i) => (
-                <div key={i} className="flex items-center gap-4 group">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${item.bgColor} border ${item.borderColor} transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg ${item.shadowClass}`}>
-                    <item.icon className={`w-6 h-6 ${item.iconColor}`} />
+                <div key={i} className="flex items-center gap-4 group cursor-default">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${item.bgColor} border ${item.borderColor} transition-all duration-300 group-hover:scale-105 group-hover:border-white/20 ${item.shadowClass} relative overflow-hidden`}>
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <item.icon className={`w-7 h-7 ${item.iconColor} transition-transform duration-300 group-hover:scale-110 relative z-10`} />
                   </div>
                   <div>
-                    <p className={`text-base font-bold text-white group-hover:${item.iconColor} transition-colors`}>{item.title}</p>
-                    <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
+                    <p className={`text-base font-bold text-white group-hover:${item.iconColor} transition-colors duration-300`}>{item.title}</p>
+                    <p className="text-white/40 text-sm leading-relaxed group-hover:text-white/60 transition-colors duration-300">{item.desc}</p>
                   </div>
                 </div>
               ))}

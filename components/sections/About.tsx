@@ -51,7 +51,22 @@ export default function About() {
                     vizyoner bir girişime dönüştü. Amacımız sadece bir uygulama yapmak değil;
                     yapay zeka ve verinin gücünü kullanarak, amatör ruhları profesyonel bir
                     kariyere taşıyan{' '}
-                    <span className="text-emerald-400 font-semibold text-shadow-sm">&apos;Sporun LinkedIn&apos;i&apos;</span>
+                    <span className="relative inline-block overflow-hidden align-bottom">
+                      <span className="text-emerald-400 font-semibold text-shadow-sm relative z-10">&apos;Sporun LinkedIn&apos;i&apos;</span>
+                      <motion.div
+                        className="absolute inset-0 z-20 pointer-events-none"
+                        initial={{ x: '-100%' }}
+                        whileInView={{ x: '100%' }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
+                        style={{
+                          background: 'url(/assets/spiral-wave.png) no-repeat center center',
+                          backgroundSize: 'contain',
+                          mixBlendMode: 'screen',
+                          filter: 'brightness(1.5) drop-shadow(0 0 10px rgba(52, 211, 153, 0.5))'
+                        }}
+                      />
+                    </span>
                     ni inşa etmek.
                   </p>
                 </div>

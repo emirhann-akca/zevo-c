@@ -27,13 +27,8 @@ export default function Footer() {
               viewport={{ once: true }}
               className="space-y-4"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-lg">Z</span>
-                </div>
-                <span className="text-2xl font-bold text-white">ZEVO</span>
-              </div>
-              <p className="text-text-muted text-sm">Yapay Zeka Antrenör</p>
+              <span className="text-3xl font-black tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]">ZEVO</span>
+              <p className="text-text-muted text-sm">Yapay Zeka Antrenörü</p>
               <p className="text-text-muted text-sm">
                 Sporu, yapay zeka ile geleceğe taşıyoruz.
               </p>

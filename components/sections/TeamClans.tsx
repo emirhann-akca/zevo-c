@@ -37,10 +37,10 @@ const clanFeatures = [
 ]
 
 const clanMembers = [
-    { name: 'Efe', level: 42, avatar: '🦁', role: 'Lider' },
-    { name: 'Ayşe', level: 38, avatar: '🐺', role: 'Yönetici' },
-    { name: 'Mert', level: 35, avatar: '🦅', role: 'Üye' },
-    { name: 'Zeynep', level: 31, avatar: '🐉', role: 'Üye' },
+    { name: 'Efe', level: 42, avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop', role: 'Lider' },
+    { name: 'Ayşe', level: 38, avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop', role: 'Yönetici' },
+    { name: 'Mert', level: 35, avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop', role: 'Üye' },
+    { name: 'Zeynep', level: 31, avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop', role: 'Üye' },
 ]
 
 const clanQuests = [
@@ -201,7 +201,9 @@ export default function TeamClans() {
                                                     transition: `all 0.4s cubic-bezier(0.22, 1, 0.36, 1) ${0.3 + i * 0.1}s`,
                                                 }}
                                             >
-                                                <span className="text-lg bg-white/5 w-8 h-8 rounded-lg flex items-center justify-center">{m.avatar}</span>
+                                                <div className="w-9 h-9 rounded-lg overflow-hidden border border-white/10 shrink-0">
+                                                    <img src={m.avatar} alt={m.name} className="w-full h-full object-cover" />
+                                                </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="text-[10px] text-white font-medium truncate">
                                                         {m.name}
