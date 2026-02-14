@@ -2,8 +2,10 @@
 
 import { motion } from 'framer-motion'
 import SectionHeader from '@/components/ui/SectionHeader'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function About() {
+  const { t } = useLanguage()
   return (
     <section id="hakkimizda" className="relative py-24 px-6 bg-dark-primary overflow-hidden">
       {/* Structural Background - Matching VisionNutrition but adapted for dark-primary */}
@@ -38,36 +40,32 @@ export default function About() {
           {/* Left - Content */}
           <div className="space-y-8">
             <SectionHeader
-              badge="Biz Kimiz?"
-              title={<span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">Hakkımızda</span>}
+              badge={t.about.badge}
+              title={<span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">{t.about.title}</span>}
               description={
                 <div className="space-y-6 text-white/80">
                   <p>
-                    Biz, kod satırlarını spor sahalarına taşıyan tutkulu{' '}
-                    <span className="text-white font-semibold">bilgisayar mühendisleriyiz.</span>
+                    {t.about.descriptionP1start}{' '}
+                    <span className="text-white font-semibold">{t.about.descriptionP1highlight}</span>
                   </p>
                   <p>
-                    Bir yurt odasında filizlenen Zevo, bugün sporu teknolojiyle birleştiren
-                    vizyoner bir girişime dönüştü. Amacımız sadece bir uygulama yapmak değil;
-                    yapay zeka ve verinin gücünü kullanarak, amatör ruhları profesyonel bir
-                    kariyere taşıyan{' '}
+                    {t.about.descriptionP2start}{' '}
                     <span className="relative inline-block overflow-hidden align-bottom">
-                      <span className="text-emerald-400 font-semibold text-shadow-sm relative z-10">&apos;Sporun LinkedIn&apos;i&apos;</span>
-                      <motion.div
+                      <span className="text-emerald-400 font-semibold text-shadow-sm relative z-10">{t.about.descriptionP2highlight}</span>
+                      <motion.span
                         className="absolute inset-0 z-20 pointer-events-none"
                         initial={{ x: '-100%' }}
                         whileInView={{ x: '100%' }}
                         viewport={{ once: true }}
                         transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
                         style={{
-                          background: 'url(/assets/spiral-wave.png) no-repeat center center',
-                          backgroundSize: 'contain',
+                          background: 'linear-gradient(90deg, transparent 0%, rgba(52,211,153,0.4) 40%, rgba(16,220,120,0.6) 50%, rgba(52,211,153,0.4) 60%, transparent 100%)',
                           mixBlendMode: 'screen',
                           filter: 'brightness(1.5) drop-shadow(0 0 10px rgba(52, 211, 153, 0.5))'
                         }}
                       />
                     </span>
-                    ni inşa etmek.
+                    {t.about.descriptionP2end}
                   </p>
                 </div>
               }
@@ -80,12 +78,9 @@ export default function About() {
               <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
               <div className="relative z-10">
-                <h3 className="text-2xl font-bold mb-4 text-white group-hover:text-emerald-400 transition-colors duration-300">Hedefimiz</h3>
+                <h3 className="text-2xl font-bold mb-4 text-white group-hover:text-emerald-400 transition-colors duration-300">{t.about.missionTitle}</h3>
                 <p className="text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">
-                  Her sporcunun içindeki profesyoneli ortaya çıkarmak. Zevo ile sahadaki
-                  teri dijital veriye, rekabeti ise global bir dostluğa dönüştürüyoruz.
-                  Sınırları kaldıran teknolojimizle, sporu herkes için daha akıllı,
-                  daha sosyal ve daha rekabetçi hale getiriyoruz.
+                  {t.about.missionDescription}
                 </p>
               </div>
             </div>
@@ -104,49 +99,44 @@ export default function About() {
             </div>
 
             <div className="space-y-12">
-              {[
-                { year: '2025', title: 'Fikrin Doğuşu', desc: 'Sporcuların ihtiyaçlarını dinleyerek ZEVO fikri doğdu', active: true },
-                { year: '2026', title: 'Uygulama Çıkışı', desc: 'Beta versiyonu ile ilk kullanıcılarımıza ulaştık', active: true },
-                { year: '2027', title: 'Sporun LinkedIn\'i', desc: 'Sporcuların birbirleriyle bağlantı kurduğu dev platform', active: false },
-                { year: '2028', title: 'Sporun Yeni Çağı', desc: 'AI destekli spor dünyasında lider konuma geldik', active: false }
-              ].map((milestone, i) => (
+              {t.about.roadmap.map((milestone, i) => (
                 <div
                   key={i}
                   className="group relative flex items-center gap-8 pl-2"
                 >
                   {/* Waypoint Node */}
-                  <div className={`relative z-10 flex-shrink-0 w-14 h-14 rounded-2xl border-2 flex items-center justify-center transition-all duration-300 ${milestone.active
+                  <div className={`relative z-10 flex-shrink-0 w-14 h-14 rounded-2xl border-2 flex items-center justify-center transition-all duration-300 ${i < 2
                     ? 'bg-[#0a0e1a] border-emerald-500 shadow-[0_0_20px_rgba(16,220,120,0.3)]'
                     : 'bg-[#0a0e1a] border-white/10 group-hover:border-emerald-500/50'
                     }`}>
                     {/* Inner Dot */}
-                    {milestone.active && (
+                    {i < 2 && (
                       <div className="absolute inset-0 rounded-xl bg-emerald-500/10 animate-pulse-slow" />
                     )}
-                    <span className={`font-bold text-sm ${milestone.active ? 'text-emerald-400' : 'text-white/50 group-hover:text-emerald-400/70'} transition-colors`}>
+                    <span className={`font-bold text-sm ${i < 2 ? 'text-emerald-400' : 'text-white/50 group-hover:text-emerald-400/70'} transition-colors`}>
                       {milestone.year}
                     </span>
 
                     {/* Connector Line to Card */}
-                    <div className={`absolute left-full top-1/2 w-8 h-[2px] ${milestone.active ? 'bg-emerald-500' : 'bg-white/10 group-hover:bg-emerald-500/30'
+                    <div className={`absolute left-full top-1/2 w-8 h-[2px] ${i < 2 ? 'bg-emerald-500' : 'bg-white/10 group-hover:bg-emerald-500/30'
                       } transition-colors`} />
                   </div>
 
                   {/* Content Card */}
-                  <div className={`flex-1 rounded-xl p-6 border transition-all duration-300 relative overflow-hidden ${milestone.active
+                  <div className={`flex-1 rounded-xl p-6 border transition-all duration-300 relative overflow-hidden ${i < 2
                     ? 'bg-white/5 border-emerald-500/30 shadow-[0_0_30px_rgba(16,220,120,0.1)]'
                     : 'bg-white/[0.02] border-white/5 hover:border-emerald-500/20 hover:bg-white/5'
                     }`}>
                     {/* Active Indicator Glow */}
-                    {milestone.active && (
+                    {i < 2 && (
                       <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 blur-2xl -mr-10 -mt-10 pointer-events-none" />
                     )}
 
-                    <h4 className={`text-lg font-bold mb-2 transition-colors duration-300 ${milestone.active ? 'text-white' : 'text-white/80 group-hover:text-white'
+                    <h4 className={`text-lg font-bold mb-2 transition-colors duration-300 ${i < 2 ? 'text-white' : 'text-white/80 group-hover:text-white'
                       }`}>
                       {milestone.title}
                     </h4>
-                    <p className={`text-sm transition-colors duration-300 ${milestone.active ? 'text-white/70' : 'text-white/40 group-hover:text-white/60'
+                    <p className={`text-sm transition-colors duration-300 ${i < 2 ? 'text-white/70' : 'text-white/40 group-hover:text-white/60'
                       }`}>
                       {milestone.desc}
                     </p>

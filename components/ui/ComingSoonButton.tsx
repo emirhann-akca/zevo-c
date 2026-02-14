@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface ComingSoonButtonProps extends HTMLMotionProps<"button"> {
     children: React.ReactNode
@@ -13,12 +14,14 @@ interface ComingSoonButtonProps extends HTMLMotionProps<"button"> {
 
 export default function ComingSoonButton({
     children,
-    comingSoonText = '10 Mart 🚀',
+    comingSoonText,
     className,
     delay = 2000,
     onClick,
     ...props
 }: ComingSoonButtonProps) {
+    const { t } = useLanguage()
+    const textToShow = comingSoonText || t.nav.comingSoon
     const [isComingSoon, setIsComingSoon] = useState(false)
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -48,7 +51,7 @@ export default function ComingSoonButton({
                         exit={{ opacity: 0, y: -10 }}
                         className="flex items-center gap-2 whitespace-nowrap"
                     >
-                        {comingSoonText}
+                        {textToShow}
                     </motion.span>
                 ) : (
                     <motion.span

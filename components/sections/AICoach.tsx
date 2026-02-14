@@ -4,12 +4,11 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Brain, Zap, Target, TrendingUp, Volume2, MessageCircle, MoreHorizontal, Send, Eye, Bot, Sparkles } from 'lucide-react'
 import SectionHeader from '@/components/ui/SectionHeader'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
-const features = [
+const FEATURE_CONFIGS = [
   {
     icon: Eye,
-    title: 'Gerçek Zamanlı Düzeltme',
-    desc: 'Her hareketi analiz eder, anında geri bildirim verir',
     iconColor: 'text-emerald-400',
     bgColor: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/5',
     borderColor: 'border-emerald-500/20',
@@ -17,38 +16,16 @@ const features = [
   },
   {
     icon: TrendingUp,
-    title: 'Gelişim Takibi',
-    desc: 'Haftalık gelişim raporları ve hedef belirleme',
     iconColor: 'text-emerald-400',
     bgColor: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/5',
     borderColor: 'border-emerald-500/20',
     shadowClass: 'group-hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.3)]'
   },
-
 ]
 
-// ... (existing code)
 
-{/* Feature Cards - Moved Up */ }
-<div className="space-y-4">
-  {features.map((item, i) => (
-    <div key={i} className="flex items-center gap-4 group">
-      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${item.bgColor} border ${item.borderColor} transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg ${item.shadowClass}`}>
-        <item.icon className={`w-7 h-7 ${item.iconColor}`} />
-      </div>
-      <div>
-        <p className={`text-base font-bold text-white group-hover:${item.iconColor} transition-colors`}>{item.title}</p>
-        <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
-      </div>
-    </div>
-  ))}
-</div>
 
-const stats = [
-  { value: '94%', label: 'Doğruluk', icon: Zap },
-  { value: '2.5K', label: 'Günlük Analiz', icon: Brain },
-  { value: '24/7', label: 'Aktif Destek', icon: MessageCircle },
-]
+const STAT_ICONS = [Zap, Brain, MessageCircle]
 
 interface ScriptStep {
   type: 'user' | 'ai' | 'typing'
@@ -57,6 +34,7 @@ interface ScriptStep {
 }
 
 export default function AICoach() {
+  const { t } = useLanguage()
   const sectionRef = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [isChatStarted, setIsChatStarted] = useState(false)
@@ -110,12 +88,12 @@ export default function AICoach() {
     let mounted = true
 
     const script: ScriptStep[] = [
-      { type: 'user', text: 'Bugün bacak antrenmanı yaptım, form kontrolüm nasıldı?', delay: 1000 },
+      { type: 'user', text: t.aiCoach.chatScript[0].text, delay: 1000 },
       { type: 'typing', delay: 1500 },
-      { type: 'ai', text: 'Squat formunu analiz ettim 📊 Diz açın 85° ile mükemmel seviyede. Ancak topuk kalkışında %12 sapma var. Düzeltme videosu hazırladım.', delay: 200 }, // Fast response after typing
-      { type: 'user', text: 'Kalori hedefime ne kadar yakınım?', delay: 2000 },
+      { type: 'ai', text: t.aiCoach.chatScript[1].text, delay: 200 },
+      { type: 'user', text: t.aiCoach.chatScript[2].text, delay: 2000 },
       { type: 'typing', delay: 1500 },
-      { type: 'ai', text: 'Günlük hedefe %78 ulaştın 🔥 1,847 / 2,400 kcal. Protein alımın hedefin üstünde (142g), harika gidiyorsun!', delay: 200 } // Fast response after typing
+      { type: 'ai', text: t.aiCoach.chatScript[3].text, delay: 200 }
     ]
 
     const runScript = () => {
@@ -183,12 +161,12 @@ export default function AICoach() {
         <div className="flex flex-col lg:flex-row gap-16 items-center">
 
           {/* ==================== LEFT - CHAT PANEL (%55-60) ==================== */}
-          <div className="w-full lg:w-[55%] order-first">
+          <div className="w-full lg:w-[55%] order-first hidden lg:block">
             <div className="relative w-full max-w-[520px] mx-auto lg:mx-0">
 
               {/* Talking AI Pulse Effect - Custom Image */}
               <motion.div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] -z-20 pointer-events-none mix-blend-screen"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] lg:w-[350px] lg:h-[350px] -z-20 pointer-events-none mix-blend-screen"
                 animate={{
                   scale: [1, 1.15, 1],
                   opacity: [0.4, 0.7, 0.4],
@@ -199,10 +177,11 @@ export default function AICoach() {
                   ease: "easeInOut"
                 }}
               >
-                <img
-                  src="/assets/ai-core.png"
-                  alt="AI Core"
-                  className="w-full h-full object-contain blur-[2px]"
+                <div
+                  className="w-full h-full rounded-full blur-[2px]"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(16,220,120,0.6) 0%, rgba(16,185,129,0.3) 40%, transparent 70%)',
+                  }}
                 />
               </motion.div>
 
@@ -254,12 +233,12 @@ export default function AICoach() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-white text-base leading-none">AI Koç</h3>
+                        <h3 className="font-bold text-white text-base leading-none">{t.aiCoach.chatHeader}</h3>
                         <span className="px-2 h-5 flex items-center justify-center bg-emerald-500/20 rounded-full text-[10px] font-bold text-emerald-400 uppercase tracking-wider leading-none mt-0.5">PRO</span>
                       </div>
                       <div className="flex items-center gap-1.5 mt-1">
                         <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                        <span className="text-xs text-emerald-400/80 font-medium">Aktif • Yanıt süresi ~1s</span>
+                        <span className="text-xs text-emerald-400/80 font-medium">{t.aiCoach.chatStatus}</span>
                       </div>
                     </div>
                   </div>
@@ -321,7 +300,7 @@ export default function AICoach() {
                   <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full p-1.5 pl-5">
                     <input
                       type="text"
-                      placeholder="Koçuna bir şey sor..."
+                      placeholder={t.aiCoach.chatPlaceholder}
                       className="flex-1 bg-transparent text-white text-sm placeholder:text-white/30 outline-none"
                       disabled
                     />
@@ -338,10 +317,10 @@ export default function AICoach() {
           {/* ==================== RIGHT - CONTENT (%40-45) ==================== */}
           <div className="w-full lg:w-[45%] space-y-8">
             <SectionHeader
-              badge="AI Koç"
+              badge={t.aiCoach.badge}
               icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
-              title={<>Kişisel <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">AI Koç</span></>}
-              description="Sadece ne yapacağını söylemez, nasıl yapacağını da gösterir. Hatalarını yargılamaz, doğrusunu öğretir. Aklına takılan her soruyu cevaplayan, gelişim yolculuğundaki antrenörün."
+              title={<>{t.aiCoach.title} <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">{t.aiCoach.titleHighlight}</span></>}
+              description={t.aiCoach.description}
               align="left"
               className="mb-0"
             />
@@ -352,39 +331,45 @@ export default function AICoach() {
 
             {/* Feature Cards - Moved Up */}
             <div className="space-y-4">
-              {features.map((item, i) => (
-                <div key={i} className="flex items-center gap-4 group cursor-default">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${item.bgColor} border ${item.borderColor} transition-all duration-300 group-hover:scale-105 group-hover:border-white/20 ${item.shadowClass} relative overflow-hidden`}>
-                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <item.icon className={`w-7 h-7 ${item.iconColor} transition-transform duration-300 group-hover:scale-110 relative z-10`} />
+              {FEATURE_CONFIGS.map((item, i) => {
+                const feat = t.aiCoach.features[i]
+                return (
+                  <div key={i} className="flex items-center gap-4 group cursor-default">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${item.bgColor} border ${item.borderColor} transition-all duration-300 group-hover:scale-105 group-hover:border-white/20 ${item.shadowClass} relative overflow-hidden`}>
+                      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <item.icon className={`w-7 h-7 ${item.iconColor} transition-transform duration-300 group-hover:scale-110 relative z-10`} />
+                    </div>
+                    <div>
+                      <p className={`text-base font-bold text-white group-hover:${item.iconColor} transition-colors duration-300`}>{feat.title}</p>
+                      <p className="text-white/40 text-sm leading-relaxed group-hover:text-white/60 transition-colors duration-300">{feat.desc}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className={`text-base font-bold text-white group-hover:${item.iconColor} transition-colors duration-300`}>{item.title}</p>
-                    <p className="text-white/40 text-sm leading-relaxed group-hover:text-white/60 transition-colors duration-300">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             {/* Stats Row - Moved Down with left alignment */}
             <div className="flex items-center gap-8 lg:gap-12">
-              {stats.map((stat, i) => (
-                <div key={i} className="text-left group">
-                  <div className="text-xl lg:text-2xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{stat.value}</div>
-                  <div className="flex items-center justify-start gap-1.5 text-[10px] text-white/40 font-medium uppercase tracking-wide group-hover:text-white/60 transition-colors">
-                    <stat.icon className="w-3 h-3 text-emerald-500" />
-                    {stat.label}
+              {t.aiCoach.stats.map((stat, i) => {
+                const StatIcon = STAT_ICONS[i]
+                return (
+                  <div key={i} className="text-left group">
+                    <div className="text-xl lg:text-2xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{stat.value}</div>
+                    <div className="flex items-center justify-start gap-1.5 text-[10px] text-white/40 font-medium uppercase tracking-wide group-hover:text-white/60 transition-colors">
+                      <StatIcon className="w-3 h-3 text-emerald-500" />
+                      {stat.label}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             {/* CTA Button */}
             <a
               href="/chat"
-              className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold rounded-2xl hover:shadow-xl hover:shadow-emerald-500/20 transition-all text-lg"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 text-base lg:px-8 lg:py-4 lg:text-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold rounded-2xl hover:shadow-xl hover:shadow-emerald-500/20 transition-all"
             >
-              Şimdi Dene
+              {t.aiCoach.cta}
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

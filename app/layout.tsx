@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import ConsoleMessage from '@/components/ConsoleMessage'
+import { LanguageProvider } from '@/lib/i18n/LanguageContext'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -56,7 +58,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body>{children}</body>
+      <body><ConsoleMessage /><LanguageProvider>{children}</LanguageProvider></body>
     </html>
   )
 }

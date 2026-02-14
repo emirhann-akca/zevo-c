@@ -386,10 +386,10 @@ export default function ChatPage() {
                     <div className="flex-1 flex flex-col items-center justify-center px-4 pb-20 fade-in-up">
                         <div className="mb-10 text-center relative">
                             <div className="absolute -inset-10 bg-[#10DC78] opacity-[0.05] blur-3xl rounded-full pointer-events-none"></div>
-                            <h1 className="text-[56px] font-bold text-white tracking-tight leading-tight drop-shadow-lg">
+                            <h1 className="text-3xl md:text-5xl lg:text-[56px] font-bold text-white tracking-tight leading-tight drop-shadow-lg">
                                 Merhaba
                             </h1>
-                            <h2 className="text-[56px] font-bold text-white/20 tracking-tight leading-tight">
+                            <h2 className="text-3xl md:text-5xl lg:text-[56px] font-bold text-white/20 tracking-tight leading-tight">
                                 Sana nasıl yardımcı olabilirim?
                             </h2>
                         </div>
@@ -445,7 +445,7 @@ export default function ChatPage() {
                 ) : (
                     /* Active State */
                     <>
-                        <div className="flex-1 max-w-3xl w-full mx-auto pt-8 pb-40 px-4">
+                        <div className="flex-1 max-w-3xl w-full mx-auto pt-8 pb-24 lg:pb-40 px-4">
                             {messages.map((msg, idx) => (
                                 <MessageBubble key={idx} msg={msg} />
                             ))}

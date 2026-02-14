@@ -5,44 +5,37 @@ import { Users, Trophy, Zap, Activity, ChevronRight } from 'lucide-react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 import SectionHeader from '@/components/ui/SectionHeader'
 import PhoneMockup from '@/components/ui/PhoneMockup'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
-const FEATURES = [
+const FEATURE_STYLES = [
     {
-        id: '01',
-        title: 'Veri Odaklı Analiz',
-        desc: 'Sıradan antrenmanları geride bırakın. Zevo\'nun yapay zekası, vücut hareketlerinizi milisaniyeler içinde tarar, duruş bozukluklarını tespit eder ve sakatlık riskini %90\'a kadar azaltır.',
         icon: Activity,
         color: 'text-blue-400',
         bg: 'bg-blue-500/20',
         borderColor: 'border-blue-500/50',
         glow: 'shadow-[0_0_50px_-10px_rgba(59,130,246,0.5)]',
-        hex: '#3b82f6' // Blue-500
+        hex: '#3b82f6'
     },
     {
-        id: '02',
-        title: 'Kişisel Program',
-        desc: 'Sadece sana özel, performansınla şekillenen ve hedeflerinle optimize edilmiş akıllı bir antrenman deneyimi. Yapay zeka; vücut analizini ve verilerini işleyerek tahminlere değil, gerçeklere dayalı en uygun gelişim rotasını çizer.',
         icon: Users,
         color: 'text-purple-400',
         bg: 'bg-purple-500/20',
         borderColor: 'border-purple-500/50',
         glow: 'shadow-[0_0_50px_-10px_rgba(168,85,247,0.5)]',
-        hex: '#a855f7' // Purple-500
+        hex: '#a855f7'
     },
     {
-        id: '03',
-        title: 'Rekabetçi Ligler',
-        desc: 'Antrenman yapmak hiç bu kadar eğlenceli olmamıştı. Her kalori bir puan, her set bir zafer. Arkadaşlarınızla kapışın, liglerde yükselin ve gerçek ödüller kazanın.',
         icon: Trophy,
         color: 'text-amber-400',
         bg: 'bg-amber-500/20',
         borderColor: 'border-amber-500/50',
         glow: 'shadow-[0_0_50px_-10px_rgba(251,191,36,0.5)]',
-        hex: '#f59e0b' // Amber-500
+        hex: '#f59e0b'
     }
 ]
 
 export default function WhyZevo() {
+    const { t } = useLanguage()
     const [activeFeature, setActiveFeature] = useState(0)
     const observerRef = useRef<IntersectionObserver | null>(null)
     const explosionRef = useRef<HTMLDivElement>(null)
@@ -141,7 +134,7 @@ export default function WhyZevo() {
                 <div
                     className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full transition-all duration-1000"
                     style={{
-                        background: `radial-gradient(circle, ${FEATURES[activeFeature].hex}15 0%, transparent 70%)`,
+                        background: `radial-gradient(circle, ${FEATURE_STYLES[activeFeature].hex}15 0%, transparent 70%)`,
                         filter: 'blur(100px)'
                     }}
                 />
@@ -150,11 +143,11 @@ export default function WhyZevo() {
             <div className="max-w-7xl mx-auto px-6 relative z-10">
 
                 {/* Section Header */}
-                <div className="mb-32 why-header">
+                <div className="mb-16 lg:mb-32 why-header">
                     <SectionHeader
-                        badge="GELECEĞİ ŞEKİLLENDİR"
-                        title={<>NEDEN <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(52,211,153,0.4)]">ZEVO?</span></>}
-                        description="Teknoloji ve sporun mükemmel uyumu. Sadece bir uygulama değil, sizi profesyonel seviyeye taşıyacak bir platform."
+                        badge={t.whyZevo.badge}
+                        title={<>{t.whyZevo.title} <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(52,211,153,0.4)]">{t.whyZevo.titleHighlight}</span></>}
+                        description={t.whyZevo.description}
                         align="center"
                     />
                 </div>
@@ -162,7 +155,7 @@ export default function WhyZevo() {
                 <div className="flex flex-col lg:flex-row gap-20">
 
                     {/* LEFT: Sticky Phone Container */}
-                    <div className="w-full lg:w-1/2 relative why-phone">
+                    <div className="w-full lg:w-1/2 relative why-phone hidden lg:block">
                         <div className="lg:sticky lg:top-24 w-full flex justify-center items-center perspective-1000">
 
                             {/* Neon Explosion Layer */}
@@ -170,7 +163,7 @@ export default function WhyZevo() {
                                 ref={explosionRef}
                                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[600px] rounded-full pointer-events-none"
                                 style={{
-                                    background: `radial-gradient(circle, ${FEATURES[activeFeature].hex}80 0%, transparent 70%)`,
+                                    background: `radial-gradient(circle, ${FEATURE_STYLES[activeFeature].hex}80 0%, transparent 70%)`,
                                     filter: 'blur(40px)',
                                     zIndex: 0
                                 }}
@@ -182,7 +175,7 @@ export default function WhyZevo() {
                             >
                                 <PhoneMockup
                                     className="w-[280px] h-[580px]"
-                                    glowColor={`${FEATURES[activeFeature].hex}60`}
+                                    glowColor={`${FEATURE_STYLES[activeFeature].hex}60`}
                                 >
                                     {/* Dynamic Content Screen */}
                                     <div className="absolute inset-0 bg-[#0f172a] p-6 flex flex-col pt-14">
@@ -203,7 +196,7 @@ export default function WhyZevo() {
                                                 </div>
                                                 <div className="w-full bg-slate-800/80 backdrop-blur-md rounded-2xl p-5 border border-slate-700/50">
                                                     <div className="flex justify-between items-center mb-4">
-                                                        <span className="text-gray-400 text-xs">Analiz Skoru</span>
+                                                        <span className="text-gray-400 text-xs">{t.whyZevo.phone.analysisScore}</span>
                                                         <span className="text-blue-400 font-bold text-sm">98/100</span>
                                                     </div>
                                                     <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
@@ -232,11 +225,11 @@ export default function WhyZevo() {
                                                 <div className="grid grid-cols-2 gap-3 w-full">
                                                     <div className="bg-slate-800/80 p-3 rounded-xl text-center border border-purple-500/20">
                                                         <div className="text-xl font-bold text-white">12.5K</div>
-                                                        <div className="text-[10px] text-gray-400">Takipçi</div>
+                                                        <div className="text-[10px] text-gray-400">{t.whyZevo.phone.followers}</div>
                                                     </div>
                                                     <div className="bg-slate-800/80 p-3 rounded-xl text-center border border-purple-500/20">
                                                         <div className="text-xl font-bold text-white">8</div>
-                                                        <div className="text-[10px] text-gray-400">Kulüp Teklifi</div>
+                                                        <div className="text-[10px] text-gray-400">{t.whyZevo.phone.clubOffers}</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -245,7 +238,7 @@ export default function WhyZevo() {
                                             <div className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-500 ${activeFeature === 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
                                                 <Trophy className="w-28 h-28 text-amber-400 drop-shadow-[0_0_30px_rgba(251,191,36,0.6)] animate-bounce duration-1000" />
                                                 <div className="text-center mt-6">
-                                                    <h3 className="text-2xl font-black text-white tracking-widest uppercase">KAZANDIN!</h3>
+                                                    <h3 className="text-2xl font-black text-white tracking-widest uppercase">{t.whyZevo.phone.youWon}</h3>
                                                     <div className="inline-block mt-4 px-5 py-2 bg-amber-500 text-black font-bold rounded-full shadow-[0_0_20px_rgba(251,191,36,0.5)] text-sm">
                                                         +500 XP
                                                     </div>
@@ -254,8 +247,8 @@ export default function WhyZevo() {
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center font-bold text-amber-500 text-sm">1</div>
                                                         <div className="flex-1">
-                                                            <div className="text-white font-bold text-sm">Haftanın Lideri</div>
-                                                            <div className="text-[10px] text-amber-400">Şampiyonlar Ligi</div>
+                                                            <div className="text-white font-bold text-sm">{t.whyZevo.phone.weekLeader}</div>
+                                                            <div className="text-[10px] text-amber-400">{t.whyZevo.phone.championsLeague}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -270,48 +263,51 @@ export default function WhyZevo() {
 
                     {/* RIGHT: Content Text */}
                     <div className="w-full lg:w-1/2 pt-10 pb-24 min-h-screen why-content">
-                        {FEATURES.map((feature, index) => (
-                            <div key={index} className="feature-item-wrapper opacity-0 translate-x-[50px] feature-item">
-                                <div
-                                    data-id={index}
-                                    className={`feature-section min-h-[50vh] flex flex-col justify-center transition-all duration-700 ${activeFeature === index ? 'opacity-100 translate-x-0' : 'opacity-30 lg:opacity-20 translate-x-10 scale-95 blur-sm'}`}
-                                >
-                                    <div className={`w-16 h-16 rounded-2xl mb-8 flex items-center justify-center ${feature.bg} ${feature.glow} border ${feature.borderColor}`}>
-                                        <feature.icon className={`w-8 h-8 ${feature.color}`} />
-                                    </div>
-
-                                    <h3 className={`text-4xl lg:text-5xl font-bold mb-6 text-white transition-all duration-500 ${activeFeature === index ? 'drop-shadow-[0_0_25px_rgba(255,255,255,0.3)]' : ''}`}>
-                                        {feature.title}
-                                    </h3>
-
-                                    <p className="text-lg lg:text-xl text-gray-400 leading-relaxed font-light border-l-4 border-slate-700 pl-6">
-                                        {feature.desc}
-                                    </p>
-
-                                    <a
-                                        href={index === 0 ? "#ozellikler-antrenman" : index === 1 ? "#ozellikler-koc" : index === 2 ? "#ozellikler-pvp" : "#ozellikler"}
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            if (index === 0) {
-                                                window.location.hash = '#ozellikler-antrenman'
-                                            } else if (index === 1) {
-                                                window.location.hash = '#ozellikler-koc'
-                                            } else if (index === 2) {
-                                                window.location.hash = '#ozellikler-pvp'
-                                            }
-
-                                            document.getElementById('ozellikler')?.scrollIntoView({
-                                                behavior: 'smooth', block: 'start'
-                                            })
-                                        }}
-                                        className={`mt-8 flex items-center gap-2 font-bold ${feature.color} opacity-0 transition-all duration-500 cursor-pointer ${activeFeature === index ? 'opacity-100 translate-x-0' : '-translate-x-4'}`}
+                        {FEATURE_STYLES.map((feature, index) => {
+                            const featureText = t.whyZevo.features[index]
+                            return (
+                                <div key={index} className="feature-item-wrapper opacity-0 translate-x-[50px] feature-item">
+                                    <div
+                                        data-id={index}
+                                        className={`feature-section min-h-[50vh] flex flex-col justify-center transition-all duration-700 ${activeFeature === index ? 'opacity-100 translate-x-0' : 'opacity-30 lg:opacity-20 translate-x-10 scale-95 blur-sm'}`}
                                     >
-                                        <span>Detaylı İncele</span>
-                                        <ChevronRight className="w-5 h-5" />
-                                    </a>
+                                        <div className={`w-16 h-16 rounded-2xl mb-8 flex items-center justify-center ${feature.bg} ${feature.glow} border ${feature.borderColor}`}>
+                                            <feature.icon className={`w-8 h-8 ${feature.color}`} />
+                                        </div>
+
+                                        <h3 className={`text-4xl lg:text-5xl font-bold mb-6 text-white transition-all duration-500 ${activeFeature === index ? 'drop-shadow-[0_0_25px_rgba(255,255,255,0.3)]' : ''}`}>
+                                            {featureText.title}
+                                        </h3>
+
+                                        <p className="text-lg lg:text-xl text-gray-400 leading-relaxed font-light border-l-4 border-slate-700 pl-6">
+                                            {featureText.desc}
+                                        </p>
+
+                                        <a
+                                            href={index === 0 ? "#ozellikler-antrenman" : index === 1 ? "#ozellikler-koc" : index === 2 ? "#ozellikler-pvp" : "#ozellikler"}
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                if (index === 0) {
+                                                    window.location.hash = '#ozellikler-antrenman'
+                                                } else if (index === 1) {
+                                                    window.location.hash = '#ozellikler-koc'
+                                                } else if (index === 2) {
+                                                    window.location.hash = '#ozellikler-pvp'
+                                                }
+
+                                                document.getElementById('ozellikler')?.scrollIntoView({
+                                                    behavior: 'smooth', block: 'start'
+                                                })
+                                            }}
+                                            className={`mt-8 flex items-center gap-2 font-bold ${feature.color} opacity-0 transition-all duration-500 cursor-pointer ${activeFeature === index ? 'opacity-100 translate-x-0' : '-translate-x-4'}`}
+                                        >
+                                            <span>{t.whyZevo.cta}</span>
+                                            <ChevronRight className="w-5 h-5" />
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 </div>
             </div>

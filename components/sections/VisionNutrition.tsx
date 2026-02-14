@@ -4,19 +4,17 @@ import { useState, useEffect, useRef } from 'react'
 import { Camera, Zap, Brain, CheckCircle, Eye, Apple, Flame, Droplets, Target, Database, Activity } from 'lucide-react'
 import SectionHeader from '@/components/ui/SectionHeader'
 import PhoneMockup from '@/components/ui/PhoneMockup'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
-const macroData = [
-  { label: 'Protein', value: 52, unit: 'g', max: 100, color: '#10DC78', icon: Zap },
-  { label: 'Kalori', value: 380, unit: 'kcal', max: 800, color: '#22C55E', icon: Flame },
-  { label: 'Karbonhidrat', value: 8, unit: 'g', max: 100, color: '#14b8a6', icon: Apple },
-  { label: 'Yağ', value: 12, unit: 'g', max: 80, color: '#06b6d4', icon: Droplets },
-]
+const MACRO_ICONS = [Zap, Flame, Apple, Droplets]
+const MACRO_COLORS = ['#10DC78', '#22C55E', '#14b8a6', '#06b6d4']
+const MACRO_VALUES = [52, 380, 8, 12]
+const MACRO_UNITS = ['g', 'kcal', 'g', 'g']
+const MACRO_MAXES = [100, 800, 100, 80]
 
-const features = [
+const FEATURE_CONFIGS = [
   {
     icon: Eye,
-    title: 'Anında Görsel Tanıma',
-    desc: 'Yapay zeka ile saniyeler içinde yemek türü, porsiyon ve içerik tespiti',
     iconColor: 'text-emerald-400',
     bgColor: 'bg-emerald-500/10',
     borderColor: 'border-emerald-500/20',
@@ -24,8 +22,6 @@ const features = [
   },
   {
     icon: Brain,
-    title: 'Akıllı Besin Analizi',
-    desc: 'Makro ve mikro besin değerlerini AI modelleriyle hassas hesaplama',
     iconColor: 'text-teal-400',
     bgColor: 'bg-teal-500/10',
     borderColor: 'border-teal-500/20',
@@ -33,8 +29,6 @@ const features = [
   },
   {
     icon: Database,
-    title: 'Geniş Veri Tabanı',
-    desc: 'Binlerce yemek ve besin türünü anında tanır.',
     iconColor: 'text-cyan-400',
     bgColor: 'bg-cyan-500/10',
     borderColor: 'border-cyan-500/20',
@@ -42,21 +36,20 @@ const features = [
   }
 ]
 
-const stats = [
-  { value: '%95', label: 'Doğruluk', icon: CheckCircle },
-  { value: '5000+', label: 'Toplam Veri Sayısı', icon: Database },
-  { value: '2s', label: 'Analiz Süresi', icon: Zap },
-]
+const STAT_ICONS = [CheckCircle, Database, Zap]
 
-const scanSteps = [
-  { progress: 20, text: 'Görüntü analiz ediliyor...', icon: '🔍' },
-  { progress: 40, text: 'Yemek türü tespit ediliyor...', icon: '🍽️' },
-  { progress: 60, text: 'Porsiyon hesaplanıyor...', icon: '⚖️' },
-  { progress: 80, text: 'Besin değerleri belirleniyor...', icon: '🧮' },
-  { progress: 100, text: 'Sonuçlar hazırlanıyor...', icon: '✅' }
-]
+const SCAN_ICONS = ['🔍', '🍽️', '⚖️', '🧮', '✅']
 
 export default function VisionNutrition() {
+  const { t } = useLanguage()
+  const macroData = Object.values(t.visionNutrition.macros).map((label, i) => ({
+    label,
+    value: MACRO_VALUES[i],
+    unit: MACRO_UNITS[i],
+    max: MACRO_MAXES[i],
+    color: MACRO_COLORS[i],
+    icon: MACRO_ICONS[i],
+  }))
   const [isScanning, setIsScanning] = useState(false)
   const [scanProgress, setScanProgress] = useState(0)
   const [showResults, setShowResults] = useState(false)
@@ -89,7 +82,7 @@ export default function VisionNutrition() {
 
       // Update step based on progress
       // 0-20: step 0, 20-40: step 1, etc.
-      const stepIndex = Math.min(Math.floor(progress / 20), scanSteps.length - 1)
+      const stepIndex = Math.min(Math.floor(progress / 20), t.visionNutrition.phone.scanSteps.length - 1)
       setCurrentStep(stepIndex)
 
       if (progress < 100) {
@@ -142,7 +135,7 @@ export default function VisionNutrition() {
 
 
   return (
-    <section id="beslenme" className="relative h-screen min-h-[800px] py-16 px-6 bg-[#0a0e1a] overflow-hidden flex items-center">
+    <section id="beslenme" className="relative min-h-0 lg:h-screen lg:min-h-[800px] py-16 px-6 bg-[#0a0e1a] overflow-hidden lg:flex lg:items-center">
 
       {/* Static Efficient Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -171,11 +164,11 @@ export default function VisionNutrition() {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto relative w-full h-full flex items-center">
+      <div className="max-w-7xl mx-auto relative w-full h-full lg:flex lg:items-center">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center w-full">
 
           {/* ==================== LEFT - PHONE MOCKUP (55%) ==================== */}
-          <div className="relative flex justify-center lg:order-first h-full items-center">
+          <div className="relative hidden lg:flex justify-center lg:order-first h-full items-center">
             <div className="relative transform lg:scale-110">
               <PhoneMockup>
 
@@ -222,7 +215,7 @@ export default function VisionNutrition() {
                   >
                     <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm mb-3">
                       <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                      Taranıyor...
+                      {t.visionNutrition.phone.scanning}
                     </div>
 
                     {/* Performant Progress Bar (scaleX) */}
@@ -238,8 +231,8 @@ export default function VisionNutrition() {
                     </div>
 
                     <div className="flex items-center gap-2 text-white text-xs min-h-[20px]">
-                      <span className="text-lg">{scanSteps[currentStep]?.icon}</span>
-                      <span className="text-white/80">{scanSteps[currentStep]?.text}</span>
+                      <span className="text-lg">{SCAN_ICONS[currentStep]}</span>
+                      <span className="text-white/80">{t.visionNutrition.phone.scanSteps[currentStep]}</span>
                     </div>
 
                     <div className="text-right text-emerald-400 font-bold text-lg mt-2">
@@ -253,11 +246,11 @@ export default function VisionNutrition() {
                   >
                     <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs mb-3">
                       <CheckCircle className="w-3.5 h-3.5" />
-                      TARAMA TAMAMLANDI
+                      {t.visionNutrition.phone.scanComplete}
                     </div>
 
                     <h4 className="text-white font-bold text-base mb-3">
-                      🍗 Tavuk Izgara <span className="text-white/50 font-normal text-sm">240g</span>
+                      {t.visionNutrition.phone.foodName} <span className="text-white/50 font-normal text-sm">240g</span>
                     </h4>
 
                     <div className="grid grid-cols-4 gap-1.5 mb-3">
@@ -272,7 +265,7 @@ export default function VisionNutrition() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
-                        <span className="text-[10px] text-white/40">Güvenilirlik</span>
+                        <span className="text-[10px] text-white/40">{t.visionNutrition.phone.reliability}</span>
                       </div>
                       <span className="text-emerald-400 font-bold text-xs">%95</span>
                     </div>
@@ -282,7 +275,7 @@ export default function VisionNutrition() {
                       className="w-full mt-3 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform"
                     >
                       <Camera className="w-4 h-4" />
-                      Tekrar Tara
+                      {t.visionNutrition.phone.rescan}
                     </button>
                   </div>
 
@@ -293,7 +286,7 @@ export default function VisionNutrition() {
                       className="px-8 py-4 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(16,220,120,0.4)] border-2 border-white/20 active:scale-95 transition-transform"
                     >
                       <Camera className="w-6 h-6 text-white" />
-                      <span className="text-white font-bold text-sm">Tarat</span>
+                      <span className="text-white font-bold text-sm">{t.visionNutrition.phone.scanButton}</span>
                     </button>
                   </div>
 
@@ -305,39 +298,45 @@ export default function VisionNutrition() {
           <div className="relative lg:order-last pl-4">
             <SectionHeader
               icon={<Camera className="w-4 h-4" />}
-              badge="Vision AI"
-              title={<>Tabağını Tarat,{' '}<span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">İçindekini Gör</span></>}
-              description={<>Yemeğinin fotoğrafını çek, Zevo makro ve mikro değerlerini anında hesaplasın. Görüntü işleme teknolojisiyle beslenmeni şansa bırakma.</>}
+              badge={t.visionNutrition.badge}
+              title={<>{t.visionNutrition.title}{' '}<span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">{t.visionNutrition.titleHighlight}</span></>}
+              description={<>{t.visionNutrition.description}</>}
               className="mb-8"
               align="left"
             />
 
             {/* Feature Cards - AICoach Style */}
             <div className="space-y-4">
-              {features.map((item, i) => (
-                <div key={i} className="flex items-center gap-4 group cursor-default">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${item.bgColor} border ${item.borderColor} transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg ${item.shadowClass} flex-shrink-0`}>
-                    <item.icon className={`w-7 h-7 ${item.iconColor}`} />
+              {FEATURE_CONFIGS.map((item, i) => {
+                const feat = t.visionNutrition.features[i]
+                return (
+                  <div key={i} className="flex items-center gap-4 group cursor-default">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${item.bgColor} border ${item.borderColor} transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg ${item.shadowClass} flex-shrink-0`}>
+                      <item.icon className={`w-7 h-7 ${item.iconColor}`} />
+                    </div>
+                    <div>
+                      <p className={`text-base font-bold text-white group-hover:${item.iconColor} transition-colors`}>{feat.title}</p>
+                      <p className="text-white/40 text-sm leading-relaxed">{feat.desc}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className={`text-base font-bold text-white group-hover:${item.iconColor} transition-colors`}>{item.title}</p>
-                    <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             {/* Stats Row - AICoach Style */}
             <div className="mt-6 pt-6 border-t border-white/10 flex items-center gap-8 lg:gap-12">
-              {stats.map((stat, i) => (
-                <div key={i} className="text-left group cursor-default">
-                  <div className="text-xl lg:text-3xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{stat.value}</div>
-                  <div className="flex items-center justify-start gap-1.5 text-[10px] text-white/40 font-medium uppercase tracking-wide group-hover:text-white/60 transition-colors">
-                    <stat.icon className="w-3 h-3 text-emerald-500" />
-                    {stat.label}
+              {t.visionNutrition.stats.map((stat, i) => {
+                const StatIcon = STAT_ICONS[i]
+                return (
+                  <div key={i} className="text-left group cursor-default">
+                    <div className="text-xl lg:text-3xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{stat.value}</div>
+                    <div className="flex items-center justify-start gap-1.5 text-[10px] text-white/40 font-medium uppercase tracking-wide group-hover:text-white/60 transition-colors">
+                      <StatIcon className="w-3 h-3 text-emerald-500" />
+                      {stat.label}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 

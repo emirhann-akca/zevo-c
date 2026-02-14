@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-
 import { Menu, X } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
 import ComingSoonButton from '@/components/ui/ComingSoonButton'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -12,6 +13,7 @@ export default function Navigation() {
   const [isVisible, setIsVisible] = useState(true)
 
   const [comingSoon, setComingSoon] = useState(false)
+  const { locale, setLocale, t } = useLanguage()
 
   const { scrollY } = useScroll()
 
@@ -65,27 +67,42 @@ export default function Navigation() {
           <div className="hidden md:flex items-center gap-10">
             {NAV_LINKS.map((item) => (
               <button
-                key={item.name}
+                key={item.key}
                 onClick={() => scrollToSection(item.href)}
                 className="text-sm font-medium text-white/60 hover:text-white transition-all duration-300 relative group tracking-wide"
               >
-                <span className="relative z-10">{item.name}</span>
+                <span className="relative z-10">{t.nav[item.key as keyof typeof t.nav]}</span>
                 <span className="absolute -bottom-2 left-1/2 w-0 h-0.5 bg-emerald-500 -translate-x-1/2 group-hover:w-full transition-all duration-300" />
                 <span className="absolute inset-0 blur-lg bg-emerald-500/0 group-hover:bg-emerald-500/20 transition-colors duration-300 -z-10 bg-opacity-0" />
               </button>
             ))}
           </div>
 
-          {/* CTA Button - Desktop */}
-          <div className="hidden md:block">
+          {/* Language Toggle + CTA Button - Desktop */}
+          <div className="hidden md:flex items-center gap-4">
+            <div className="flex items-center gap-1 text-sm">
+              <button
+                onClick={() => setLocale('tr')}
+                className={`px-1.5 py-0.5 rounded transition-all duration-200 ${locale === 'tr' ? 'text-white font-bold' : 'text-white/40 hover:text-white/60'}`}
+              >
+                TR
+              </button>
+              <span className="text-white/20">|</span>
+              <button
+                onClick={() => setLocale('en')}
+                className={`px-1.5 py-0.5 rounded transition-all duration-200 ${locale === 'en' ? 'text-white font-bold' : 'text-white/40 hover:text-white/60'}`}
+              >
+                EN
+              </button>
+            </div>
             <ComingSoonButton>
-              Uygulamayı İndir
+              {t.nav.downloadApp}
             </ComingSoonButton>
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors"
+            className={`md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/5 transition-all duration-300 ${isScrolled ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
@@ -107,7 +124,7 @@ export default function Navigation() {
             className="fixed inset-0 z-40 md:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-black/80" />
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
@@ -132,7 +149,7 @@ export default function Navigation() {
               >
                 {NAV_LINKS.map((item) => (
                   <motion.button
-                    key={item.name}
+                    key={item.key}
                     variants={{
                       hidden: { x: 20, opacity: 0 },
                       show: { x: 0, opacity: 1 }
@@ -140,13 +157,30 @@ export default function Navigation() {
                     onClick={() => scrollToSection(item.href)}
                     className="text-left text-lg font-medium text-white/70 hover:text-emerald-400 transition-colors border-b border-white/5 pb-2"
                   >
-                    {item.name}
+                    {t.nav[item.key as keyof typeof t.nav]}
                   </motion.button>
                 ))}
 
+                {/* Language Toggle - Mobile */}
+                <div className="flex items-center gap-2 text-sm pt-2 pb-2">
+                  <button
+                    onClick={() => setLocale('tr')}
+                    className={`px-2 py-1 rounded transition-all duration-200 ${locale === 'tr' ? 'text-white font-bold' : 'text-white/40 hover:text-white/60'}`}
+                  >
+                    TR
+                  </button>
+                  <span className="text-white/20">|</span>
+                  <button
+                    onClick={() => setLocale('en')}
+                    className={`px-2 py-1 rounded transition-all duration-200 ${locale === 'en' ? 'text-white font-bold' : 'text-white/40 hover:text-white/60'}`}
+                  >
+                    EN
+                  </button>
+                </div>
+
                 <div className="pt-4">
                   <ComingSoonButton className="w-full text-center justify-center">
-                    Uygulamayı İndir
+                    {t.nav.downloadApp}
                   </ComingSoonButton>
                 </div>
               </motion.div>

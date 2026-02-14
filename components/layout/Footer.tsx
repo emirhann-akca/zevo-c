@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Twitter, Instagram, Linkedin, Github } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 const socialLinks = [
   { name: 'Twitter', icon: Twitter, href: '#' },
@@ -12,6 +13,7 @@ const socialLinks = [
 ]
 
 export default function Footer() {
+  const { t } = useLanguage()
   const currentYear = new Date().getFullYear()
 
   return (
@@ -28,9 +30,9 @@ export default function Footer() {
               className="space-y-4"
             >
               <span className="text-3xl font-black tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]">ZEVO</span>
-              <p className="text-text-muted text-sm">Yapay Zeka Antrenörü</p>
+              <p className="text-text-muted text-sm">{t.footer.tagline}</p>
               <p className="text-text-muted text-sm">
-                Sporu, yapay zeka ile geleceğe taşıyoruz.
+                {t.footer.description}
               </p>
             </motion.div>
 
@@ -41,7 +43,7 @@ export default function Footer() {
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
             >
-              <h3 className="text-white font-semibold text-lg mb-4">Hızlı Geçiş</h3>
+              <h3 className="text-white font-semibold text-lg mb-4">{t.footer.quickLinks}</h3>
               <ul className="space-y-2">
                 {NAV_LINKS.map((link, i) => (
                   <li key={i}>
@@ -50,7 +52,7 @@ export default function Footer() {
                       whileHover={{ x: 5 }}
                       className="text-text-muted hover:text-emerald-primary transition-colors inline-block"
                     >
-                      {link.name}
+                      {t.nav[link.key as keyof typeof t.nav]}
                     </motion.a>
                   </li>
                 ))}
@@ -64,7 +66,7 @@ export default function Footer() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              <h3 className="text-white font-semibold text-lg mb-4">Sosyal Ağ</h3>
+              <h3 className="text-white font-semibold text-lg mb-4">{t.footer.socialNetwork}</h3>
               <div className="flex flex-wrap gap-3">
                 {socialLinks.map((social, i) => {
                   const Icon = social.icon
@@ -101,7 +103,7 @@ export default function Footer() {
                 animate={{ opacity: 1, y: 0 }}
               >
                 {currentYear}
-              </motion.span> ZEVO. Tüm hakları saklıdır.
+              </motion.span> {t.footer.copyright}
             </p>
           </motion.div>
         </div>

@@ -5,6 +5,7 @@ import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { Eye, Shield, RefreshCw, Check, AlertTriangle } from 'lucide-react'
 import ConnectedPointsBackground from '@/components/effects/ConnectedPointsBackground'
 import SectionHeader from '@/components/ui/SectionHeader'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 // ================================
 // AI MOTION SECTION - CINEMATIC
@@ -47,11 +48,8 @@ const BONES = [
     ['kneeR', 'ankleR'],
 ]
 
-const FEATURES = [
-    { icon: Eye, label: 'Gerçek Zamanlı İskelet Takibi', desc: 'Kamera açıkken anlık analiz', color: 'green' },
-    { icon: Shield, label: 'Hata Düzeltme', desc: 'Yanlış form anında uyarı', color: 'amber' },
-    { icon: RefreshCw, label: 'Otomatik Sayım', desc: 'Tekrarları sen değil, yapay zeka sayar', color: 'blue' },
-]
+const FEATURE_ICONS = [Eye, Shield, RefreshCw]
+const FEATURE_COLORS = ['green', 'amber', 'blue']
 
 // Easing function
 const easeInOutCubic = (t: number): number => {
@@ -59,6 +57,7 @@ const easeInOutCubic = (t: number): number => {
 }
 
 export default function AIMotionSection() {
+    const { t } = useLanguage()
     const sectionRef = useRef<HTMLDivElement>(null)
     const phoneRef = useRef<HTMLDivElement>(null)
     const [mounted, setMounted] = useState(false)
@@ -262,7 +261,7 @@ export default function AIMotionSection() {
         <section
             ref={sectionRef}
             id="hareket-analizi"
-            className="relative min-h-screen bg-[#0a0e1a] py-16 lg:py-20 flex items-center overflow-hidden"
+            className="relative min-h-0 lg:min-h-screen bg-[#0a0e1a] py-16 lg:py-20 flex items-center overflow-hidden"
         >
             <ConnectedPointsBackground />
 
@@ -273,40 +272,40 @@ export default function AIMotionSection() {
                     <div className="ai-left w-full lg:w-[45%] space-y-6">
 
                         <SectionHeader
-                            badge="Yapay Zeka Motoru"
-                            title={<>Hareketini <br /> <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">Analiz Et.</span></>}
-                            description="Tek ihtiyacın bir kamera. Kameranı aç, harekete başla. Yapay zeka gerisini halleder. Seni tarar, tekrarlarını sayar ve hatalarını anında yakalar. Gelişimini şansa bırakma."
+                            badge={t.aiMotion.badge}
+                            title={<>{t.aiMotion.title} <br /> <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">{t.aiMotion.titleHighlight}</span></>}
+                            description={t.aiMotion.description}
                             align="left"
                             className="mb-8"
                         />
 
                         {/* Feature list */}
                         <div className="space-y-3">
-                            {FEATURES.map((feature) => (
-                                <div key={feature.label} className="flex items-center gap-3">
-                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${feature.color === 'green' ? 'bg-green-500/10' :
-                                        feature.color === 'amber' ? 'bg-amber-500/10' : 'bg-blue-500/10'
-                                        }`}>
-                                        <feature.icon className={`w-4 h-4 ${feature.color === 'green' ? 'text-green-400' :
-                                            feature.color === 'amber' ? 'text-amber-400' : 'text-blue-400'
-                                            }`} />
+                            {FEATURE_ICONS.map((Icon, i) => {
+                                const color = FEATURE_COLORS[i]
+                                const feat = t.aiMotion.features[i]
+                                return (
+                                    <div key={feat.label} className="flex items-center gap-3">
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color === 'green' ? 'bg-green-500/10' :
+                                            color === 'amber' ? 'bg-amber-500/10' : 'bg-blue-500/10'
+                                            }`}>
+                                            <Icon className={`w-4 h-4 ${color === 'green' ? 'text-green-400' :
+                                                color === 'amber' ? 'text-amber-400' : 'text-blue-400'
+                                                }`} />
+                                        </div>
+                                        <div>
+                                            <p className="text-white text-sm font-medium">{feat.label}</p>
+                                            <p className="text-white/30 text-xs">{feat.desc}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-white text-sm font-medium">{feature.label}</p>
-                                        <p className="text-white/30 text-xs">{feature.desc}</p>
-                                    </div>
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
 
                         {/* Metric cards */}
                         {/* Metric cards */}
                         <div className="flex gap-3">
-                            {[
-                                { value: '17', label: 'Eklem Noktası' },
-                                { value: '30+', label: 'FPS Analiz' },
-                                { value: '50', label: 'ms Gecikme' },
-                            ].map((stat) => (
+                            {t.aiMotion.metrics.map((stat) => (
                                 <div key={stat.label} className="flex-1 group cursor-default">
                                     <p className="text-white group-hover:text-green-400 transition-colors duration-300 text-3xl font-bold flex items-center justify-center lg:justify-start gap-1">
                                         {stat.value}
@@ -318,7 +317,7 @@ export default function AIMotionSection() {
                     </div>
 
                     {/* ================== RIGHT COLUMN - PHONE ================== */}
-                    <div className="w-full lg:w-[55%] flex justify-center relative">
+                    <div className="w-full lg:w-[55%] hidden lg:flex justify-center relative">
 
                         {/* Phone mockup - smaller to fit screen */}
                         <div
@@ -384,19 +383,19 @@ export default function AIMotionSection() {
                             {/* Top bar - AI Aktif only, no REC */}
                             <div className="phone-ui absolute top-8 left-2 right-2 flex justify-end items-center z-10">
                                 <div className="bg-black/60 backdrop-blur rounded-lg px-2.5 py-1">
-                                    <span className="text-green-400 text-[9px] font-medium">AI Aktif</span>
+                                    <span className="text-green-400 text-[9px] font-medium">{t.aiMotion.phone.aiActive}</span>
                                 </div>
                             </div>
 
                             {/* Exercise label */}
                             <div className="phone-ui absolute top-14 left-1/2 -translate-x-1/2 bg-green-500/20 backdrop-blur border border-green-500/30 rounded-full px-3 py-0.5 z-10">
-                                <span className="text-green-400 text-[10px] font-semibold">🏋️ Squat</span>
+                                <span className="text-green-400 text-[10px] font-semibold">{t.aiMotion.phone.exercise}</span>
                             </div>
 
                             {/* Angle indicator */}
                             <div className="phone-ui absolute z-10" style={{ top: '58%', right: '8px' }}>
                                 <div className="bg-black/70 backdrop-blur rounded-lg px-2 py-1 border border-white/10">
-                                    <p className="text-[8px] text-white/40">DİZ AÇISI</p>
+                                    <p className="text-[8px] text-white/40">{t.aiMotion.phone.kneeAngle}</p>
                                     <p className="text-white text-xs font-bold" ref={kneeTextRef}>
                                         175° <span className="text-gray-500"></span>
                                     </p>
@@ -406,7 +405,7 @@ export default function AIMotionSection() {
                             {/* Rep counter */}
                             <div className="phone-ui absolute bottom-14 left-2 z-10">
                                 <div className="bg-black/70 backdrop-blur rounded-lg px-2 py-1.5 border border-white/10">
-                                    <p className="text-[8px] text-white/40 mb-0.5">TEKRAR</p>
+                                    <p className="text-[8px] text-white/40 mb-0.5">{t.aiMotion.phone.rep}</p>
                                     <div className="flex items-baseline gap-0.5">
                                         <span ref={repTextRef} className="text-green-400 text-lg font-bold">0</span>
                                         <span className="text-white/30 text-[10px]">/ 12</span>
@@ -439,10 +438,10 @@ export default function AIMotionSection() {
                                     </div>
                                     <div>
                                         <p className={`text-[10px] font-semibold ${postureCorrect ? 'text-green-400' : 'text-orange-400'}`}>
-                                            {postureCorrect ? 'Duruş Doğru' : 'Sırtını Düzelt!'}
+                                            {postureCorrect ? t.aiMotion.phone.postureCorrect : t.aiMotion.phone.postureFix}
                                         </p>
                                         <p className="text-white/30 text-[8px]">
-                                            {postureCorrect ? 'Formun mükemmel' : 'Eğilme algılandı'}
+                                            {postureCorrect ? t.aiMotion.phone.postureCorrectDesc : t.aiMotion.phone.postureFixDesc}
                                         </p>
                                     </div>
                                 </div>

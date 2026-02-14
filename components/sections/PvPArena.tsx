@@ -5,6 +5,7 @@ import { gsap, ScrollTrigger } from '@/lib/gsap'
 import PvPBattleBackground from '@/components/effects/PvPBattleBackground'
 import SectionHeader from '@/components/ui/SectionHeader'
 import PhoneMockup from '@/components/ui/PhoneMockup'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 // ================================
 // PVP ARENA SECTION - Codeway Style
@@ -17,13 +18,8 @@ const LEADERBOARD = [
   { name: 'Mert D.', score: 2115 },
 ]
 
-const FEATURE_CHIPS = [
-  { label: 'Hız Düellosu' },
-  { label: 'Kalori Yarışı' },
-  { label: 'Takım Savaşı' },
-]
-
 export default function PvPArena() {
+  const { t } = useLanguage()
   const sectionRef = useRef<HTMLDivElement>(null)
   const leftColRef = useRef<HTMLDivElement>(null)
   const phoneRef = useRef<HTMLDivElement>(null)
@@ -118,7 +114,7 @@ export default function PvPArena() {
     <section
       ref={sectionRef}
       id="pvp-arena"
-      className="relative min-h-screen bg-[#0a0e1a] py-16 md:py-20 overflow-hidden"
+      className="relative min-h-0 lg:min-h-screen bg-[#0a0e1a] py-16 md:py-20 overflow-hidden"
     >
       <PvPBattleBackground />
 
@@ -131,29 +127,29 @@ export default function PvPArena() {
           <div ref={leftColRef} className="w-full lg:w-[45%] space-y-6">
 
             <SectionHeader
-              badge="PVP ARENA"
+              badge={t.pvpArena.badge}
               icon={<span className="text-base"></span>}
-              title={<>Gerçek Rakip. <br /> <span className="bg-gradient-to-r from-[#22c55e] to-[#f59e0b] bg-clip-text text-transparent">Gerçek Zamanlı.</span></>}
-              description="Arkadaşını davet et ya da rastgele rakip bul. Hız düellosu, kalori yarışı veya takım savaşı. Modu sen seç, kazanan sahada belli olsun."
+              title={<>{t.pvpArena.title} <br /> <span className="bg-gradient-to-r from-[#22c55e] to-[#f59e0b] bg-clip-text text-transparent">{t.pvpArena.titleHighlight}</span></>}
+              description={t.pvpArena.description}
               align="left"
               className="mb-8"
             />
 
             {/* Feature chips */}
             <div className="flex flex-wrap gap-3">
-              {FEATURE_CHIPS.map((chip) => (
+              {t.pvpArena.chips.map((label) => (
                 <div
-                  key={chip.label}
+                  key={label}
                   className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-white/[0.08] text-sm hover:scale-105 hover:bg-emerald-500/10 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-300 cursor-pointer"
                 >
-                  <span className="text-white/80 font-medium group-hover:text-emerald-400 transition-colors duration-300">{chip.label}</span>
+                  <span className="text-white/80 font-medium group-hover:text-emerald-400 transition-colors duration-300">{label}</span>
                 </div>
               ))}
             </div>
 
             {/* Mini Leaderboard */}
             <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4 max-w-sm">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Liderlik Tablosu</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">{t.pvpArena.leaderboard}</p>
               <div className="space-y-2">
                 {LEADERBOARD.map((player, i) => (
                   <div
@@ -163,15 +159,15 @@ export default function PvPArena() {
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold ${i === 0
-                          ? 'bg-emerald-500 text-[#0a0e1a] shadow-[0_0_10px_rgba(16,220,120,0.3)]'
-                          : 'bg-white/5 text-white/50 border border-white/5'
+                        ? 'bg-emerald-500 text-[#0a0e1a] shadow-[0_0_10px_rgba(16,220,120,0.3)]'
+                        : 'bg-white/5 text-white/50 border border-white/5'
                         }`}>
                         {i + 1}
                       </div>
                       <span className={`text-sm font-medium ${i === 0 ? 'text-white' : 'text-white/80'}`}>{player.name}</span>
                     </div>
                     <span className={`text-sm font-bold tabular-nums ${i === 0 ? 'text-[#22c55e]' : 'text-gray-400'}`}>
-                      {player.score.toLocaleString()} puan
+                      {player.score.toLocaleString()} {t.pvpArena.pointSuffix}
                     </span>
                   </div>
                 ))}
@@ -182,7 +178,7 @@ export default function PvPArena() {
           {/* ================================
               SAĞ KOLON - %55 - Telefon Mockup
               ================================ */}
-          <div className="w-full lg:w-[55%] flex justify-center relative">
+          <div className="w-full lg:w-[55%] hidden lg:flex justify-center relative">
 
 
 
@@ -206,12 +202,12 @@ export default function PvPArena() {
                   {/* Green Header */}
                   <div className="mt-14 bg-gradient-to-r from-green-600 to-green-500 mx-3 rounded-xl px-4 py-2.5 flex justify-between items-center">
                     <div>
-                      <p className="text-white/70 text-[9px] font-medium">CANLI MAÇ</p>
+                      <p className="text-white/70 text-[9px] font-medium">{t.pvpArena.phone.liveMatch}</p>
                       <p className="text-white text-sm font-bold">PvP Arena</p>
                     </div>
                     <div className="flex items-center gap-1.5 bg-white/20 rounded-full px-2.5 py-1">
                       <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                      <span className="text-white text-[9px] font-bold">LIVE</span>
+                      <span className="text-white text-[9px] font-bold">{t.pvpArena.phone.live}</span>
                     </div>
                   </div>
 
@@ -222,7 +218,7 @@ export default function PvPArena() {
                       <div className="w-11 h-11 rounded-full border-2 border-green-500 bg-green-500/20 flex items-center justify-center mb-1">
                         <span className="text-white text-base font-bold">S</span>
                       </div>
-                      <p className="text-white text-[10px]">Sen</p>
+                      <p className="text-white text-[10px]">{t.pvpArena.phone.you}</p>
                       <p className="text-green-400 text-xl font-bold">12</p>
                     </div>
 
@@ -234,7 +230,7 @@ export default function PvPArena() {
                       <div className="w-11 h-11 rounded-full border-2 border-gray-600 bg-gray-600/20 flex items-center justify-center mb-1">
                         <span className="text-white text-base font-bold">R</span>
                       </div>
-                      <p className="text-white text-[10px]">Rakip</p>
+                      <p className="text-white text-[10px]">{t.pvpArena.phone.opponent}</p>
                       <p className="text-white/70 text-xl font-bold">11</p>
                     </div>
                   </div>
@@ -242,7 +238,7 @@ export default function PvPArena() {
                   {/* Progress Bar */}
                   <div className="px-4 mb-2">
                     <div className="flex justify-between text-[9px] text-white/50 mb-1">
-                      <span>İlerleme</span>
+                      <span>{t.pvpArena.phone.progress}</span>
                       <span>%75</span>
                     </div>
                     <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -253,15 +249,15 @@ export default function PvPArena() {
                   {/* Stats Row */}
                   <div className="flex justify-around px-3 py-2.5 border-t border-white/5">
                     <div className="text-center">
-                      <p className="text-white/40 text-[8px]">SÜRE</p>
+                      <p className="text-white/40 text-[8px]">{t.pvpArena.phone.time}</p>
                       <p className="text-white text-[11px] font-bold">02:34</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-white/40 text-[8px]">KALORİ</p>
+                      <p className="text-white/40 text-[8px]">{t.pvpArena.phone.calories}</p>
                       <p className="text-green-400 text-[11px] font-bold">156</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-white/40 text-[8px]">HIZ</p>
+                      <p className="text-white/40 text-[8px]">{t.pvpArena.phone.speed}</p>
                       <p className="text-white text-[11px] font-bold">8.2</p>
                     </div>
                   </div>
@@ -279,7 +275,7 @@ export default function PvPArena() {
                         <div className="absolute bottom-1 left-1 w-1.5 h-1.5 bg-green-500/60 rounded-full" />
                         <div className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-green-500/60 rounded-full" />
                       </div>
-                      <p className="text-white/20 text-[8px]">Hareket Analizi</p>
+                      <p className="text-white/20 text-[8px]">{t.pvpArena.phone.motionAnalysis}</p>
                     </div>
                   </div>
                 </div>

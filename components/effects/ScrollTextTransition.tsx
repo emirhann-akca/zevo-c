@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useRef } from 'react';
 import { gsap, ScrollTrigger } from '@/lib/gsap';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 
 
 export default function ScrollTextTransition() {
+    const { t } = useLanguage()
     const containerRef = useRef<HTMLDivElement>(null);
     const text1Ref = useRef<HTMLHeadingElement>(null);
     const text2Ref = useRef<HTMLHeadingElement>(null);
@@ -126,7 +128,7 @@ export default function ScrollTextTransition() {
                         zIndex: 10,
                     }}
                 >
-                    Sporun Yeni Yüzyılı
+                    {t.scrollTransition.text1}
                 </h2>
 
                 {/* Text 2: ZEVO — emerald-to-cyan gradient */}

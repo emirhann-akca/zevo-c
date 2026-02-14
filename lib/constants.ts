@@ -17,10 +17,10 @@ export const SECTION_IDS = {
 
 /** Navigation links shared between Navigation and Footer */
 export const NAV_LINKS = [
-    { name: 'Anasayfa', href: `#${SECTION_IDS.hero}` },
-    { name: 'Özellikler', href: `#${SECTION_IDS.features}` },
-    { name: 'Hakkımızda', href: `#${SECTION_IDS.about}` },
-    { name: 'Ekip', href: `#${SECTION_IDS.teams}` },
+    { name: 'Anasayfa', key: 'home', href: `#${SECTION_IDS.hero}` },
+    { name: 'Özellikler', key: 'features', href: `#${SECTION_IDS.features}` },
+    { name: 'Hakkımızda', key: 'about', href: `#${SECTION_IDS.about}` },
+    { name: 'Ekip', key: 'team', href: `#${SECTION_IDS.team}` },
 ] as const
 
 /** Social media links */
