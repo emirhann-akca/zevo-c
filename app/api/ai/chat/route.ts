@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ZEVO AI Chat API Route
  * 
  * Security: Rate limiting (30/min), threat detection, input sanitization,
@@ -21,16 +21,16 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { message, history, sportType, injuries, streaming } = body;
 
-        // ── Security validation pipeline ──
+        // â”€â”€ Security validation pipeline â”€â”€
         const security = validateApiRequest(request, ENDPOINT, message);
         if (!security.passed) {
             return security.response!;
         }
 
-        // ── Input validation ──
+        // â”€â”€ Input validation â”€â”€
         if (!message || typeof message !== 'string' || !message.trim()) {
             return NextResponse.json(
-                { error: 'Mesaj boş olamaz.' },
+                { error: 'Mesaj boÅŸ olamaz.' },
                 { status: 400 }
             );
         }
@@ -48,7 +48,11 @@ export async function POST(request: NextRequest) {
         };
 
         // Build system prompt with modular loading
-        const systemPrompt = buildCoachSystemPrompt(
+        // Detect user language and add instruction
+        const isEnglish = /^[a-zA-Z0-9\s.,!?'"():;@#$%^&*+-=<>\/]+$/.test(cleanMessage.trim());
+        const langInstruction = isEnglish ? '\nCRITICAL: The user is writing in English. You MUST respond ENTIRELY in English. Do NOT use Turkish.\n' : '';
+
+        const systemPrompt = langInstruction + buildCoachSystemPrompt(
             cleanMessage,
             userProfile,
             cleanHistory as any
@@ -56,7 +60,7 @@ export async function POST(request: NextRequest) {
 
         const vertexAI = getVertexAIService();
 
-        // ─── Streaming Response ───
+        // â”€â”€â”€ Streaming Response â”€â”€â”€
         if (streaming) {
             const stream = await vertexAI.chatStream({
                 message: cleanMessage,
@@ -77,7 +81,7 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // ─── Standard Response ───
+        // â”€â”€â”€ Standard Response â”€â”€â”€
         const response = await vertexAI.chat({
             message: cleanMessage,
             history: cleanHistory as any,
@@ -94,10 +98,11 @@ export async function POST(request: NextRequest) {
         });
     } catch (error) {
         console.error('AI Chat API error:', error);
-        const clientError = sanitizeErrorForClient(error, 'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.');
+        const clientError = sanitizeErrorForClient(error, 'Beklenmeyen bir hata oluÅŸtu. LÃ¼tfen tekrar deneyin.');
         return NextResponse.json(
             { error: clientError.message },
             { status: 500 }
         );
     }
 }
+

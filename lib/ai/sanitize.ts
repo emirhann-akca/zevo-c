@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ZEVO Enhanced Input Sanitization
  * 
  * Protections:
@@ -10,7 +10,7 @@
  * - Chat history validation
  */
 
-// ─── XSS Patterns ────────────────────────────────────────
+// â”€â”€â”€ XSS Patterns â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const XSS_PATTERNS = [
     /<script\b[^>]*>/i,
@@ -30,10 +30,10 @@ const XSS_PATTERNS = [
     /\bwindow\s*\.\s*(location|open)/i,
 ];
 
-// ─── SQL Injection Patterns ───────────────────────────────
+// â”€â”€â”€ SQL Injection Patterns â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const SQL_PATTERNS = [
-    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE|UNION)\b\s+(ALL\s+)?)/i,
+    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|EXEC|EXECUTE|UNION)\b\s+(ALL\s+)?(SELECT|FROM|INTO|TABLE|DATABASE)\b)/i,
     /(\b(TABLE|DATABASE|FROM|WHERE|AND|OR)\b.*(\b(SELECT|DROP|DELETE|INSERT)\b))/i,
     /(--|#|\/\*|\*\/)/,                       // SQL comments
     /('\s*(OR|AND)\s+')/i,                    // ' OR '1'='1
@@ -45,7 +45,7 @@ const SQL_PATTERNS = [
     /(\bWAITFOR\s+DELAY\b)/i,
 ];
 
-// ─── Prompt Injection Patterns ────────────────────────────
+// â”€â”€â”€ Prompt Injection Patterns â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const PROMPT_INJECTION_PATTERNS = [
     /ignore\s+(all\s+)?previous\s+(instructions|prompts|context)/i,
@@ -66,7 +66,7 @@ const PROMPT_INJECTION_PATTERNS = [
     /\bdo\s+anything\s+now\b/i,
 ];
 
-// ─── Core Functions ───────────────────────────────────────
+// â”€â”€â”€ Core Functions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Sanitize user message before sending to AI
@@ -204,3 +204,4 @@ export function validateBodySize(bodyString: string, maxSizeMB: number = 1): boo
     const sizeInBytes = new TextEncoder().encode(bodyString).length;
     return sizeInBytes <= maxSizeMB * 1024 * 1024;
 }
+

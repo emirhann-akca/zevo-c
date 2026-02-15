@@ -65,5 +65,11 @@ ${historyStr}`;
         historyMessages: chatHistory?.length || 0,
     });
 
+    // Language detection: respond in user's language
+    const isEnglish = /^[a-zA-Z0-9\s.,!?'"():;@#$%^&*+\-=<>\/]+$/.test(userMessage.trim());
+    if (isEnglish) {
+        prompt = 'IMPORTANT: The user is communicating in English. You MUST respond ENTIRELY in English. Do not use any Turkish words or phrases in your response.\n\n' + prompt + '\n\nREMINDER: Your ENTIRE response must be in English. Not a single Turkish word.';
+    }
+
     return prompt;
 }
