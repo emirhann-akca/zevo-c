@@ -26,32 +26,32 @@ export const en = {
         stats: {
             athletes: 'Active Athletes',
             clubs: 'Clubs',
-            growth: 'Growth Rate',
+            growth: 'Performance Boost',
         },
     },
     whyZevo: {
         badge: 'SHAPE THE FUTURE',
         title: 'WHY',
         titleHighlight: 'ZEVO?',
-        description: 'The perfect blend of technology and sports. Not just an app — a platform that takes you to the professional level.',
+        description: 'The synergy of tech and sports. Not just an app—a platform that propels you to pro levels.',
         features: [
             {
                 id: '01',
                 title: 'Data-Driven Analysis',
-                desc: 'Leave ordinary training behind. Zevo\'s AI scans your body movements in milliseconds, detects posture issues, and reduces injury risk by up to 90%.',
+                desc: 'No more guessing. AI scans your movement in milliseconds, fixing posture instantly. Zero injury risk, 100% safe progress.',
             },
             {
                 id: '02',
                 title: 'Personalized Program',
-                desc: 'A smart training experience tailored just for you, shaped by your performance and optimized for your goals. AI processes your body analysis and data to draw the best development path based on facts, not guesses.',
+                desc: 'An algorithm that lives for you. AI processes your data, plotting the shortest route to your goal. No cookie-cutter lists, just a plan that adapts to you.',
             },
             {
                 id: '03',
                 title: 'Competitive Leagues',
-                desc: 'Training has never been this fun. Every calorie is a point, every set is a victory. Compete with friends, climb the leagues, and win real rewards.',
+                desc: 'Every rep is a point, every workout a victory. Battle friends in real-time, climb the leagues. Don\'t just train—win the game.',
             },
         ],
-        cta: 'Learn More',
+        cta: 'Explore >',
         phone: {
             analysisScore: 'Analysis Score',
             followers: 'Followers',
@@ -59,6 +59,20 @@ export const en = {
             youWon: 'YOU WON!',
             weekLeader: 'Leader of the Week',
             championsLeague: 'Champions League',
+            phoneTitle: 'Program',
+            phoneSubtitle: 'Monday, Chest & Triceps',
+            aiGenerated: 'AI Generated',
+            progress: "Today's Progress",
+            sets: 'sets',
+            reps: 'reps',
+            dataTitle: 'Workout Analysis',
+            totalVolume: 'Total Volume',
+            duration: 'Duration',
+            intensity: 'Intensity',
+            muscleActivation: 'Muscle Activation',
+            volumeUnit: 'Tons',
+            durationUnit: 'min',
+            intensityHigh: 'High',
         },
     },
     features: {
@@ -122,7 +136,7 @@ export const en = {
             {
                 title: 'Teams',
                 shortDescription: 'Train with your teammates',
-                detailedDescription: 'Analyzes training data, creates a dynamic league environment where you can compete with friends.||Turns your performance into a team game.',
+                detailedDescription: 'Join forces, crush goals. Analyze data, compete in dynamic leagues, and turn training into a team sport.||Rise together.',
                 problemTitle: 'WHY IS SOLO TRAINING CHALLENGING?',
                 listTitle: 'THE ZEVO DIFFERENCE',
                 problems: [
@@ -139,7 +153,7 @@ export const en = {
             {
                 title: 'PvP Arena',
                 shortDescription: 'Real-time competition',
-                detailedDescription: 'Turns training into a digital arena, ensures fairness with AI refereeing.||Solves trust and fairness issues in remote competition.',
+                detailedDescription: 'The Digital Arena is open. AI referees every rep, ensuring fair play in real-time battles.||Compete. Climb. Conquer.',
                 problemTitle: 'Why Is Traditional Competition Insufficient?',
                 listTitle: 'THE ZEVO DIFFERENCE',
                 problems: [
@@ -207,7 +221,7 @@ export const en = {
         badge: 'AI Coach',
         title: 'Personal',
         titleHighlight: 'AI Coach',
-        description: 'Doesn\'t just tell you what to do, shows you how to do it. Doesn\'t judge your mistakes, teaches you the right way. Your trainer on your development journey, answering every question on your mind.',
+        description: 'It doesn\'t just tell you what to do, it shows you how to do it. It doesn\'t judge your mistakes, it teaches you the right way. It\'s your coach on your journey of growth, answering every question that comes to mind.',
         features: [
             { title: 'Real-Time Correction', desc: 'Analyzes every movement, provides instant feedback' },
             { title: 'Progress Tracking', desc: 'Weekly progress reports and goal setting' },
@@ -232,7 +246,7 @@ export const en = {
         badge: 'Vision AI',
         title: 'Scan Your Plate,',
         titleHighlight: 'See What\'s Inside',
-        description: 'Take a photo of your food, let Zevo calculate macro and micro values instantly. Don\'t leave your nutrition to chance with image processing technology.',
+        description: 'Take a photo of your meal, and Zevo instantly calculates its macro and micro values. Don\'t leave your nutrition to chance with image processing technology.',
         features: [
             { title: 'Instant Visual Recognition', desc: 'Food type, portion, and content detection in seconds with AI' },
             { title: 'Smart Nutrient Analysis', desc: 'Precise calculation of macro and micro nutrient values with AI models' },

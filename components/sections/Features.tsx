@@ -286,10 +286,10 @@ export default function Features() {
 
                   {/* Body Content */}
                   <div className="space-y-4">
-                    {/* Description Section (Only if no problems, otherwise it is in header) */}
+                    {/* Description Section */}
                     {!selectedFeature.problems && (
                       <div className="mb-3">
-                        <div className="max-h-[140px] overflow-y-auto pr-2 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+                        <div className="max-h-[140px] overflow-y-auto pr-2 scrollbar-none">
                           <p className="text-white/80 leading-relaxed text-base pb-2">
                             {selectedFeature.detailedDescription}
                           </p>
@@ -297,7 +297,7 @@ export default function Features() {
                       </div>
                     )}
 
-                    {/* Problems Section (Only if exists) */}
+                    {/* Problems Section */}
                     {selectedFeature.problems && (
                       <div className="mb-4">
                         <h4 className="text-xs font-bold text-white/50 uppercase tracking-wider mb-2">
@@ -344,10 +344,7 @@ export default function Features() {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2 + (index * 0.1) }}
-                            className={`flex items-center gap-3 p-2.5 rounded-xl border transition-colors duration-200 group ${benefit.title === 'Akıllı Yüklenme ve Güvenlik'
-                              ? 'bg-emerald-500/10 border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.1)] scale-[1.01]'
-                              : 'bg-white/5 border-emerald-500/20 hover:border-emerald-500/40 hover:bg-emerald-500/5'
-                              }`}
+                            className="flex items-center gap-3 p-2.5 rounded-xl border transition-colors duration-200 group bg-white/5 border-emerald-500/20 hover:border-emerald-500/40 hover:bg-emerald-500/5"
                           >
                             {/* Icon if exists, or simple dot */}
                             {benefit.icon ? (

@@ -16,8 +16,8 @@ export const tr = {
         introDescription: 'Yapay zeka ile performansını ölç ve geliştir.',
         scrollText: 'Kaydır',
         demoLabel: 'Demo',
-        title1: 'Antrenörün',
-        title2: 'Cebinde',
+        title1: 'Cebindeki',
+        title2: 'Antrenör',
         description: 'Antrenmanını ölç, analiz et, geliştir',
         descriptionLine2: 'hepsi tek uygulamada.',
         cta: 'Şimdi Başla',
@@ -26,7 +26,7 @@ export const tr = {
         stats: {
             athletes: 'Aktif Sporcu',
             clubs: 'Kulüp',
-            growth: 'Gelişim Artışı',
+            growth: 'Performans Artışı',
         },
     },
     whyZevo: {
@@ -38,20 +38,20 @@ export const tr = {
             {
                 id: '01',
                 title: 'Veri Odaklı Analiz',
-                desc: 'Sıradan antrenmanları geride bırakın. Zevo\'nun yapay zekası, vücut hareketlerinizi milisaniyeler içinde tarar, duruş bozukluklarını tespit eder ve sakatlık riskini %90\'a kadar azaltır.',
+                desc: 'Tahminlere veda et. Yapay zeka, vücut hareketlerini milisaniyeler içinde tarar, duruş bozukluklarını yakalar. Sakatlık riski yok, %100 güvenli gelişim var.',
             },
             {
                 id: '02',
                 title: 'Kişisel Program',
-                desc: 'Sadece sana özel, performansınla şekillenen ve hedeflerinle optimize edilmiş akıllı bir antrenman deneyimi. Yapay zeka; vücut analizini ve verilerini işleyerek tahminlere değil, gerçeklere dayalı en uygun gelişim rotasını çizer.',
+                desc: 'Sana özel işleyen bir algoritma. Yapay zeka verilerini işler, hedefine en kısa rotayı çizer. Basmakalıp listeler yok, senin için yaşayan bir plan var.',
             },
             {
                 id: '03',
                 title: 'Rekabetçi Ligler',
-                desc: 'Antrenman yapmak hiç bu kadar eğlenceli olmamıştı. Her kalori bir puan, her set bir zafer. Arkadaşlarınızla kapışın, liglerde yükselin ve gerçek ödüller kazanın.',
+                desc: 'Her tekrar bir puan, her antrenman bir zafer. Arkadaşlarınla gerçek zamanlı kapış, liglerde yüksel. Sadece spor yapma, oyunun kazananı ol.',
             },
         ],
-        cta: 'Detaylı İncele',
+        cta: 'Keşfet >',
         // Phone mockup texts
         phone: {
             analysisScore: 'Analiz Skoru',
@@ -60,6 +60,20 @@ export const tr = {
             youWon: 'KAZANDIN!',
             weekLeader: 'Haftanın Lideri',
             championsLeague: 'Şampiyonlar Ligi',
+            phoneTitle: 'Programın',
+            phoneSubtitle: 'Pazartesi, Göğüs & Triseps',
+            aiGenerated: 'AI ile oluşturuldu',
+            progress: 'Bugünkü İlerleme',
+            sets: 'set',
+            reps: 'tekrar',
+            dataTitle: 'Antrenman Analizi',
+            totalVolume: 'Toplam Yük',
+            duration: 'Süre',
+            intensity: 'Yoğunluk',
+            muscleActivation: 'Kas Aktivasyonu',
+            volumeUnit: 'Ton',
+            durationUnit: 'dk',
+            intensityHigh: 'Yüksek',
         },
     },
     features: {
@@ -123,7 +137,7 @@ export const tr = {
             {
                 title: 'Ekipler',
                 shortDescription: 'Takım arkadaşlarınla antrenman',
-                detailedDescription: 'Antrenman verilerini analiz eder, arkadaşlarınla yarışabileceğin dinamik bir lig ortamı oluşturur.||Performansını takım oyununa dönüştürür.',
+                detailedDescription: 'Verilerini analiz et, dinamik liglerde yarış. Arkadaşlarınla takım ol.||Birlikte yüksel.',
                 problemTitle: 'TEK BAŞINA ANTRENMAN NEDEN ZORLUYOR?',
                 listTitle: 'ZEVO FARKI',
                 problems: [
@@ -140,7 +154,7 @@ export const tr = {
             {
                 title: 'PvP Arena',
                 shortDescription: 'Gerçek zamanlı rekabet',
-                detailedDescription: 'Antrenmanı dijital bir arenaya dönüştürür, AI hakemliği ile tarafsızlık sağlar.||Uzaktan rekabette güven ve adalet sorununu çözer.',
+                detailedDescription: 'Dijital arenaya hoş geldin. AI hakemliğinde adil yarış.||Güven sorunu yok, sadece rekabet var.',
                 problemTitle: 'Geleneksel Rekabet Neden Yetersiz?',
                 listTitle: 'ZEVO FARKI',
                 problems: [
