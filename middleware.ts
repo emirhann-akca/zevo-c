@@ -1,13 +1,4 @@
-/**
- * ZEVO Security Middleware
- * 
- * Handles: CORS, CSRF protection, global rate limiting, DDoS protection
- * Runs on every /api/* request before reaching route handlers
- */
-
 import { NextRequest, NextResponse } from 'next/server';
-
-// ─── Configuration ────────────────────────────────────────
 
 const ALLOWED_ORIGINS = [
     'http://localhost:3000',
@@ -16,27 +7,21 @@ const ALLOWED_ORIGINS = [
     'https://www.zevosports.com',
 ];
 
-const GLOBAL_RATE_LIMIT = 100;  // requests per minute per IP
-const GLOBAL_WINDOW_MS = 60_000;
-const MAX_CONCURRENT = 5;       // max concurrent requests per IP
+const SOFT_RATE_LIMIT = 120;
+const SOFT_WINDOW_MS = 60_000;
 
-// ─── In-memory stores ─────────────────────────────────────
+const softRateMap = new Map<string, number[]>();
 
-const globalRateMap = new Map<string, { timestamps: number[] }>();
-const concurrentMap = new Map<string, number>();
-
-// Clean up every 5 minutes
 if (typeof setInterval !== 'undefined') {
     setInterval(() => {
         const now = Date.now();
-        for (const [key, entry] of globalRateMap.entries()) {
-            entry.timestamps = entry.timestamps.filter(t => now - t < GLOBAL_WINDOW_MS);
-            if (entry.timestamps.length === 0) globalRateMap.delete(key);
+        for (const [key, timestamps] of softRateMap.entries()) {
+            const valid = timestamps.filter(t => now - t < SOFT_WINDOW_MS);
+            if (valid.length === 0) softRateMap.delete(key);
+            else softRateMap.set(key, valid);
         }
-    }, 300_000);
+    }, 120_000);
 }
-
-// ─── Helpers ──────────────────────────────────────────────
 
 function getClientIP(request: NextRequest): string {
     return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
@@ -45,65 +30,33 @@ function getClientIP(request: NextRequest): string {
 }
 
 function isAllowedOrigin(origin: string | null): boolean {
-    if (!origin) return true; // Same-origin requests don't send Origin
-    return ALLOWED_ORIGINS.some(allowed => origin === allowed);
+    if (!origin) return true;
+    return ALLOWED_ORIGINS.some(allowed => origin === allowed)
+        || /^https:\/\/.*\.vercel\.app$/.test(origin || '');
 }
 
-function checkGlobalRateLimit(ip: string): { allowed: boolean; retryAfter: number } {
+function softRateCheck(ip: string): { allowed: boolean; remaining: number } {
     const now = Date.now();
-    const entry = globalRateMap.get(ip) || { timestamps: [] };
-
-    // Sliding window: keep only timestamps within the window
-    entry.timestamps = entry.timestamps.filter(t => now - t < GLOBAL_WINDOW_MS);
-
-    if (entry.timestamps.length >= GLOBAL_RATE_LIMIT) {
-        const oldest = entry.timestamps[0];
-        const retryAfter = Math.ceil((oldest + GLOBAL_WINDOW_MS - now) / 1000);
-        return { allowed: false, retryAfter };
+    const timestamps = (softRateMap.get(ip) || []).filter(t => now - t < SOFT_WINDOW_MS);
+    if (timestamps.length >= SOFT_RATE_LIMIT) {
+        softRateMap.set(ip, timestamps);
+        return { allowed: false, remaining: 0 };
     }
-
-    entry.timestamps.push(now);
-    globalRateMap.set(ip, entry);
-    return { allowed: true, retryAfter: 0 };
+    timestamps.push(now);
+    softRateMap.set(ip, timestamps);
+    return { allowed: true, remaining: SOFT_RATE_LIMIT - timestamps.length };
 }
-
-function checkConcurrentLimit(ip: string): boolean {
-    const current = concurrentMap.get(ip) || 0;
-    if (current >= MAX_CONCURRENT) return false;
-    concurrentMap.set(ip, current + 1);
-    return true;
-}
-
-function releaseConcurrent(ip: string): void {
-    const current = concurrentMap.get(ip) || 0;
-    if (current <= 1) {
-        concurrentMap.delete(ip);
-    } else {
-        concurrentMap.set(ip, current - 1);
-    }
-}
-
-// ─── Middleware ────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    const isApiRoute = pathname.startsWith('/api/');
-
-    // Only apply full security checks to API routes
-    if (!isApiRoute) {
-        return NextResponse.next();
-    }
+    if (!pathname.startsWith('/api/')) return NextResponse.next();
 
     const ip = getClientIP(request);
     const origin = request.headers.get('origin');
     const method = request.method;
 
-    // ── CORS: Preflight ──
     if (method === 'OPTIONS') {
-        if (!isAllowedOrigin(origin)) {
-            return new NextResponse(null, { status: 403 });
-        }
-
+        if (!isAllowedOrigin(origin)) return new NextResponse(null, { status: 403 });
         return new NextResponse(null, {
             status: 204,
             headers: {
@@ -115,69 +68,30 @@ export async function middleware(request: NextRequest) {
         });
     }
 
-    // ── CORS: Origin check ──
     if (origin && !isAllowedOrigin(origin)) {
-        console.warn(`🛡️ CORS blocked: ${origin} from ${ip}`);
-        return NextResponse.json(
-            { error: 'Origin not allowed' },
-            { status: 403 }
-        );
+        return NextResponse.json({ error: 'Origin not allowed' }, { status: 403 });
     }
 
-    // ── CSRF: Check Origin header on mutations ──
-    if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
-        // In production, require Origin header to match
-        if (process.env.NODE_ENV === 'production' && origin && !isAllowedOrigin(origin)) {
-            console.warn(`🛡️ CSRF blocked: ${origin} from ${ip}`);
-            return NextResponse.json(
-                { error: 'Request origin not trusted' },
-                { status: 403 }
-            );
-        }
+    if ((method === 'POST' || method === 'PUT' || method === 'DELETE') &&
+        process.env.NODE_ENV === 'production' && origin && !isAllowedOrigin(origin)) {
+        return NextResponse.json({ error: 'Request origin not trusted' }, { status: 403 });
     }
 
-    // ── DDoS: Concurrent request limit ──
-    if (!checkConcurrentLimit(ip)) {
-        console.warn(`🛡️ Concurrent limit exceeded: ${ip}`);
-        return NextResponse.json(
-            { error: 'Çok fazla eşzamanlı istek. Lütfen bekleyin.' },
-            { status: 429, headers: { 'Retry-After': '5' } }
-        );
-    }
-
-    // ── Global rate limit ──
-    const rateCheck = checkGlobalRateLimit(ip);
-    if (!rateCheck.allowed) {
-        releaseConcurrent(ip);
-        console.warn(`🛡️ Global rate limit exceeded: ${ip}`);
+    const rateResult = softRateCheck(ip);
+    if (!rateResult.allowed) {
         return NextResponse.json(
             { error: 'Çok fazla istek gönderildi. Lütfen bekleyin.' },
-            {
-                status: 429,
-                headers: { 'Retry-After': String(rateCheck.retryAfter) },
-            }
+            { status: 429, headers: { 'Retry-After': '30' } }
         );
     }
 
-    // ── Process request ──
     const response = NextResponse.next();
-
-    // Add CORS headers to response
     if (origin && isAllowedOrigin(origin)) {
         response.headers.set('Access-Control-Allow-Origin', origin);
         response.headers.set('Access-Control-Allow-Credentials', 'true');
     }
-
-    // Release concurrent slot after response
-    // Note: Edge middleware can't await response completion,
-    // so we release after a timeout as a safety net
-    setTimeout(() => releaseConcurrent(ip), 30_000);
-
+    response.headers.set('X-RateLimit-Remaining', String(rateResult.remaining));
     return response;
 }
 
-// ─── Matcher: Only run on API routes ──────────────────────
-
-export const config = {
-    matcher: '/api/:path*',
-};
+export const config = { matcher: '/api/:path*' };

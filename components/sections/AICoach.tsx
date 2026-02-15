@@ -41,6 +41,9 @@ export default function AICoach() {
   const [messages, setMessages] = useState<Array<{ type: 'user' | 'ai', text: string }>>([])
   const [isTyping, setIsTyping] = useState(false)
 
+  const tRef = useRef(t)
+  tRef.current = t
+
   // Intersection Observer
   useEffect(() => {
     if (!sectionRef.current) return
@@ -88,12 +91,12 @@ export default function AICoach() {
     let mounted = true
 
     const script: ScriptStep[] = [
-      { type: 'user', text: t.aiCoach.chatScript[0].text, delay: 1000 },
+      { type: 'user', text: tRef.current.aiCoach.chatScript[0].text, delay: 1000 },
       { type: 'typing', delay: 1500 },
-      { type: 'ai', text: t.aiCoach.chatScript[1].text, delay: 200 },
-      { type: 'user', text: t.aiCoach.chatScript[2].text, delay: 2000 },
+      { type: 'ai', text: tRef.current.aiCoach.chatScript[1].text, delay: 200 },
+      { type: 'user', text: tRef.current.aiCoach.chatScript[2].text, delay: 2000 },
       { type: 'typing', delay: 1500 },
-      { type: 'ai', text: t.aiCoach.chatScript[3].text, delay: 200 }
+      { type: 'ai', text: tRef.current.aiCoach.chatScript[3].text, delay: 200 }
     ]
 
     const runScript = () => {

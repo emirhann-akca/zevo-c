@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { X, Dumbbell, Apple, Brain, Users, Trophy, ChevronRight, Activity, ShieldCheck, Target, TriangleAlert, CircleHelp, FileX, Shuffle, Camera, PieChart, Mic, TrendingUp } from 'lucide-react'
 import EnergyCircuitBackground from '@/components/effects/EnergyCircuitBackground'
 import SectionHeader from '@/components/ui/SectionHeader'
@@ -69,24 +69,27 @@ export default function Features() {
     }
   })
 
+  const featuresRef = useRef(features)
+  featuresRef.current = features
+
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash
       if (hash === '#ozellikler-antrenman') {
         setTimeout(() => {
-          setSelectedFeature(features[0])
+          setSelectedFeature(featuresRef.current[0])
           window.history.replaceState(null, '', window.location.pathname)
         }, 800)
       }
       if (hash === '#ozellikler-koc') {
         setTimeout(() => {
-          setSelectedFeature(features[2])
+          setSelectedFeature(featuresRef.current[2])
           window.history.replaceState(null, '', window.location.pathname)
         }, 800)
       }
       if (hash === '#ozellikler-pvp') {
         setTimeout(() => {
-          setSelectedFeature(features[4])
+          setSelectedFeature(featuresRef.current[4])
           window.history.replaceState(null, '', window.location.pathname)
         }, 800)
       }

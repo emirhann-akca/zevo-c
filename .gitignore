@@ -17,7 +17,14 @@
 .DS_Store
 *.pem
 *.key
+
+# ─── SECURITY: Service Account Keys ───────────────────────
 service-account-key.json
+*-service-account*.json
+*credentials*.json
+!package.json
+!package-lock.json
+!tsconfig.json
 
 # Debug
 npm-debug.log*
@@ -25,8 +32,13 @@ yarn-debug.log*
 yarn-error.log*
 
 # Local env files
-.env*.local
 .env
+.env.*
+.env.local
+.env.development
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Vercel
 .vercel
