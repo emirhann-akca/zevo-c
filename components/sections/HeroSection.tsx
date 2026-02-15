@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { Play, ChevronDown, ChevronRight, Star } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -27,10 +27,9 @@ export default function HeroSection() {
 
 
 
-    const [ready, setReady] = useState(false)
+
 
     useEffect(() => {
-        setReady(true)
         gsap.registerPlugin(ScrollTrigger)
 
         const timer = setTimeout(() => {
@@ -131,14 +130,10 @@ export default function HeroSection() {
             }, wrapperRef)
 
             return () => ctx.revert()
-        }, 100)
+        }, 300)
 
         return () => clearTimeout(timer)
     }, [])
-
-    if (!ready) {
-        return <div className="min-h-screen lg:h-[300vh] bg-[#0a0e1a]" />
-    }
 
     return (
         <div id="performans" ref={wrapperRef} className="relative bg-[#0a0e1a] min-h-screen lg:h-[300vh]">
@@ -197,7 +192,7 @@ export default function HeroSection() {
                         {/* INTRO OVERLAY */}
                         <div
                             ref={introOverlayRef}
-                            className="absolute inset-0 z-20 bg-black/45 flex flex-col items-center justify-center"
+                            className="absolute inset-0 z-20 bg-black/45 hidden lg:flex flex-col items-center justify-center"
                         >
                             <div className="text-center px-6 mb-20">
                                 <h1 className="text-6xl md:text-8xl font-black text-white mb-6 tracking-tight leading-none">
@@ -237,8 +232,7 @@ export default function HeroSection() {
                 {/* SOL İÇERİK */}
                 <div
                     ref={contentLeftRef}
-                    className="relative lg:absolute z-40 flex flex-col items-center text-center lg:items-start lg:text-left px-6 lg:px-0 lg:left-[15%] py-20 lg:py-0 lg:top-1/2 lg:-translate-y-1/2 max-w-lg mx-auto lg:mx-0"
-                    style={{ opacity: 0 }}
+                    className="relative lg:absolute z-40 flex flex-col items-center text-center lg:items-start lg:text-left px-6 lg:px-0 lg:left-[15%] py-20 lg:py-0 lg:top-1/2 lg:-translate-y-1/2 max-w-lg mx-auto lg:mx-0 lg:opacity-0"
                 >
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#22c55e]/40 bg-[#22c55e]/10 mb-7">
                         <div className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse" />
