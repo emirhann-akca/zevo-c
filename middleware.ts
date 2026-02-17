@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 const ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://localhost:3000',
-    'https://zevosports.com',
-    'https://www.zevosports.com',
+    'https://zevooapp.com',
+    'https://www.zevooapp.com',
 ];
 
 const SOFT_RATE_LIMIT = 120;

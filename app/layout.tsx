@@ -31,14 +31,14 @@ export const metadata: Metadata = {
     },
   },
 
-  metadataBase: new URL('https://zevo.ai'),
+  metadataBase: new URL('https://zevooapp.com'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'ZEVO - Yapay Zeka Spor Antrenörü',
     description: 'Yapay zeka ile performansını zirveye taşı. ZEVO ile tanış.',
-    url: 'https://zevo.ai',
+    url: 'https://zevooapp.com',
     siteName: 'ZEVO',
     locale: 'tr_TR',
     type: 'website',
