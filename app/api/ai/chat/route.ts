@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         // â”€â”€ Input validation â”€â”€
         if (!message || typeof message !== 'string' || !message.trim()) {
             return NextResponse.json(
-                { error: 'Mesaj boÅŸ olamaz.' },
+                { error: 'Mesaj boş olamaz.' },
                 { status: 400 }
             );
         }
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
         });
     } catch (error) {
         console.error('AI Chat API error:', error);
-        const clientError = sanitizeErrorForClient(error, 'Beklenmeyen bir hata oluÅŸtu. LÃ¼tfen tekrar deneyin.');
+        const clientError = sanitizeErrorForClient(error, 'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.');
         return NextResponse.json(
             { error: clientError.message },
             { status: 500 }
