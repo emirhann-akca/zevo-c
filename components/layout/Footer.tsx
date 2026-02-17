@@ -1,15 +1,14 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Twitter, Instagram, Linkedin, Github } from 'lucide-react'
+import { Twitter, Instagram, Linkedin } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 const socialLinks = [
-  { name: 'Twitter', icon: Twitter, href: '#' },
-  { name: 'Instagram', icon: Instagram, href: '#' },
-  { name: 'LinkedIn', icon: Linkedin, href: '#' },
-  { name: 'GitHub', icon: Github, href: '#' }
+  { name: 'Twitter', icon: Twitter, href: 'https://x.com/AppZevo' },
+  { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/zevo.app/' },
+  { name: 'LinkedIn', icon: Linkedin, href: 'https://www.linkedin.com/company/zevoo' },
 ]
 
 export default function Footer() {
@@ -74,6 +73,8 @@ export default function Footer() {
                     <motion.a
                       key={i}
                       href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       whileHover={{ scale: 1.1, y: -2 }}
                       whileTap={{ scale: 0.9 }}
                       className="w-12 h-12 rounded-full bg-dark-secondary border border-white/10 flex items-center justify-center hover:bg-emerald-primary hover:border-emerald-primary text-text-muted hover:text-white transition-all"

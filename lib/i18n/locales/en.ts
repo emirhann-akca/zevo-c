@@ -338,9 +338,9 @@ export const en = {
         title: 'Zevo Team',
         description: 'The passionate team turning our vision into reality.',
         members: [
-            { name: 'Emirhan Boran Akça', role: 'Founder & CEO', description: 'Founder & CEO of Zevo' },
+            { name: 'Emirhan Akça', role: 'Founder & CEO', description: 'Founder & CEO of Zevo' },
             { name: 'Hasan Sefa Karakoyunlu', role: 'Design Expert', description: 'Zevo Design Expert' },
-            { name: 'Hasan Server Kamber', role: 'Design & Development', description: 'Zevo Design and Development Expert' },
+            { name: 'Hasan Server Kamber', role: 'Backend & Database', description: 'Zevo Backend and Database Expert' },
         ],
     },
     footer: {

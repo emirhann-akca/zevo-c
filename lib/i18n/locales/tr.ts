@@ -339,9 +339,9 @@ export const tr = {
         title: 'Zevo Ekibi',
         description: 'Vizyonumuzu gerçeğe dönüştüren tutkulu ekip.',
         members: [
-            { name: 'Emirhan Boran Akça', role: 'Kurucu CEO', description: 'Zevo Şirketinin Kurucu CEO\'su' },
+            { name: 'Emirhan Akça', role: 'Kurucu CEO', description: 'Zevo Şirketinin Kurucu CEO\'su' },
             { name: 'Hasan Sefa Karakoyunlu', role: 'Tasarım Uzmanı', description: 'Zevo Şirket Tasarım Uzmanı' },
-            { name: 'Hasan Server Kamber', role: 'Tasarım & Yazılım', description: 'Zevo Şirket Tasarım ve Yazılım Uzmanı' },
+            { name: 'Hasan Server Kamber', role: 'Backend & Veri Tabanı', description: 'Zevo Şirket Backend ve Veri Tabanı Uzmanı' },
         ],
     },
     footer: {

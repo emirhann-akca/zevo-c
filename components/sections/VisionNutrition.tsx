@@ -99,6 +99,7 @@ export default function VisionNutrition() {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isScanning])
 
   // Macro Counting Animation - Optimized with single RAF
@@ -131,6 +132,7 @@ export default function VisionNutrition() {
       if (animationRef.current) cancelAnimationFrame(animationRef.current)
       clearTimeout(timeout)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showResults])
 
 
