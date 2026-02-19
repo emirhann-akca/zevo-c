@@ -281,14 +281,6 @@ export default function HeroSection() {
                         <span>{t.hero.trust}</span>
                     </div>
 
-                    <div className="flex gap-10 justify-center lg:justify-start">
-                        {STAT_VALUES.map((val, i) => (
-                            <div key={i} className="group cursor-default">
-                                <div className="text-3xl font-bold text-white group-hover:text-emerald-400 transition-colors duration-300">{val}</div>
-                                <div className="text-sm text-gray-500 group-hover:text-gray-400 transition-colors duration-300">{statLabels[i]}</div>
-                            </div>
-                        ))}
-                    </div>
                 </div>
             </div>
 

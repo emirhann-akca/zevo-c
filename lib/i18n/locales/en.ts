@@ -182,7 +182,7 @@ export const en = {
             { label: 'Auto Counting', desc: 'AI counts your reps, not you' },
         ],
         metrics: [
-            { value: '17', label: 'Joint Points' },
+            { value: '32', label: 'Joint Points' },
             { value: '30+', label: 'FPS Analysis' },
             { value: '50', label: 'ms Latency' },
         ],

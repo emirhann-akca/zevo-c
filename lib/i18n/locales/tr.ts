@@ -183,7 +183,7 @@ export const tr = {
             { label: 'Otomatik Sayım', desc: 'Tekrarları sen değil, yapay zeka sayar' },
         ],
         metrics: [
-            { value: '17', label: 'Eklem Noktası' },
+            { value: '32', label: 'Eklem Noktası' },
             { value: '30+', label: 'FPS Analiz' },
             { value: '50', label: 'ms Gecikme' },
         ],

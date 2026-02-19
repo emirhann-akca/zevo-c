@@ -44,16 +44,12 @@ const QUEST_PROGRESS = [72, 45]
 const QUEST_REWARDS = ['500 XP', '300 XP']
 const QUEST_ICONS = ['🏃', '💪']
 
-const STAT_VALUES = [100, 5000, 50, 98]
-const STAT_SUFFIXES = ['K+', '+', '+', '%']
 
 /* ─── Component ─── */
 export default function TeamClans() {
     const { t } = useLanguage()
     const sectionRef = useRef<HTMLElement>(null)
     const [isVisible, setIsVisible] = useState(false)
-    const [animatedStats, setAnimatedStats] = useState(STAT_VALUES.map(() => 0))
-    const statsAnimated = useRef(false)
     const rafRef = useRef<number>()
 
     // IntersectionObserver — section visibility
@@ -75,32 +71,6 @@ export default function TeamClans() {
         return () => observer.disconnect()
     }, [])
 
-    // Stats counter — single RAF loop
-    useEffect(() => {
-        if (!isVisible || statsAnimated.current) return
-        statsAnimated.current = true
-
-        let startTime: number | null = null
-        const duration = 1200
-
-        const tick = (timestamp: number) => {
-            if (!startTime) startTime = timestamp
-            const elapsed = timestamp - startTime
-            const progress = Math.min(elapsed / duration, 1)
-            const ease = 1 - Math.pow(1 - progress, 3) // cubic ease-out
-
-            setAnimatedStats(STAT_VALUES.map((v) => Math.round(v * ease)))
-
-            if (progress < 1) {
-                rafRef.current = requestAnimationFrame(tick)
-            }
-        }
-
-        rafRef.current = requestAnimationFrame(tick)
-        return () => {
-            if (rafRef.current) cancelAnimationFrame(rafRef.current)
-        }
-    }, [isVisible])
 
     return (
         <section
@@ -313,19 +283,6 @@ export default function TeamClans() {
                             })}
                         </div>
 
-                        {/* Stats Row - Clean Text Style */}
-                        <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6">
-                            {t.teamClans.stats.map((stat, i) => (
-                                <div key={i} className="text-left group cursor-default">
-                                    <div className="text-xl lg:text-2xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">
-                                        {animatedStats[i]}{STAT_SUFFIXES[i]}
-                                    </div>
-                                    <div className="text-[10px] text-white/40 font-medium uppercase tracking-wide group-hover:text-white/60 transition-colors">
-                                        {stat.label}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
                     </div>
                 </div>
             </div>
