@@ -167,12 +167,14 @@ export default function HeroSection() {
                             borderRadius: 0,
                         }}
                     >
-                        {/* Video Background */}
+                        {/* Video Background - optimized with poster & preload */}
                         <video
                             autoPlay
                             muted
                             loop
                             playsInline
+                            preload="metadata"
+                            poster="/hero-poster.jpg"
                             className="absolute inset-0 w-full h-full object-cover"
                         >
                             <source src="/hero-video.mp4" type="video/mp4" />

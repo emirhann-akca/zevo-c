@@ -8,19 +8,19 @@ import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 const TEAM_DATA = [
   {
-    image: '/team/emirhan-akca.png',
+    image: '/team/emirhan-akca.jpg',
     twitter: 'https://x.com/Aka95167Akca',
     linkedin: 'https://www.linkedin.com/in/emirhanakca/',
     github: 'https://github.com/emirhann-akca',
   },
   {
-    image: '/team/hasan-sefa.png',
+    image: '/team/hasan-sefa.jpg',
     twitter: null,
     linkedin: 'https://www.linkedin.com/in/hasansefa7/',
     github: 'https://github.com/hasansefakarakoyunlu66-arch',
   },
   {
-    image: '/team/hasan-server.png',
+    image: '/team/hasan-server.jpg',
     twitter: null,
     linkedin: 'https://www.linkedin.com/in/hasanserverkamber/',
     github: 'https://github.com/ServerKamber',
@@ -74,9 +74,11 @@ export default function Team() {
                     src={data.image}
                     alt={member.name}
                     fill
+                    loading="lazy"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                     style={{ objectPosition: 'center 20%' }}
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    quality={85}
                   />
 
                   {/* Social Icons - Appear on Hover with Matte Style */}

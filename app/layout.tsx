@@ -1,12 +1,33 @@
 import type { Metadata, Viewport } from 'next'
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import ConsoleMessage from '@/components/ConsoleMessage'
 import { LanguageProvider } from '@/lib/i18n/LanguageContext'
+
+// ===== OPTIMIZED FONT LOADING =====
+// next/font eliminates render-blocking CSS requests
+// Fonts are self-hosted, preloaded, and subsetted automatically
+const inter = Inter({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+  variable: '--font-inter',
+  preload: true,
+})
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-jakarta',
+  preload: true,
+})
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  themeColor: '#0A1628',
 }
 
 export const metadata: Metadata = {
@@ -57,8 +78,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="tr">
-      <body><ConsoleMessage /><LanguageProvider>{children}</LanguageProvider></body>
+    <html lang="tr" className={`${inter.variable} ${plusJakarta.variable}`}>
+      <body className={inter.className}>
+        <ConsoleMessage />
+        <LanguageProvider>{children}</LanguageProvider>
+      </body>
     </html>
   )
 }

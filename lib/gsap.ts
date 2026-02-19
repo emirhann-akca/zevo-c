@@ -2,11 +2,10 @@
 
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
 
-// Register plugins once
+// Register plugins once (client-side only)
 if (typeof window !== 'undefined') {
-    gsap.registerPlugin(ScrollTrigger, MotionPathPlugin)
+    gsap.registerPlugin(ScrollTrigger)
 }
 
-export { gsap, ScrollTrigger, MotionPathPlugin }
+export { gsap, ScrollTrigger }

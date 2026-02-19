@@ -48,9 +48,11 @@ export async function POST(request: NextRequest) {
         };
 
         // Build system prompt with modular loading
-        // Detect user language and add instruction
-        const isEnglish = /^[a-zA-Z0-9\s.,!?'"():;@#$%^&*+-=<>\/]+$/.test(cleanMessage.trim());
-        const langInstruction = isEnglish ? '\nCRITICAL: The user is writing in English. You MUST respond ENTIRELY in English. Do NOT use Turkish.\n' : '';
+        // Detect user language and add appropriate instruction
+        const isEnglish = /^[a-zA-Z0-9\s.,!?'"():;@#$%^&*+\-=<>\/\[\]{}|\\~`_]+$/.test(cleanMessage.trim());
+        const langInstruction = isEnglish
+            ? '\nCRITICAL: The user is writing in English. You MUST respond ENTIRELY in English. Do NOT use Turkish.\n'
+            : '\nCRITICAL: Kullanıcı Türkçe yazıyor. MUTLAKA tüm yanıtını Türkçe ver. İngilizce KULLANMA. Her cümle, başlık ve madde Türkçe olmalı.\n';
 
         const systemPrompt = langInstruction + buildCoachSystemPrompt(
             cleanMessage,
