@@ -167,23 +167,24 @@ export default function HeroSection() {
                             borderRadius: 0,
                         }}
                     >
-                        {/* Gradient BG */}
-                        <div
-                            className="absolute inset-0"
-                            style={{
-                                background: `
-                  radial-gradient(ellipse at 30% 30%, rgba(16, 220, 120, 0.35) 0%, transparent 50%),
-                  radial-gradient(ellipse at 70% 70%, rgba(14, 169, 104, 0.25) 0%, transparent 50%),
-                  linear-gradient(180deg, #0d1829 0%, #0a1628 50%, #071018 100%)
-                `,
-                                backgroundSize: '200% 200%',
-                                animation: 'bgPulse 10s ease-in-out infinite',
-                            }}
-                        />
+                        {/* Video Background */}
+                        <video
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            className="absolute inset-0 w-full h-full object-cover"
+                        >
+                            <source src="/hero-video.mp4" type="video/mp4" />
+                        </video>
+                        <div className="absolute inset-0 bg-black/20" />
 
                         {/* Play button */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-                            <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 flex items-center justify-center mb-5 cursor-pointer hover:bg-white/20 transition-all">
+                            <div
+                                onClick={() => window.open('https://youtube.com/shorts/0Wycc59kfa0?feature=share', '_blank')}
+                                className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 flex items-center justify-center mb-5 cursor-pointer hover:bg-white/20 transition-all"
+                            >
                                 <Play className="w-8 h-8 text-white ml-1" fill="white" fillOpacity={0.85} />
                             </div>
                             <span className="text-white/50 text-sm tracking-[0.25em] uppercase">Demo</span>
@@ -263,7 +264,10 @@ export default function HeroSection() {
                                 <ChevronRight className="w-5 h-5" />
                             </div>
                         </ComingSoonButton>
-                        <button className="px-8 py-4 bg-white/5 border border-white/10 text-white font-semibold rounded-2xl flex items-center gap-2 justify-center hover:bg-white/10 transition-all">
+                        <button
+                            onClick={() => window.open('https://youtube.com/shorts/0Wycc59kfa0?feature=share', '_blank')}
+                            className="px-8 py-4 bg-white/5 border border-white/10 text-white font-semibold rounded-2xl flex items-center gap-2 justify-center hover:bg-white/10 transition-all"
+                        >
                             <Play className="w-5 h-5" />
                             {t.hero.demo}
                         </button>
