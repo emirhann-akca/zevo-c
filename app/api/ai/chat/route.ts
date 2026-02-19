@@ -48,11 +48,20 @@ export async function POST(request: NextRequest) {
         };
 
         // Build system prompt with modular loading
-        // Detect user language and add appropriate instruction
-        const isEnglish = /^[a-zA-Z0-9\s.,!?'"():;@#$%^&*+\-=<>\/\[\]{}|\\~`_]+$/.test(cleanMessage.trim());
-        const langInstruction = isEnglish
-            ? '\nCRITICAL: The user is writing in English. You MUST respond ENTIRELY in English. Do NOT use Turkish.\n'
-            : '\nCRITICAL: Kullanıcı Türkçe yazıyor. MUTLAKA tüm yanıtını Türkçe ver. İngilizce KULLANMA. Her cümle, başlık ve madde Türkçe olmalı.\n';
+        // Detect user language: Turkish is DEFAULT (Turkish app), English only if explicitly English
+        const turkishChars = /[çÇğĞıİöÖşŞüÜ]/;
+        const turkishWords = /\b(selam|merhaba|nasıl|naber|antrenman|egzersiz|beslenme|koşu|spor|günlük|haftalık|ağırlık|karın|kilo|yağ|kas|bana|sana|bir|için|nasıl|lütfen|yardım|oluştur|göster|analiz|program|plan|öner|ver|yap|ne|nedir|kaç|hangi|evet|hayır|tamam|teşekkür|günaydın|iyi|kötü)\b/i;
+        const hasTurkishChars = turkishChars.test(cleanMessage);
+        const hasTurkishWords = turkishWords.test(cleanMessage);
+        const isStrictlyEnglish = /^[a-zA-Z0-9\s.,!?'"():;@#$%^&*+\-=<>\/\[\]{}|\\~`_]+$/.test(cleanMessage.trim());
+
+        // Turkish if: has Turkish chars OR has Turkish words OR is not strictly English
+        // English only if: strictly ASCII AND no Turkish words detected
+        const isTurkish = hasTurkishChars || hasTurkishWords || !isStrictlyEnglish;
+
+        const langInstruction = isTurkish
+            ? '\nCRITICAL: Kullanıcı Türkçe yazıyor. MUTLAKA tüm yanıtını Türkçe ver. İngilizce KULLANMA. Her cümle, başlık ve madde Türkçe olmalı.\n'
+            : '\nCRITICAL: The user is writing in English. You MUST respond ENTIRELY in English. Do NOT use Turkish.\n';
 
         const systemPrompt = langInstruction + buildCoachSystemPrompt(
             cleanMessage,

@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
-import { Play, ChevronDown, ChevronRight, Star } from 'lucide-react'
+import { Play, ChevronDown, ChevronRight, Star, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import TechBackground from '@/components/effects/TechBackground'
 import ComingSoonButton from '@/components/ui/ComingSoonButton'
@@ -13,10 +13,12 @@ import { useLanguage } from '@/lib/i18n/LanguageContext'
 // ================================
 
 const STAT_VALUES = ['2.5K+', '12', '%42']
+const YOUTUBE_VIDEO_ID = '0Wycc59kfa0'
 
 export default function HeroSection() {
     const { t } = useLanguage()
     const statLabels = [t.hero.stats.athletes, t.hero.stats.clubs, t.hero.stats.growth]
+    const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
     const wrapperRef = useRef<HTMLDivElement>(null)
     const pinnedRef = useRef<HTMLDivElement>(null)
     const videoBoxRef = useRef<HTMLDivElement>(null)
@@ -184,8 +186,8 @@ export default function HeroSection() {
                         {/* Play button */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
                             <div
-                                onClick={() => window.open('https://youtube.com/shorts/0Wycc59kfa0?feature=share', '_blank')}
-                                className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 flex items-center justify-center mb-5 cursor-pointer hover:bg-white/20 transition-all"
+                                onClick={() => setIsVideoModalOpen(true)}
+                                className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 flex items-center justify-center mb-5 cursor-pointer hover:bg-white/20 hover:scale-110 transition-all duration-300"
                             >
                                 <Play className="w-8 h-8 text-white ml-1" fill="white" fillOpacity={0.85} />
                             </div>
@@ -267,7 +269,7 @@ export default function HeroSection() {
                             </div>
                         </ComingSoonButton>
                         <button
-                            onClick={() => window.open('https://youtube.com/shorts/0Wycc59kfa0?feature=share', '_blank')}
+                            onClick={() => setIsVideoModalOpen(true)}
                             className="px-8 py-4 bg-white/5 border border-white/10 text-white font-semibold rounded-2xl flex items-center gap-2 justify-center hover:bg-white/10 transition-all"
                         >
                             <Play className="w-5 h-5" />
@@ -290,6 +292,46 @@ export default function HeroSection() {
                 </div>
             </div>
 
+            {/* YouTube Video Modal */}
+            <AnimatePresence>
+                {isVideoModalOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+                        onClick={() => setIsVideoModalOpen(false)}
+                    >
+                        {/* Close button */}
+                        <button
+                            onClick={() => setIsVideoModalOpen(false)}
+                            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all z-10"
+                        >
+                            <X className="w-6 h-6 text-white" />
+                        </button>
+
+                        {/* Video container - Phone shape for Shorts */}
+                        <motion.div
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className="relative w-[360px] h-[640px] max-w-[90vw] max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/20 border-2 border-white/10"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <iframe
+                                src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+                                title="ZEVO Demo"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="absolute inset-0 w-full h-full"
+                                style={{ border: 'none' }}
+                            />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
         </div>
     )

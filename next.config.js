@@ -78,6 +78,7 @@ const nextConfig = {
               "img-src 'self' data: blob: https:",
               "media-src 'self' blob:",
               "connect-src 'self' https://us-central1-aiplatform.googleapis.com",
+              "frame-src 'self' https://www.youtube.com https://youtube.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",

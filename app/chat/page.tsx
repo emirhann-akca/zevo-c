@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 
 // --- Types ---
 interface Message {
@@ -213,13 +214,14 @@ export default function ChatPage() {
     `}>
             {/* Top Part - Logo */}
             <div className="flex items-center gap-3">
-                <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-[#10DC78] to-[#0EA968] flex items-center justify-center shadow-[0_0_20px_rgba(16,220,120,0.3)]">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5 4H19L12 20L5 4Z" fill="#0A1628" fillOpacity="0.9"/>
-                        <path d="M8 8H16L12 16L8 8Z" fill="#0A1628" fillOpacity="0.4"/>
-                    </svg>
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
-                </div>
+                <Image
+                    src="/zevo-logo.png"
+                    alt="ZEVO Logo"
+                    width={40}
+                    height={40}
+                    className="rounded-lg"
+                    priority
+                />
                 <div className="flex flex-col">
                     <span className="text-lg font-bold text-white tracking-tight leading-none">ZEVO</span>
                     <span className="text-[10px] text-[#10DC78]/60 font-medium tracking-widest uppercase leading-none mt-0.5">AI Coach</span>
@@ -396,12 +398,15 @@ export default function ChatPage() {
                         <div className="mb-10 text-center relative">
                             <div className="absolute -inset-10 bg-[#10DC78] opacity-[0.05] blur-3xl rounded-full pointer-events-none"></div>
                                     {/* Logo in empty state */}
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#10DC78] to-[#0EA968] flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(16,220,120,0.25)] mx-auto relative">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M5 4H19L12 20L5 4Z" fill="#0A1628" fillOpacity="0.9"/>
-                                    <path d="M8 8H16L12 16L8 8Z" fill="#0A1628" fillOpacity="0.4"/>
-                                </svg>
-                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent" />
+                            <div className="mb-6 mx-auto">
+                                <Image
+                                    src="/zevo-logo.png"
+                                    alt="ZEVO Logo"
+                                    width={80}
+                                    height={80}
+                                    className="rounded-2xl drop-shadow-[0_0_30px_rgba(16,220,120,0.25)]"
+                                    priority
+                                />
                             </div>
                             <h1 className="text-3xl md:text-5xl lg:text-[56px] font-bold text-white tracking-tight leading-tight drop-shadow-lg">
                                 Merhaba
