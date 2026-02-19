@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
 import Image from 'next/image';
 
 // --- Types ---
@@ -23,6 +23,77 @@ const HISTORY_ITEMS = [
     "Kardiyo programı"
 ];
 
+// --- Extracted Components (outside ChatPage to prevent re-creation on every render) ---
+
+const MessageBubble = memo(({ msg }: { msg: Message }) => {
+    const isUser = msg.role === 'user';
+    const content = isUser ? msg.content : (
+        <div className="whitespace-pre-line">
+            {msg.content.split('\n').map((line, i) => {
+                if (line.trim().startsWith('•')) {
+                    return (
+                        <div key={i} className="flex items-start pl-1 mb-1">
+                            <span className="mr-2 text-[#10DC78]">•</span>
+                            <span>{line.trim().substring(1).trim()}</span>
+                        </div>
+                    );
+                }
+                if (line.includes('**')) {
+                    const parts = line.split(/(\*\*[^*]+\*\*)/g);
+                    return (
+                        <span key={i}>
+                            {parts.map((part, j) => {
+                                if (part.startsWith('**') && part.endsWith('**')) {
+                                    return <strong key={j} className="text-white font-semibold">{part.slice(2, -2)}</strong>;
+                                }
+                                return <span key={j}>{part}</span>;
+                            })}
+                            {'\n'}
+                        </span>
+                    );
+                }
+                return <span key={i}>{line}{'\n'}</span>;
+            })}
+        </div>
+    );
+
+    return (
+        <div className="py-6 border-b border-white/[0.04] flex">
+            <div className="flex-shrink-0">
+                {isUser ? (
+                    <div className="w-8 h-8 rounded-full bg-[#10DC78]/20 flex items-center justify-center border border-[#10DC78]/30 shadow-[0_0_15px_rgba(16,220,120,0.1)]">
+                        <span className="text-xs font-bold text-[#10DC78]">S</span>
+                    </div>
+                ) : (
+                    <div className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.06]">
+                        <span className="text-xs font-bold text-[#10DC78]">Z</span>
+                    </div>
+                )}
+            </div>
+            <div className={`ml-4 text-[15px] leading-relaxed ${isUser ? 'text-white/95' : 'text-white/80'}`}>
+                {content}
+            </div>
+        </div>
+    );
+});
+MessageBubble.displayName = 'MessageBubble';
+
+const TypingIndicator = memo(() => (
+    <div className="py-6 border-b border-white/[0.04] flex">
+        <div className="flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.06]">
+                <span className="text-xs font-bold text-[#10DC78]">Z</span>
+            </div>
+        </div>
+        <div className="ml-4 flex items-center gap-1 h-8">
+            <div className="w-1.5 h-1.5 bg-[#10DC78]/40 rounded-full animate-[typingBounce_0.6s_infinite_ease-in-out_0s]"></div>
+            <div className="w-1.5 h-1.5 bg-[#10DC78]/60 rounded-full animate-[typingBounce_0.6s_infinite_ease-in-out_0.15s]"></div>
+            <div className="w-1.5 h-1.5 bg-[#10DC78]/80 rounded-full animate-[typingBounce_0.6s_infinite_ease-in-out_0.3s]"></div>
+        </div>
+    </div>
+));
+TypingIndicator.displayName = 'TypingIndicator';
+
 export default function ChatPage() {
     // --- State ---
     const [messages, setMessages] = useState<Message[]>([]);
@@ -35,21 +106,27 @@ export default function ChatPage() {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
+    const messagesRef = useRef<Message[]>([]);
+
+    // Keep ref in sync with state (for use in callbacks without dependency)
+    useEffect(() => {
+        messagesRef.current = messages;
+    }, [messages]);
 
     // --- Effects ---
 
     // Auto-resize textarea
     useEffect(() => {
         if (textareaRef.current) {
-            textareaRef.current.style.height = '24px'; // Reset height
+            textareaRef.current.style.height = '24px';
             textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
         }
     }, [input]);
 
-    // Scroll to bottom
+    // Scroll to bottom only when messages change (not on input change)
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, isStreaming]);
+    }, [messages]);
 
     // --- Build history for API ---
     const buildApiHistory = useCallback((msgs: Message[]) => {
@@ -61,23 +138,22 @@ export default function ChatPage() {
 
     // --- Handlers ---
 
-    const handleSendMessage = useCallback(async (text: string = input) => {
-        if (!text.trim() || isStreaming) return;
+    const handleSendMessage = useCallback(async (text?: string) => {
+        const messageText = text || input;
+        if (!messageText.trim() || isStreaming) return;
 
         setError(null);
 
-        // Add user message
-        const userMessage: Message = { role: 'user', content: text.trim() };
-        const updatedMessages = [...messages, userMessage];
+        const userMessage: Message = { role: 'user', content: messageText.trim() };
+        const currentMessages = messagesRef.current;
+        const updatedMessages = [...currentMessages, userMessage];
         setMessages(updatedMessages);
         setInput('');
         setIsStreaming(true);
 
-        // Prepare AI placeholder message
         const aiPlaceholder: Message = { role: 'ai', content: '' };
         setMessages(prev => [...prev, aiPlaceholder]);
 
-        // Abort controller for cancellation
         const abortController = new AbortController();
         abortControllerRef.current = abortController;
 
@@ -86,8 +162,8 @@ export default function ChatPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    message: text.trim(),
-                    history: buildApiHistory(messages), // previous messages (before this one)
+                    message: messageText.trim(),
+                    history: buildApiHistory(currentMessages),
                     streaming: true,
                 }),
                 signal: abortController.signal,
@@ -102,7 +178,6 @@ export default function ChatPage() {
                 throw new Error('Streaming yanıt alınamadı.');
             }
 
-            // Read SSE stream
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let accumulatedContent = '';
@@ -114,21 +189,19 @@ export default function ChatPage() {
 
                 buffer += decoder.decode(value, { stream: true });
 
-                // Process SSE lines
                 const lines = buffer.split('\n');
-                buffer = lines.pop() || ''; // Keep incomplete line in buffer
+                buffer = lines.pop() || '';
 
                 for (const line of lines) {
                     const trimmed = line.trim();
                     if (!trimmed || !trimmed.startsWith('data: ')) continue;
 
                     try {
-                        const jsonStr = trimmed.slice(6); // Remove "data: "
+                        const jsonStr = trimmed.slice(6);
                         const parsed = JSON.parse(jsonStr);
 
                         if (parsed.type === 'chunk' && parsed.content) {
                             accumulatedContent += parsed.content;
-                            // Update AI message with accumulated content
                             setMessages(prev => {
                                 const updated = [...prev];
                                 const lastIdx = updated.length - 1;
@@ -140,16 +213,13 @@ export default function ChatPage() {
                         } else if (parsed.type === 'error') {
                             throw new Error(parsed.message || 'AI yanıt hatası');
                         }
-                        // 'done' type: stream ended naturally
                     } catch (parseErr) {
-                        // Skip malformed SSE lines
                         if (parseErr instanceof SyntaxError) continue;
                         throw parseErr;
                     }
                 }
             }
 
-            // If no content was received, show fallback
             if (!accumulatedContent.trim()) {
                 setMessages(prev => {
                     const updated = [...prev];
@@ -163,7 +233,6 @@ export default function ChatPage() {
 
         } catch (err: any) {
             if (err.name === 'AbortError') {
-                // User cancelled — remove empty AI message
                 setMessages(prev => {
                     const updated = [...prev];
                     const lastIdx = updated.length - 1;
@@ -175,7 +244,6 @@ export default function ChatPage() {
             } else {
                 const errorMsg = err.message || 'Beklenmeyen bir hata oluştu.';
                 setError(errorMsg);
-                // Update AI message with error
                 setMessages(prev => {
                     const updated = [...prev];
                     const lastIdx = updated.length - 1;
@@ -189,186 +257,27 @@ export default function ChatPage() {
             setIsStreaming(false);
             abortControllerRef.current = null;
         }
-    }, [input, isStreaming, messages, buildApiHistory]);
+    }, [input, isStreaming, buildApiHistory]);
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSendMessage();
         }
-    };
+    }, [handleSendMessage]);
 
-    const handleStopStreaming = () => {
+    const handleStopStreaming = useCallback(() => {
         abortControllerRef.current?.abort();
-    };
+    }, []);
 
-    // --- Components ---
+    const handleNewChat = useCallback(() => {
+        setMessages([]);
+        setIsStreaming(false);
+        setError(null);
+        abortControllerRef.current?.abort();
+        if (window.innerWidth < 1024) setIsSidebarOpen(false);
+    }, []);
 
-    const Sidebar = () => (
-        <div className={`
-      fixed top-0 left-0 h-screen w-[260px] bg-[#050b14] border-r border-white/[0.04] p-4 z-40
-      transition-transform duration-200 ease-in-out
-      ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      lg:translate-x-0
-      shadow-2xl shadow-black/50
-    `}>
-            {/* Top Part - Logo */}
-            <div className="flex items-center gap-3">
-                <Image
-                    src="/zevo-logo-dark.png"
-                    alt="ZEVO Logo"
-                    width={40}
-                    height={40}
-                    className="rounded-lg"
-                    priority
-                />
-                <div className="flex flex-col">
-                    <span className="text-lg font-bold text-white tracking-tight leading-none">ZEVO</span>
-                    <span className="text-[10px] text-[#10DC78]/60 font-medium tracking-widest uppercase leading-none mt-0.5">AI Coach</span>
-                </div>
-            </div>
-
-            <button
-                onClick={() => {
-                    setMessages([]);
-                    setIsStreaming(false);
-                    setError(null);
-                    abortControllerRef.current?.abort();
-                    if (window.innerWidth < 1024) setIsSidebarOpen(false);
-                }}
-                className="mt-6 w-full py-2.5 px-3 flex items-center gap-3 text-sm text-white/80 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg transition-colors group border border-white/[0.02]"
-            >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/40 group-hover:text-[#10DC78] transition-colors">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                Yeni Sohbet
-            </button>
-
-            {/* History */}
-            <div className="mt-8">
-                <h3 className="text-[11px] uppercase tracking-wider text-white/30 font-medium mb-2 px-2">Bugün</h3>
-                <div className="space-y-1">
-                    {HISTORY_ITEMS.map((item, i) => (
-                        <div
-                            key={i}
-                            className="px-3 py-2 text-sm text-white/50 hover:text-white/90 hover:bg-white/[0.03] rounded-lg transition-colors cursor-pointer truncate"
-                        >
-                            {item}
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Bottom */}
-            <div className="absolute bottom-0 left-0 w-full p-4 border-t border-white/[0.04] bg-[#050b14]">
-                <a href="/" className="flex items-center gap-2 text-xs text-white/40 hover:text-[#10DC78] transition-colors">
-                    <span>←</span> Ana Sayfa
-                </a>
-            </div>
-        </div>
-    );
-
-    const MobileHeader = () => (
-        <div className="lg:hidden fixed top-4 left-4 z-50">
-            <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="text-white/60 hover:text-white transition-colors p-2 bg-[#0A1628]/50 backdrop-blur-md rounded-lg border border-white/10"
-            >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    {isSidebarOpen ? (
-                        <><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></>
-                    ) : (
-                        <><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></>
-                    )}
-                </svg>
-            </button>
-        </div>
-    );
-
-    const MessageBubble = ({ msg }: { msg: Message }) => {
-        const isUser = msg.role === 'user';
-        const content = isUser ? msg.content : (
-            <div className="whitespace-pre-line">
-                {msg.content.split('\n').map((line, i) => {
-                    if (line.trim().startsWith('•')) {
-                        return (
-                            <div key={i} className="flex items-start pl-1 mb-1">
-                                <span className="mr-2 text-[#10DC78]">•</span>
-                                <span>{line.trim().substring(1).trim()}</span>
-                            </div>
-                        );
-                    }
-                    // Bold text formatting (**text**)
-                    if (line.includes('**')) {
-                        const parts = line.split(/(\*\*[^*]+\*\*)/g);
-                        return (
-                            <span key={i}>
-                                {parts.map((part, j) => {
-                                    if (part.startsWith('**') && part.endsWith('**')) {
-                                        return <strong key={j} className="text-white font-semibold">{part.slice(2, -2)}</strong>;
-                                    }
-                                    return <span key={j}>{part}</span>;
-                                })}
-                                {'\n'}
-                            </span>
-                        );
-                    }
-                    return <span key={i}>{line}{'\n'}</span>;
-                })}
-            </div>
-        );
-
-        return (
-            <div
-                className="py-6 border-b border-white/[0.04] animate-[fadeIn_0.4s_ease-out] flex"
-                style={{
-                    animationFillMode: 'forwards',
-                    animation: 'fadeIn 0.4s ease-out, slideUp 0.4s ease-out'
-                }}
-            >
-                {/* Avatar */}
-                <div className="flex-shrink-0">
-                    {isUser ? (
-                        <div className="w-8 h-8 rounded-full bg-[#10DC78]/20 flex items-center justify-center border border-[#10DC78]/30 shadow-[0_0_15px_rgba(16,220,120,0.1)]">
-                            <span className="text-xs font-bold text-[#10DC78]">S</span>
-                        </div>
-                    ) : (
-                        <div className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.06]">
-                            <span className="text-xs font-bold text-[#10DC78]">Z</span>
-                        </div>
-                    )}
-                </div>
-
-                {/* Content */}
-                <div className={`ml-4 text-[15px] leading-relaxed ${isUser ? 'text-white/95' : 'text-white/80'}`}>
-                    {content}
-                </div>
-
-                <style jsx>{`
-          @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-          @keyframes slideUp { from { transform: translateY(8px); } to { transform: translateY(0); } }
-        `}</style>
-            </div>
-        );
-    };
-
-    const TypingIndicator = () => (
-        <div className="py-6 border-b border-white/[0.04] flex animate-[fadeIn_0.4s_ease-out]">
-            <div className="flex-shrink-0">
-                <div className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center border border-white/[0.06]">
-                    <span className="text-xs font-bold text-[#10DC78]">Z</span>
-                </div>
-            </div>
-            <div className="ml-4 flex items-center gap-1 h-8">
-                <div className="w-1.5 h-1.5 bg-[#10DC78]/40 rounded-full animate-[typingBounce_0.6s_infinite_ease-in-out_0s]"></div>
-                <div className="w-1.5 h-1.5 bg-[#10DC78]/60 rounded-full animate-[typingBounce_0.6s_infinite_ease-in-out_0.15s]"></div>
-                <div className="w-1.5 h-1.5 bg-[#10DC78]/80 rounded-full animate-[typingBounce_0.6s_infinite_ease-in-out_0.3s]"></div>
-            </div>
-        </div>
-    );
-
-    // Check if the last AI message is still empty (waiting for first chunk)
     const isWaitingForFirstChunk = isStreaming && messages.length > 0 && messages[messages.length - 1].role === 'ai' && !messages[messages.length - 1].content;
 
     return (
@@ -388,16 +297,83 @@ export default function ChatPage() {
                 />
             )}
 
-            <Sidebar />
-            <MobileHeader />
+            {/* Sidebar */}
+            <div className={`
+                fixed top-0 left-0 h-screen w-[260px] bg-[#050b14] border-r border-white/[0.04] p-4 z-40
+                transition-transform duration-200 ease-in-out
+                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                lg:translate-x-0
+                shadow-2xl shadow-black/50
+            `}>
+                <div className="flex items-center gap-3">
+                    <Image
+                        src="/zevo-logo-dark.png"
+                        alt="ZEVO Logo"
+                        width={40}
+                        height={40}
+                        className="rounded-lg"
+                        priority
+                    />
+                    <div className="flex flex-col">
+                        <span className="text-lg font-bold text-white tracking-tight leading-none">ZEVO</span>
+                        <span className="text-[10px] text-[#10DC78]/60 font-medium tracking-widest uppercase leading-none mt-0.5">AI Coach</span>
+                    </div>
+                </div>
+
+                <button
+                    onClick={handleNewChat}
+                    className="mt-6 w-full py-2.5 px-3 flex items-center gap-3 text-sm text-white/80 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg transition-colors group border border-white/[0.02]"
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/40 group-hover:text-[#10DC78] transition-colors">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Yeni Sohbet
+                </button>
+
+                <div className="mt-8">
+                    <h3 className="text-[11px] uppercase tracking-wider text-white/30 font-medium mb-2 px-2">Bugün</h3>
+                    <div className="space-y-1">
+                        {HISTORY_ITEMS.map((item, i) => (
+                            <div
+                                key={i}
+                                className="px-3 py-2 text-sm text-white/50 hover:text-white/90 hover:bg-white/[0.03] rounded-lg transition-colors cursor-pointer truncate"
+                            >
+                                {item}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="absolute bottom-0 left-0 w-full p-4 border-t border-white/[0.04] bg-[#050b14]">
+                    <a href="/" className="flex items-center gap-2 text-xs text-white/40 hover:text-[#10DC78] transition-colors">
+                        <span>←</span> Ana Sayfa
+                    </a>
+                </div>
+            </div>
+
+            {/* Mobile Header */}
+            <div className="lg:hidden fixed top-4 left-4 z-50">
+                <button
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    className="text-white/60 hover:text-white transition-colors p-2 bg-[#0A1628]/50 backdrop-blur-md rounded-lg border border-white/10"
+                >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        {isSidebarOpen ? (
+                            <><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></>
+                        ) : (
+                            <><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></>
+                        )}
+                    </svg>
+                </button>
+            </div>
 
             <main className="lg:ml-[260px] min-h-screen relative flex flex-col z-10">
                 {messages.length === 0 ? (
                     /* Empty State */
-                    <div className="flex-1 flex flex-col items-center justify-center px-4 pb-20 fade-in-up">
+                    <div className="flex-1 flex flex-col items-center justify-center px-4 pb-20">
                         <div className="mb-10 text-center relative">
                             <div className="absolute -inset-10 bg-[#10DC78] opacity-[0.05] blur-3xl rounded-full pointer-events-none"></div>
-                                    {/* Logo in empty state */}
                             <div className="mb-6 mx-auto">
                                 <Image
                                     src="/zevo-logo-dark.png"
@@ -416,7 +392,6 @@ export default function ChatPage() {
                             </h2>
                         </div>
 
-                        {/* Error Banner */}
                         {error && (
                             <div className="w-full max-w-2xl mx-auto mb-4 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
                                 {error}
@@ -438,9 +413,9 @@ export default function ChatPage() {
                                     onClick={() => handleSendMessage()}
                                     disabled={isStreaming}
                                     className={`
-                      mr-3 mb-3 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300
-                      ${input.trim() && !isStreaming ? 'bg-[#10DC78] text-[#0A1628] shadow-[0_0_15px_rgba(16,220,120,0.4)] hover:bg-[#0EA968] transform hover:scale-105' : 'bg-white/[0.05] text-white/20'}
-                    `}
+                                        mr-3 mb-3 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300
+                                        ${input.trim() && !isStreaming ? 'bg-[#10DC78] text-[#0A1628] shadow-[0_0_15px_rgba(16,220,120,0.4)] hover:bg-[#0EA968] transform hover:scale-105' : 'bg-white/[0.05] text-white/20'}
+                                    `}
                                 >
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                         <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -450,7 +425,6 @@ export default function ChatPage() {
                             </div>
                         </div>
 
-                        {/* Chips */}
                         <div className="flex flex-wrap gap-2.5 justify-center max-w-2xl">
                             {SUGGESTIONS.map((chip, i) => (
                                 <button
@@ -469,9 +443,8 @@ export default function ChatPage() {
                     <>
                         <div className="flex-1 max-w-3xl w-full mx-auto pt-8 pb-24 lg:pb-40 px-4">
                             {messages.map((msg, idx) => {
-                                // Hide empty AI message while waiting for first chunk (TypingIndicator shows instead)
                                 if (msg.role === 'ai' && !msg.content && isStreaming) return null;
-                                return <MessageBubble key={idx} msg={msg} />;
+                                return <MessageBubble key={`msg-${idx}-${msg.role}`} msg={msg} />;
                             })}
                             {isWaitingForFirstChunk && <TypingIndicator />}
                             <div ref={messagesEndRef} />
@@ -480,7 +453,6 @@ export default function ChatPage() {
                         {/* Fixed Input Bar */}
                         <div className="fixed bottom-0 lg:left-[260px] left-0 right-0 p-6 bg-gradient-to-t from-[#0A1628] via-[#0A1628]/95 to-transparent z-20">
                             <div className="max-w-3xl w-full mx-auto">
-                                {/* Error Banner */}
                                 {error && (
                                     <div className="mb-3 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
                                         {error}
@@ -511,9 +483,9 @@ export default function ChatPage() {
                                         <button
                                             onClick={() => handleSendMessage()}
                                             className={`
-                            mr-3 mb-3 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300
-                            ${input.trim() ? 'bg-[#10DC78] text-[#0A1628] shadow-[0_0_15px_rgba(16,220,120,0.4)] hover:bg-[#0EA968] transform hover:scale-105' : 'bg-white/[0.05] text-white/20'}
-                          `}
+                                                mr-3 mb-3 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300
+                                                ${input.trim() ? 'bg-[#10DC78] text-[#0A1628] shadow-[0_0_15px_rgba(16,220,120,0.4)] hover:bg-[#0EA968] transform hover:scale-105' : 'bg-white/[0.05] text-white/20'}
+                                            `}
                                         >
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                                 <line x1="22" y1="2" x2="11" y2="13"></line>

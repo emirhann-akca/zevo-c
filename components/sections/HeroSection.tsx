@@ -120,10 +120,9 @@ export default function HeroSection() {
                     }
                 })
 
-                // Mobil
+                // Mobil — video göster (statik, scroll animasyonu yok)
                 mm.add('(max-width: 1023px)', () => {
-                    // Mobilde: telefonu gizle, içeriği göster
-                    gsap.set(videoBoxRef.current, { autoAlpha: 0 })
+                    gsap.set(videoBoxRef.current, { autoAlpha: 1, clearProps: 'width,height,x' })
                     gsap.set(introOverlayRef.current, { autoAlpha: 0 })
                     gsap.set(phoneBorderRef.current, { autoAlpha: 0 })
                     gsap.set(contentLeftRef.current, { autoAlpha: 1, x: 0 })
@@ -158,15 +157,13 @@ export default function HeroSection() {
                     />
                 </div>
 
-                {/* VIDEO BOX */}
-                <div className="absolute inset-0 hidden lg:flex items-center justify-center pointer-events-none">
+                {/* VIDEO BOX - Mobile: below content, Desktop: absolute fullscreen with GSAP */}
+                <div className="relative lg:absolute lg:inset-0 flex items-center justify-center pointer-events-none mt-8 lg:mt-0 px-4 lg:px-0">
                     <div
                         ref={videoBoxRef}
-                        className="relative overflow-hidden pointer-events-auto"
+                        className="relative overflow-hidden pointer-events-auto w-full max-w-sm lg:max-w-none rounded-2xl lg:rounded-none"
                         style={{
-                            width: '100vw',
-                            height: '100vh',
-                            borderRadius: 0,
+                            height: '50vh',
                         }}
                     >
                         {/* Video Background - optimized with poster & preload */}
