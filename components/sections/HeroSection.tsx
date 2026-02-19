@@ -120,13 +120,10 @@ export default function HeroSection() {
                     }
                 })
 
-                // Mobil — video göster (statik, scroll animasyonu yok)
+                // Mobil — sadece içerik göster, video ayrı HTML element olarak render ediliyor
                 mm.add('(max-width: 1023px)', () => {
-                    gsap.set(videoBoxRef.current, { autoAlpha: 1, clearProps: 'width,height,x' })
-                    gsap.set(introOverlayRef.current, { autoAlpha: 0 })
-                    gsap.set(phoneBorderRef.current, { autoAlpha: 0 })
-                    gsap.set(contentLeftRef.current, { autoAlpha: 1, x: 0 })
-                    gsap.set(glowRef.current, { autoAlpha: 0 })
+                    if (contentLeftRef.current) gsap.set(contentLeftRef.current, { autoAlpha: 1, x: 0 })
+                    if (glowRef.current) gsap.set(glowRef.current, { autoAlpha: 0 })
                 })
             }, wrapperRef)
 
@@ -157,16 +154,18 @@ export default function HeroSection() {
                     />
                 </div>
 
-                {/* VIDEO BOX - Mobile: below content, Desktop: absolute fullscreen with GSAP */}
-                <div className="relative lg:absolute lg:inset-0 flex items-center justify-center pointer-events-none mt-8 lg:mt-0 px-4 lg:px-0">
+                {/* VIDEO BOX - Desktop: absolute fullscreen with GSAP scroll animation */}
+                <div className="hidden lg:flex absolute inset-0 items-center justify-center pointer-events-none">
                     <div
                         ref={videoBoxRef}
-                        className="relative overflow-hidden pointer-events-auto w-full max-w-sm lg:max-w-none rounded-2xl lg:rounded-none"
+                        className="relative overflow-hidden pointer-events-auto"
                         style={{
-                            height: '50vh',
+                            width: '100vw',
+                            height: '100vh',
+                            borderRadius: 0,
                         }}
                     >
-                        {/* Video Background - optimized with poster & preload */}
+                        {/* Video Background */}
                         <video
                             autoPlay
                             muted
@@ -194,7 +193,7 @@ export default function HeroSection() {
                         {/* INTRO OVERLAY */}
                         <div
                             ref={introOverlayRef}
-                            className="absolute inset-0 z-20 bg-black/45 hidden lg:flex flex-col items-center justify-center"
+                            className="absolute inset-0 z-20 bg-black/45 flex flex-col items-center justify-center"
                         >
                             <div className="text-center px-6 mb-20">
                                 <h1 className="text-6xl md:text-8xl font-black text-white mb-6 tracking-tight leading-none">
@@ -228,8 +227,6 @@ export default function HeroSection() {
                         </div>
                     </div>
                 </div>
-
-
 
                 {/* SOL İÇERİK */}
                 <div
@@ -275,6 +272,42 @@ export default function HeroSection() {
                     </div>
 
 
+                </div>
+
+                {/* MOBILE VIDEO - Ayrı section, GSAP'tan bağımsız */}
+                <div className="lg:hidden relative z-30 px-5 pb-16 -mt-6">
+                    <div className="relative w-full max-w-sm mx-auto rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/10 border border-white/10"
+                         style={{ aspectRatio: '9/16', maxHeight: '65vh' }}
+                    >
+                        <video
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata"
+                            poster="/hero-poster.jpg"
+                            className="absolute inset-0 w-full h-full object-cover"
+                        >
+                            <source src="/hero-video.mp4" type="video/mp4" />
+                        </video>
+                        <div className="absolute inset-0 bg-black/10" />
+
+                        {/* Mobile Play button */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                            <div
+                                onClick={() => setIsVideoModalOpen(true)}
+                                className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 flex items-center justify-center mb-3 cursor-pointer hover:bg-white/20 active:scale-95 transition-all"
+                            >
+                                <Play className="w-7 h-7 text-white ml-0.5" fill="white" fillOpacity={0.85} />
+                            </div>
+                            <span className="text-white/50 text-xs tracking-[0.25em] uppercase">Demo İzle</span>
+                        </div>
+
+                        {/* Phone frame effect */}
+                        <div className="absolute inset-0 rounded-3xl border-[6px] border-[#1c1c2e]/60 pointer-events-none z-20">
+                            <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-16 h-5 bg-black rounded-full" />
+                        </div>
+                    </div>
                 </div>
             </div>
 
