@@ -277,9 +277,6 @@ export default function HeroSection() {
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-3 text-sm text-gray-500 mb-9 pl-1">
-                        <span>{t.hero.trust}</span>
-                    </div>
 
                 </div>
             </div>

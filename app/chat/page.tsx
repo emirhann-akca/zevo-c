@@ -215,7 +215,7 @@ export default function ChatPage() {
             {/* Top Part - Logo */}
             <div className="flex items-center gap-3">
                 <Image
-                    src="/zevo-logo.png"
+                    src="/zevo-logo-dark.png"
                     alt="ZEVO Logo"
                     width={40}
                     height={40}
@@ -400,7 +400,7 @@ export default function ChatPage() {
                                     {/* Logo in empty state */}
                             <div className="mb-6 mx-auto">
                                 <Image
-                                    src="/zevo-logo.png"
+                                    src="/zevo-logo-dark.png"
                                     alt="ZEVO Logo"
                                     width={80}
                                     height={80}
@@ -468,9 +468,11 @@ export default function ChatPage() {
                     /* Active State */
                     <>
                         <div className="flex-1 max-w-3xl w-full mx-auto pt-8 pb-24 lg:pb-40 px-4">
-                            {messages.map((msg, idx) => (
-                                <MessageBubble key={idx} msg={msg} />
-                            ))}
+                            {messages.map((msg, idx) => {
+                                // Hide empty AI message while waiting for first chunk (TypingIndicator shows instead)
+                                if (msg.role === 'ai' && !msg.content && isStreaming) return null;
+                                return <MessageBubble key={idx} msg={msg} />;
+                            })}
                             {isWaitingForFirstChunk && <TypingIndicator />}
                             <div ref={messagesEndRef} />
                         </div>
@@ -486,13 +488,7 @@ export default function ChatPage() {
                                 )}
                                 <div className="bg-[#121b2e]/90 backdrop-blur-xl rounded-2xl border border-white/[0.08] overflow-hidden flex items-end shadow-2xl shadow-black/20 focus-within:border-[#10DC78]/40 transition-colors">
                                     <textarea
-                                        ref={(el) => {
-                                            if (el) {
-                                                el.style.height = '24px'; // Reset
-                                                el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
-                                                textareaRef.current = el;
-                                            }
-                                        }}
+                                        ref={textareaRef}
                                         value={input}
                                         onChange={(e) => setInput(e.target.value)}
                                         onKeyDown={handleKeyDown}
