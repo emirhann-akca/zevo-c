@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { Twitter, Instagram, Linkedin } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
@@ -9,6 +10,13 @@ const socialLinks = [
   { name: 'Twitter', icon: Twitter, href: 'https://x.com/AppZevo' },
   { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/zevo.app/' },
   { name: 'LinkedIn', icon: Linkedin, href: 'https://www.linkedin.com/company/zevoo' },
+]
+
+const legalLinks = [
+  { name: 'Gizlilik Politikası', href: '/gizlilik' },
+  { name: 'Kullanım Şartları', href: '/kosullar' },
+  { name: 'Destek', href: '/destek' },
+  { name: 'Hesap Silme', href: '/hesap-silme' },
 ]
 
 export default function Footer() {
@@ -89,6 +97,24 @@ export default function Footer() {
 
           {/* Divider */}
           <div className="border-t border-white/5 my-8" />
+
+          {/* Legal Links */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-6"
+          >
+            {legalLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-text-muted hover:text-emerald-primary transition-colors text-sm"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </motion.div>
 
           {/* Copyright */}
           <motion.div
