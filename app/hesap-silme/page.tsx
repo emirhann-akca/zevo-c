@@ -30,7 +30,7 @@ export default function AccountDeletionPage() {
       <p>Uygulamaya erişiminiz yoksa veya silme işleminde sorun yaşıyorsanız:</p>
       <ul>
         <li>
-          <strong>Alıcı:</strong> <a href="mailto:destek@zevooapp.com?subject=Hesap%20Silme%20Talebi">destek@zevooapp.com</a>
+          <strong>Alıcı:</strong> <a href="mailto:support@zevooapp.com?subject=Hesap%20Silme%20Talebi">support@zevooapp.com</a>
         </li>
         <li><strong>Konu:</strong> Hesap Silme Talebi</li>
         <li>
@@ -98,7 +98,7 @@ export default function AccountDeletionPage() {
       <p>
         Silme süreciyle ilgili herhangi bir sorunuz için:
         <br />
-        <a href="mailto:destek@zevooapp.com">destek@zevooapp.com</a>
+        <a href="mailto:support@zevooapp.com">support@zevooapp.com</a>
       </p>
     </LegalLayout>
   )

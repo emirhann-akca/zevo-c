@@ -44,22 +44,22 @@ const contactCards = [
     icon: Mail,
     title: 'E-posta Destek',
     desc: 'Genel sorular, hatalar, geri bildirim',
-    href: 'mailto:destek@zevooapp.com',
-    cta: 'destek@zevooapp.com',
+    href: 'mailto:support@zevooapp.com',
+    cta: 'support@zevooapp.com',
   },
   {
     icon: Shield,
     title: 'Gizlilik & KVKK',
     desc: 'Veri erişim, silme ve gizlilik talepleri',
-    href: 'mailto:gizlilik@zevooapp.com',
-    cta: 'gizlilik@zevooapp.com',
+    href: 'mailto:support@zevooapp.com',
+    cta: 'support@zevooapp.com',
   },
   {
     icon: Bug,
     title: 'Hata Bildirimi',
     desc: 'Crash, bug ve teknik sorunlar',
-    href: 'mailto:bug@zevooapp.com',
-    cta: 'bug@zevooapp.com',
+    href: 'mailto:support@zevooapp.com',
+    cta: 'support@zevooapp.com',
   },
 ]
 

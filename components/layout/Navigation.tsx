@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
@@ -76,6 +77,13 @@ export default function Navigation() {
                 <span className="absolute inset-0 blur-lg bg-emerald-500/0 group-hover:bg-emerald-500/20 transition-colors duration-300 -z-10 bg-opacity-0" />
               </button>
             ))}
+            <Link
+              href="/destek"
+              className="text-sm font-medium text-white/60 hover:text-white transition-all duration-300 relative group tracking-wide"
+            >
+              <span className="relative z-10">Destek</span>
+              <span className="absolute -bottom-2 left-1/2 w-0 h-0.5 bg-emerald-500 -translate-x-1/2 group-hover:w-full transition-all duration-300" />
+            </Link>
           </div>
 
           {/* Language Toggle + CTA Button - Desktop */}
@@ -160,6 +168,20 @@ export default function Navigation() {
                     {t.nav[item.key as keyof typeof t.nav]}
                   </motion.button>
                 ))}
+                <motion.div
+                  variants={{
+                    hidden: { x: 20, opacity: 0 },
+                    show: { x: 0, opacity: 1 }
+                  }}
+                >
+                  <Link
+                    href="/destek"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block text-left text-lg font-medium text-white/70 hover:text-emerald-400 transition-colors border-b border-white/5 pb-2"
+                  >
+                    Destek
+                  </Link>
+                </motion.div>
 
                 {/* Language Toggle - Mobile */}
                 <div className="flex items-center gap-2 text-sm pt-2 pb-2">

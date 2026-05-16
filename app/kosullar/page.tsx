@@ -106,7 +106,7 @@ export default function TermsPage() {
 
       <h2>12. İletişim</h2>
       <p>
-        Sorularınız için: <a href="mailto:destek@zevooapp.com">destek@zevooapp.com</a>
+        Sorularınız için: <a href="mailto:support@zevooapp.com">support@zevooapp.com</a>
       </p>
     </LegalLayout>
   )

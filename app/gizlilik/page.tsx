@@ -24,7 +24,7 @@ export default function PrivacyPage() {
       <h2>1. Veri Sorumlusu</h2>
       <p>
         Veri sorumlusu: <strong>ZEVO</strong><br />
-        İletişim: <a href="mailto:destek@zevooapp.com">destek@zevooapp.com</a><br />
+        İletişim: <a href="mailto:support@zevooapp.com">support@zevooapp.com</a><br />
         Web: <a href="https://zevooapp.com">zevooapp.com</a>
       </p>
 
@@ -119,7 +119,7 @@ export default function PrivacyPage() {
       <p>
         ZEVO <strong>13 yaş ve üzeri</strong> kullanıcılar için tasarlanmıştır. 13 yaşın altındaki çocuklardan bilerek
         veri toplamayız. Bir ebeveyn olarak çocuğunuzun bize veri verdiğinden şüpheleniyorsanız
-        <a href="mailto:destek@zevooapp.com"> destek@zevooapp.com</a> üzerinden bizimle iletişime geçin.
+        <a href="mailto:support@zevooapp.com"> support@zevooapp.com</a> üzerinden bizimle iletişime geçin.
       </p>
 
       <h2>8. Haklarınız (KVKK &amp; GDPR)</h2>
@@ -135,7 +135,7 @@ export default function PrivacyPage() {
       </ul>
       <p>
         Bu hakları kullanmak için: uygulama içi <strong>Ayarlar → Hesap → Hesabımı Sil</strong> seçeneğini kullanabilir
-        veya <a href="mailto:destek@zevooapp.com">destek@zevooapp.com</a> adresine yazabilirsiniz. Detaylı silme talimatı için
+        veya <a href="mailto:support@zevooapp.com">support@zevooapp.com</a> adresine yazabilirsiniz. Detaylı silme talimatı için
         bkz. <a href="/hesap-silme">Hesap Silme</a>.
       </p>
 
@@ -155,7 +155,7 @@ export default function PrivacyPage() {
       <p>
         Gizlilikle ilgili her türlü soru, talep veya şikâyet için:
         <br />
-        E-posta: <a href="mailto:destek@zevooapp.com">destek@zevooapp.com</a>
+        E-posta: <a href="mailto:support@zevooapp.com">support@zevooapp.com</a>
       </p>
     </LegalLayout>
   )

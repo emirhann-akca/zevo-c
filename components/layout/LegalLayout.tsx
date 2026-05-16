@@ -30,7 +30,7 @@ export default function LegalLayout({ title, lastUpdated, children }: LegalLayou
 
         <div className="mt-16 pt-8 border-t border-white/5 text-text-muted text-sm">
           <p>
-            Sorularınız için: <a href="mailto:destek@zevooapp.com" className="text-emerald-primary underline">destek@zevooapp.com</a>
+            Sorularınız için: <a href="mailto:support@zevooapp.com" className="text-emerald-primary underline">support@zevooapp.com</a>
           </p>
         </div>
       </div>

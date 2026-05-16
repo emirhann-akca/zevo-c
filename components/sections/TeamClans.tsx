@@ -167,7 +167,7 @@ export default function TeamClans() {
                                                     }}
                                                 >
                                                     <div className="w-9 h-9 rounded-lg overflow-hidden border border-white/10 shrink-0">
-                                                        <img src={MEMBER_AVATARS[i]} alt={name} className="w-full h-full object-cover" />
+                                                        <img src={MEMBER_AVATARS[i]} alt={name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className="text-[10px] text-white font-medium truncate">

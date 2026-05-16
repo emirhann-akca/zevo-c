@@ -4,7 +4,8 @@ import { useRef } from 'react'
 import { useCanvasOptimization } from '@/hooks/useCanvasOptimization'
 
 // Configuration for optimization
-const PARTICLE_COUNT = 75 // Fixed pool size (5x increase)
+// Mobile cihazlarda particle count'u yarıya indir (performans)
+const PARTICLE_COUNT = typeof window !== 'undefined' && window.innerWidth < 768 ? 35 : 60
 const SPEED_MODIFIER = 0.8 // Global speed multiplier
 
 interface CircuitParticle {
