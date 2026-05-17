@@ -30,7 +30,8 @@ export default function ConnectedPointsBackground() {
         onResize: (width, height) => {
             // Dynamic particle count based on internal width (scaled)
             // TechBackground uses width / 20. We use width / 30 for slightly fewer particles + larger connections.
-            const particleCount = Math.floor(width / 30)
+            const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+            const particleCount = Math.floor(width / (isMobile ? 50 : 30))
 
             particlesRef.current = []
 

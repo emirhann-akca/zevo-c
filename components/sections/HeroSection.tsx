@@ -226,8 +226,11 @@ export default function HeroSection() {
                             playsInline
                             preload="metadata"
                             poster="/hero-poster.jpg"
+                            // @ts-expect-error - fetchPriority is valid HTML attribute
+                            fetchpriority="high"
                             className="absolute inset-0 w-full h-full object-cover"
                         >
+                            <source src="/hero-video.webm" type="video/webm" />
                             <source src="/hero-video.mp4" type="video/mp4" />
                         </video>
                         <div className="absolute inset-0 bg-black/20" />
@@ -344,8 +347,11 @@ export default function HeroSection() {
                             playsInline
                             preload="metadata"
                             poster="/hero-poster.jpg"
+                            // @ts-expect-error - fetchPriority is valid HTML attribute
+                            fetchpriority="high"
                             className="absolute inset-0 w-full h-full object-cover"
                         >
+                            <source src="/hero-video.webm" type="video/webm" />
                             <source src="/hero-video.mp4" type="video/mp4" />
                         </video>
                         <div className="absolute inset-0 bg-black/15" />

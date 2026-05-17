@@ -59,7 +59,8 @@ export default function TechBackground() {
             // Adjust density for lower resolution - one drop per 20px (account for resolution scale if used in calc, but width here is internal)
             // If internal width is 960 (1920*0.5), we want density relative to visual width?
             // Actually density per pixel should be similar.
-            const dropCount = Math.floor(width / 20)
+            const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+            const dropCount = Math.floor(width / (isMobile ? 35 : 20))
             for (let i = 0; i < dropCount; i++) {
                 dropsRef.current.push(new Drop(width, height))
             }
