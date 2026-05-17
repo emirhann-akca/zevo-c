@@ -230,7 +230,6 @@ export default function HeroSection() {
                             fetchpriority="high"
                             className="absolute inset-0 w-full h-full object-cover"
                         >
-                            <source src="/hero-video.webm" type="video/webm" />
                             <source src="/hero-video.mp4" type="video/mp4" />
                         </video>
                         <div className="absolute inset-0 bg-black/20" />
@@ -351,7 +350,6 @@ export default function HeroSection() {
                             fetchpriority="high"
                             className="absolute inset-0 w-full h-full object-cover"
                         >
-                            <source src="/hero-video.webm" type="video/webm" />
                             <source src="/hero-video.mp4" type="video/mp4" />
                         </video>
                         <div className="absolute inset-0 bg-black/15" />
