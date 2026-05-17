@@ -57,3 +57,11 @@ next-env.d.ts
 # Video backups (local only, don't commit)
 public/hero-video.original.*
 public/hero-video.webm
+
+# Ad generator
+/tools/ad-generator/node_modules
+/tools/ad-generator/output
+/tools/ad-generator/.env
+
+# Claude Code local state
+.claude/

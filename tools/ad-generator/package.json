@@ -1,0 +1,28 @@
+{
+  "name": "zevo-ad-generator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Autonomous AI agent that researches competitor ads and generates Zevo social media ad concepts (Reels/TikTok, TR+EN)",
+  "type": "module",
+  "scripts": {
+    "generate": "tsx src/cli.ts",
+    "cron": "tsx src/cron-weekly.ts",
+    "discover": "tsx src/pipeline/1-discover.ts",
+    "analyze": "tsx src/pipeline/2-analyze.ts",
+    "concept": "tsx src/pipeline/3-concept.ts",
+    "assets": "tsx src/pipeline/4-assets.ts",
+    "render": "tsx src/pipeline/6-render.ts",
+    "publish": "tsx src/pipeline/7-publish.ts"
+  },
+  "dependencies": {
+    "@google-cloud/vertexai": "^1.10.0",
+    "dotenv": "^17.3.1",
+    "playwright": "^1.48.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
