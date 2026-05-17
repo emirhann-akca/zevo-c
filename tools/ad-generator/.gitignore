@@ -3,3 +3,7 @@ output/
 .env
 *.log
 .cache/
+
+# Brand asset videos — too large for git (some over 100MB GitHub limit)
+brand-assets/videos/*.mp4
+brand-assets/videos/_thumbs/
