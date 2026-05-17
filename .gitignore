@@ -53,3 +53,7 @@ next-env.d.ts
 *.swp
 *.swo
 *~
+
+# Video backups (local only, don't commit)
+public/hero-video.original.*
+public/hero-video.webm
