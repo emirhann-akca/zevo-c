@@ -7,11 +7,13 @@ import { generateConcepts } from "./pipeline/3-concept.ts";
 import { gatherAssets } from "./pipeline/4-assets.ts";
 import { renderAds } from "./pipeline/6-render.ts";
 import { publishToMeta } from "./pipeline/7-publish.ts";
+import { runQc } from "./pipeline/8-qc.ts";
+import { iterateDecisionLoop } from "./pipeline/9-iterate.ts";
 
 config();
 
-type Phase = "discover" | "analyze" | "concept" | "assets" | "render" | "publish";
-const ALL_PHASES: Phase[] = ["discover", "analyze", "concept", "assets", "render", "publish"];
+type Phase = "discover" | "analyze" | "concept" | "assets" | "render" | "qc" | "iterate" | "publish";
+const ALL_PHASES: Phase[] = ["discover", "analyze", "concept", "assets", "render", "qc", "iterate", "publish"];
 
 interface CliFlags {
   count: number;
@@ -25,7 +27,25 @@ interface CliFlags {
   headful: boolean;
   dryRun: boolean;
   date?: string;
+  tip: "zevo-template" | "klasik" | "motivasyon";
+  viralityThreshold: number;
+  maxRetries: number;
+  targetDuration: number;
 }
+
+// Nutrition-focused competitor keywords used when tip=beslenme
+const NUTRITION_KEYWORDS = [
+  "calorie tracker app",
+  "MyFitnessPal",
+  "Noom",
+  "Lose It",
+  "macro tracker",
+  "AI diet planner",
+  "meal plan app",
+  "nutrition tracker",
+  "kalori takip",
+  "diyet uygulaması",
+] as const;
 
 function parseFlags(argv: string[]): CliFlags {
   const flags: CliFlags = {
@@ -36,6 +56,10 @@ function parseFlags(argv: string[]): CliFlags {
     skip: new Set(),
     headful: false,
     dryRun: false,
+    tip: "klasik",
+    viralityThreshold: 60,
+    maxRetries: 0,
+    targetDuration: 20,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -51,6 +75,10 @@ function parseFlags(argv: string[]): CliFlags {
     else if (a === "--headful") flags.headful = true;
     else if (a === "--dry-run") flags.dryRun = true;
     else if (a === "--date") flags.date = next();
+    else if (a === "--tip") flags.tip = next() as "zevo-template" | "klasik" | "motivasyon";
+    else if (a === "--virality-threshold") flags.viralityThreshold = Number(next());
+    else if (a === "--max-retries") flags.maxRetries = Number(next());
+    else if (a === "--target-duration") flags.targetDuration = Number(next());
   }
   return flags;
 }
@@ -71,12 +99,15 @@ async function main() {
   console.log(`Phases: ${ALL_PHASES.filter((p) => shouldRun(p, flags)).join(" → ")}\n`);
 
   if (shouldRun("discover", flags)) {
-    console.log("→ Phase 1: Discovering competitor ads...");
+    // For tip=beslenme, swap the default competitor seeds for nutrition-focused apps.
+    const customKeywords = flags.tip === "beslenme" ? NUTRITION_KEYWORDS : undefined;
+    console.log(`→ Phase 1: Discovering competitor ads${customKeywords ? ` (nutrition keywords: ${customKeywords.length})` : ""}...`);
     await discoverCompetitorAds({
       outputDir,
       countries: flags.countries,
       maxAdsPerKeyword: flags.maxAdsPerKeyword,
       headless: !flags.headful,
+      keywords: customKeywords,
     });
   }
 
@@ -90,11 +121,13 @@ async function main() {
   }
 
   if (shouldRun("concept", flags)) {
-    console.log("\n→ Phase 3: Generating Zevo ad concepts...");
+    console.log(`\n→ Phase 3: Generating Zevo ad concepts (tip: ${flags.tip})...`);
     await generateConcepts({
       analysesFile: join(outputDir, "analyses.json"),
       outputDir,
       count: flags.count,
+      type: flags.tip,
+      targetDuration: flags.targetDuration,
     });
   }
 
@@ -104,6 +137,7 @@ async function main() {
       conceptsFile: join(outputDir, "concepts.json"),
       outputDir,
       conceptIds: flags.conceptIds,
+      tip: flags.tip,
     });
   }
 
@@ -115,6 +149,21 @@ async function main() {
       outputDir,
       langs: flags.langs,
       conceptIds: flags.conceptIds,
+    });
+  }
+
+  if (shouldRun("qc", flags)) {
+    console.log("\n→ Phase 8: Gemini Vision QC review...");
+    await runQc({ outputDir, cleanupFrames: false });
+  }
+
+  if (shouldRun("iterate", flags)) {
+    console.log(`\n→ Phase 9: Decision loop (threshold=${flags.viralityThreshold}, maxRetries=${flags.maxRetries})...`);
+    await iterateDecisionLoop({
+      outputDir,
+      threshold: flags.viralityThreshold,
+      maxRetries: flags.maxRetries,
+      langs: flags.langs,
     });
   }
 

@@ -17,6 +17,7 @@
   "dependencies": {
     "@google-cloud/vertexai": "^1.10.0",
     "dotenv": "^17.3.1",
+    "msedge-tts": "^2.0.5",
     "playwright": "^1.48.0",
     "zod": "^3.23.8"
   },

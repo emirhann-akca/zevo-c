@@ -1,0 +1,231 @@
+{
+  "$schema": "Each asset describes a real Zevo app screen/feature. The concept generator and asset picker prefer these over Pexels stock when there is a semantic match for the shot.",
+  "assets": [
+    {
+      "id": "ai-form-shoulder-high-score",
+      "type": "video",
+      "path": "videos/ai-form-shoulder-high-score.mp4",
+      "description": "Live AR pose detection of a user doing a seated SHOULDER PRESS at home. Phone screen view shows a man in black clothes with a cyan AR skeleton overlay. UI shows 'Shoulder Press' timer, 'TEKRAR' rep counter (up to '7 / 12'), and a 'FORM' score starting at '100'. Markers like 'DIPTE ✓' and 'ÜSTTE ✓' appear. Home setting, wooden floor.",
+      "tags": [
+        "form-check",
+        "shoulder-press",
+        "ar-overlay",
+        "home-workout",
+        "real-product",
+        "high-score"
+      ],
+      "feature": "ai-form-check",
+      "narrative": "transformation-state — user is performing the exercise with perfect form, confirmed by a high '100' score from the AI.",
+      "duration_hint_sec": 17
+    },
+    {
+      "id": "workout-plan-navigation",
+      "type": "video",
+      "path": "videos/workout-plan-navigation-demo.mp4",
+      "description": "A user navigates their \"6. Gün - Full Body\" workout plan for \"Gün 6/7\". They tap \"Antrenmanı Başla\" to view the exercise list, including \"Squat\" and \"Şınav\". Finally, they inspect the \"Squat\" details, seeing the sets and reps like \"Tekrar 12\".",
+      "tags": [
+        "ui-walkthrough",
+        "screen-recording",
+        "full-body",
+        "squat",
+        "turkish-ui",
+        "real-product"
+      ],
+      "feature": "workout-plan",
+      "narrative": "feature-demo",
+      "duration_hint_sec": 3
+    },
+    {
+      "id": "lifestyle-male-stand-up-low-angle",
+      "type": "video",
+      "path": "videos/lifestyle-male-stand-up-low-angle.mp4",
+      "description": "Low-angle, floor-level shot. A man in an olive green jacket and black pants stands up from a squat position and steps back, looking at the camera. He is in a simple room with a wooden floor and a window in the background. No app UI is visible.",
+      "tags": [
+        "low-angle",
+        "establishing-shot",
+        "home-setting",
+        "male",
+        "b-roll",
+        "ready"
+      ],
+      "feature": "lifestyle",
+      "narrative": "neutral-state",
+      "duration_hint_sec": 2.5
+    },
+    {
+      "id": "workout-plan-navigation-shoulder-day",
+      "type": "video",
+      "path": "videos/workout-plan-navigation-shoulder-day.mp4",
+      "description": "User's hand holds a phone and navigates the Zevo app's workout plan for \"Gün 5 - Omuz\". They scroll through the \"Warm-up\" and \"Workout\" sections, then tap on \"Yürüyüş / Hafif Koşu\". The app transitions to the exercise screen, showing an animated character, a \"3:00\" timer, and a \"Süreyi Başlat\" button.",
+      "tags": [
+        "workout-list",
+        "ui-navigation",
+        "real-product",
+        "shoulder-day",
+        "warm-up",
+        "turkish-ui"
+      ],
+      "feature": "workout-plan",
+      "narrative": "feature-demo",
+      "duration_hint_sec": 3
+    },
+    {
+      "id": "ai-form-squat-reps",
+      "type": "video",
+      "path": "videos/ai-form-check-squat-rep-counting-side-view.mp4",
+      "description": "Side-view of a user performing squats at home, tracked by Zevo's AI. A cyan AR skeleton overlay follows their movements. The UI shows a fluctuating 'FORM' score (e.g., '45', '10', '50'), a 'Squat' timer, a 'TEKRAR' rep counter up to '4/12', and checkpoint markers like 'DİPTE ✓' and 'ÜSTTE ✓'.",
+      "tags": [
+        "ai-form-check",
+        "squat",
+        "ar-overlay",
+        "pose-detection",
+        "home-workout",
+        "real-product",
+        "rep-counting"
+      ],
+      "feature": "ai-form-check",
+      "narrative": "feature-demo",
+      "duration_hint_sec": 9
+    },
+    {
+      "id": "workout-plan-start-flow",
+      "type": "video",
+      "path": "videos/workout-plan-start-flow.mp4",
+      "description": "User navigates from the 'Dinlenme Günü' (Rest Day) screen, tapping '+ Antrenman Ekle'. The app displays the 'Yağ Yakım Programı', showing 'Gün 5 – Omuz' which is '40 dk' with '9 hareket'. The user taps the 'Antrenmanı Başlat' button to begin. Dark mode UI.",
+      "tags": [
+        "workout-plan",
+        "ui-flow",
+        "start-workout",
+        "shoulder-day",
+        "real-product",
+        "dark-mode",
+        "turkish"
+      ],
+      "feature": "workout-plan",
+      "narrative": "feature-demo",
+      "duration_hint_sec": 4
+    },
+    {
+      "id": "nutrition-meal-log-demo",
+      "type": "video",
+      "path": "videos/nutrition-meal-logging-demo.mp4",
+      "description": "User interacts with the Zevo nutrition screen. The 'Beslenme' (Nutrition) card shows '0% Tamamlandı' and a 'Günlük hedef 2085'. User scrolls to the 'Öğünler' (Meals) section and logs their 'Kahvaltı' (Breakfast) by checking off items like 'Tam Buğday Ekmeği' and 'Elma', demonstrating the meal tracking feature.",
+      "tags": [
+        "nutrition-tracking",
+        "meal-plan",
+        "calorie-counting",
+        "ui-demo",
+        "dark-mode",
+        "turkish",
+        "real-product"
+      ],
+      "feature": "nutrition",
+      "narrative": "feature-demo",
+      "duration_hint_sec": 3
+    },
+    {
+      "id": "nutrition-food-details-demo",
+      "type": "video",
+      "path": "videos/nutrition-food-details-demo.mp4",
+      "description": "User demonstrates the nutrition tracking feature. They tap the 'Kahvaltı' ('426 kcal') card to view macro details, then drill down into an 'Elma' ('291g • 151 kcal') to see its full vitamin and mineral breakdown. The video ends by showing the 'Makro Analizi' donut chart with '442g toplam'.",
+      "tags": [
+        "nutrition-tracking",
+        "calorie-counting",
+        "macros",
+        "food-logging",
+        "ui-demo",
+        "dark-mode",
+        "real-product"
+      ],
+      "feature": "nutrition",
+      "narrative": "feature-demo",
+      "duration_hint_sec": 8
+    },
+    {
+      "id": "onboarding-data-input",
+      "type": "video",
+      "path": "videos/onboarding-age-weight-height-goal.mp4",
+      "description": "A user completes the Zevo onboarding flow on an iPhone, inputting personal metrics. They use sliders to answer 'Kaç yaşındasın?' (How old are you?), 'Boyun kaç?' (How tall are you?), 'Şu anda ne kadar tartıyorsun?' (Current weight), and 'Hedef Kilon Kaç?' (Target weight), finishing with 'Hedefindeki Değişim: -15 kg'.",
+      "tags": [
+        "onboarding",
+        "setup",
+        "personalization",
+        "user-data",
+        "ui-interaction",
+        "turkish"
+      ],
+      "feature": "onboarding",
+      "narrative": "feature-demo",
+      "duration_hint_sec": 10
+    },
+    {
+      "id": "onboarding-questionnaire",
+      "type": "video",
+      "path": "videos/onboarding-questionnaire-flow.mp4",
+      "description": "User completes the multi-step onboarding questionnaire on an iPhone held in hand. They answer questions like \"Fitness hedefiniz nedir?\" and \"Günde kaç saat çalışabilirsin?\". The flow ends on a success screen with a flying character animation, \"Tebrikler! Programınız Hazır\", and progress bars for \"Program Optimizasyonu 100%\" and \"Kişiselleştirme 100%\".",
+      "tags": [
+        "onboarding",
+        "questionnaire",
+        "personalization",
+        "ui-flow",
+        "real-product",
+        "turkish"
+      ],
+      "feature": "onboarding",
+      "narrative": "feature-demo",
+      "duration_hint_sec": 4
+    },
+    {
+      "id": "ai-form-squat-transformation",
+      "type": "video",
+      "path": "videos/ai-form-check-squat-transformation-edit.mp4",
+      "description": "A split-screen style edit transitioning from a user setting up a squat to the live Zevo AI camera. A cyan AR skeleton tracks the user's form in real-time. UI shows \"Squat\", a fluctuating \"FORM\" score (\"50\", \"45\", \"10\"), a \"TEKRAR\" counter, and checkpoints like \"ÜSTTE ✓\" and \"DİPTE ✓\".",
+      "tags": [
+        "ai-form-check",
+        "squat",
+        "ar-overlay",
+        "pose-detection",
+        "home-workout",
+        "split-screen"
+      ],
+      "feature": "ai-form-check",
+      "narrative": "transformation-state",
+      "duration_hint_sec": 11
+    },
+    {
+      "id": "onboarding-questionnaire-turkish",
+      "type": "video",
+      "path": "videos/onboarding-questionnaire-turkish-ui.mp4",
+      "description": "User's hand holds a phone, tapping through the Zevo app's Turkish onboarding questionnaire to create a personalized workout plan. Screens include 'Sana Özel Antrenman Programı Oluşturuyoruz!', 'Herhangi bir sakatlığın var mı?', and 'Deneyim seviyen nedir?'. The user makes selections like 'Dambıl' and 'Orta Seviye' to customize their plan.",
+      "tags": [
+        "onboarding",
+        "questionnaire",
+        "personalization",
+        "setup",
+        "real-product",
+        "turkish-ui"
+      ],
+      "feature": "onboarding",
+      "narrative": "feature-demo",
+      "duration_hint_sec": 17
+    },
+    {
+      "id": "logo-reveal",
+      "type": "video",
+      "path": "videos/logo-reveal.mp4",
+      "description": "Full ZEVO logo reveal animation with final call-to-action. Neon-emerald 'ZEVO' logo with a tech/circuit-board pattern animates on a dark navy background. Tagline 'Cebindeki Antrenör' appears, followed by 'İNDİRİN Google Play' and 'App Store'dan indirin' buttons. Vertical 9:16 format. Serves as a complete short ad or outro.",
+      "tags": [
+        "logo",
+        "logo-reveal",
+        "cta",
+        "outro",
+        "vertical",
+        "neon",
+        "turkish"
+      ],
+      "feature": "brand",
+      "narrative": "brand-magic",
+      "duration_hint_sec": 3
+    }
+  ]
+}

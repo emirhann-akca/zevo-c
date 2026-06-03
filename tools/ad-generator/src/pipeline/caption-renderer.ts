@@ -47,8 +47,10 @@ export async function renderKineticCaptions(
 
   const results: { path: string; revealedThrough: number }[] = [];
   for (let i = 1; i <= tokens.length; i++) {
-    const visible = tokens.slice(0, i).join(" ");
-    const hidden = tokens.slice(i).join(" ");
+    // Already-spoken words (white) | currently-spoken word (emerald) | upcoming words (transparent)
+    const alreadySpoken = tokens.slice(0, i - 1).join(" ");
+    const currentWord = tokens[i - 1];
+    const upcoming = tokens.slice(i).join(" ");
     const html = `<!doctype html><html><head><meta charset="utf-8"><style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@800;900&display=swap');
       html, body { margin: 0; padding: 0; background: transparent; }
@@ -68,11 +70,12 @@ export async function renderKineticCaptions(
         text-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.85);
         max-width: 100%; word-wrap: break-word;
       }
-      .visible { color: white; }
-      .hidden { color: rgba(255,255,255,0); }
-      .accent { color: ${accent}; }
+      /* Instagram-style karaoke caption: full sentence visible in white, current word lights up emerald. */
+      .past { color: white; }
+      .now { color: ${accent}; text-shadow: 0 0 24px ${accent}AA, 0 4px 12px rgba(0,0,0,0.6); }
+      .future { color: white; }
     </style></head><body>
-      <div class="wrap"><div class="cap" id="cap"><span class="visible">${formatInline(visible, accent, upper)}</span>${hidden ? ` <span class="hidden">${formatInline(hidden, accent, upper)}</span>` : ""}</div></div>
+      <div class="wrap"><div class="cap" id="cap">${alreadySpoken ? `<span class="past">${formatInline(alreadySpoken, accent, upper)}</span> ` : ""}<span class="now">${formatInline(currentWord, accent, upper)}</span>${upcoming ? ` <span class="future">${formatInline(upcoming, accent, upper)}</span>` : ""}</div></div>
       <script>
         const cap = document.querySelector('.cap');
         let fs = ${fontSize};

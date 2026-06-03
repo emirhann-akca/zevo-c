@@ -62,6 +62,8 @@ public/hero-video.webm
 /tools/ad-generator/node_modules
 /tools/ad-generator/output
 /tools/ad-generator/.env
+# Real Zevo app footage — local only, some files >100MB (GitHub hard limit)
+/tools/ad-generator/brand-assets/videos/
 
 # Claude Code local state
 .claude/

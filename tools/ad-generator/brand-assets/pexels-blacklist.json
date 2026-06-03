@@ -1,0 +1,4 @@
+{
+  "$comment": "Pexels video IDs you NEVER want to see in an ad again. Add the integer ID (visible in the renders.json sourceUrl or in the Pexels page URL). Format: { \"blocked\": [12345, 67890] }",
+  "blocked": [30718267]
+}
