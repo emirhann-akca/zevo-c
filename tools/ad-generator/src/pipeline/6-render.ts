@@ -4,7 +4,7 @@ import { exec } from "node:child_process";
 import { promisify } from "node:util";
 import { join, resolve } from "node:path";
 import { ZEVO_BRAND } from "../brand.ts";
-import { generateVoiceover } from "./5-voiceover.ts";
+import { generateVoiceover, generateVoiceoverPerShot } from "./5-voiceover.ts";
 import { generateMusic, buildMusicPrompt } from "./5-music.ts";
 import { generateWhoosh, generateImpact } from "./sfx.ts";
 import { renderCaptionPng, renderKineticCaptions, closeRenderer } from "./caption-renderer.ts";
@@ -33,6 +33,13 @@ async function renderShot(opts: {
   caption?: string;
   captionWorkDir?: string;
   captionPrefix?: string;
+  /**
+   * Optional per-word start times (in seconds, relative to shot start).
+   * When provided AND the count matches the number of words in `caption`,
+   * captions reveal at each word's exact spoken moment (ElevenLabs alignment).
+   * Otherwise, reveal is evenly distributed across the shot.
+   */
+  wordStartTimes?: number[];
   outPath: string;
   kenBurnsDirection?: "in" | "out";
 }): Promise<void> {
@@ -74,33 +81,41 @@ async function renderShot(opts: {
   if (opts.caption && opts.captionWorkDir && opts.captionPrefix) {
     // Render N kinetic frames (one per word revealed)
     const frames = await renderKineticCaptions(opts.caption, opts.captionWorkDir, opts.captionPrefix, {
-      width: W - 120,
-      height: 600,
-      fontSize: 120,
-      uppercase: true,
+      width: W - 240,
+      height: 360,
+      fontSize: 52,
+      uppercase: false, // Instagram-style mixed-case is more natural
       accentColor: ZEVO_BRAND.visual.primaryColor,
     });
     if (frames.length > 0) {
-      // Reveal each word evenly across the first 70% of the shot, hold full caption for 20%, fade out 10%.
-      const revealEnd = Math.min(dur * 0.7, dur - 0.5);
-      const perWord = revealEnd / frames.length;
+      // Compute reveal start times.
+      // If ElevenLabs alignment was provided AND count matches, use real per-word timings.
+      // Otherwise, fall back to even distribution across first 70% of the shot.
+      let starts: number[];
+      const useAlign = opts.wordStartTimes && opts.wordStartTimes.length === frames.length;
+      if (useAlign) {
+        starts = opts.wordStartTimes!.map((t) => Math.max(0, Math.min(dur - 0.05, t)));
+      } else {
+        const revealEnd = Math.min(dur * 0.7, dur - 0.5);
+        const perWord = revealEnd / frames.length;
+        starts = frames.map((_, i) => i * perWord);
+      }
       const holdEnd = dur - 0.35;
 
       // Add an input per caption frame
       let inputIdx = inputs.length;
       for (const f of frames) inputs.push(`-loop 1 -i "${f.path}"`);
 
-      // Each frame is visible during [i*perWord, (i+1)*perWord); last frame stays through holdEnd then fades out.
+      // Each frame visible during [starts[i], starts[i+1]); last frame stays through holdEnd then fades.
       const captionFilters: string[] = [];
       const overlayChain: string[] = [];
       let current = lastLabel;
       for (let i = 0; i < frames.length; i++) {
-        const start = (i * perWord).toFixed(3);
         const isLast = i === frames.length - 1;
-        const end = isLast ? holdEnd.toFixed(3) : ((i + 1) * perWord).toFixed(3);
+        const start = starts[i].toFixed(3);
+        const end = isLast ? holdEnd.toFixed(3) : starts[i + 1].toFixed(3);
         const lbl = `cap${i}`;
         if (isLast) {
-          // Fade-out for the final state
           captionFilters.push(
             `[${inputIdx}:v]format=rgba,fade=t=out:st=${end}:d=0.35:alpha=1[${lbl}]`
           );
@@ -122,6 +137,196 @@ async function renderShot(opts: {
   const filterComplex = filters.join(";");
   const cmd = `ffmpeg -y ${inputs.join(" ")} -filter_complex "${filterComplex}" -map "[${lastLabel}]" -t ${dur} -r ${SHOT_FPS} -c:v libx264 -pix_fmt yuv420p -preset veryfast -crf 20 -an "${opts.outPath}"`;
   await execp(cmd);
+}
+
+/**
+ * Veo-based outro with a SOFT GRADIENT FADE over the bottom region.
+ * This is the user-preferred approach: the Veo source plays AS-IS for the top 60% (clean
+ * logo + tagline visible), then the bottom 40% gradually fades to dark navy. The fade is
+ * a smooth gradient (no hard rectangle), so App Store icons + Play Store icons + Veo
+ * watermark blend into the background without a visible "kara kutu".
+ *
+ * Implementation: a one-time pre-rendered gradient PNG mask (transparent top, opaque
+ * dark-navy bottom, feathered transition) is overlayed on top of the scaled source.
+ */
+async function renderOutroShot(opts: {
+  sourcePath: string;
+  durationSec: number;
+  outPath: string;
+  workDir: string;
+}): Promise<void> {
+  const dur = opts.durationSec;
+  // Generate the gradient mask PNG (cached per workDir — cheap regardless)
+  const maskPath = join(opts.workDir, "outro-fade-mask.png");
+  await renderOutroFadeMask(maskPath);
+
+  // Compose: scale source to 9:16, overlay the gradient mask, then trim/format.
+  const filter =
+    `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1[base];` +
+    `[1:v]format=rgba[mask];` +
+    `[base][mask]overlay=0:0:format=auto,` +
+    `trim=duration=${dur},setpts=PTS-STARTPTS,format=yuv420p`;
+  const cmd = `ffmpeg -y -stream_loop -1 -i "${opts.sourcePath}" -loop 1 -i "${maskPath}" -filter_complex "${filter}" -t ${dur} -r ${SHOT_FPS} -c:v libx264 -pix_fmt yuv420p -preset veryfast -crf 20 -an "${opts.outPath}"`;
+  await execp(cmd);
+}
+
+/**
+ * Renders a 1080x1920 PNG mask tuned to the Veo source layout:
+ *  - y=0..1305 (top 68%): fully transparent → ZEVO logo + full 2-line Turkish tagline stay crisp
+ *  - y=1305..1410 (68-73%): smooth gradient transparent → opaque
+ *  - y=1410..1920 (bottom 27%): fully opaque dark navy → hides App Store icons + Play Store icons + Veo watermark
+ * The gradient zone is intentionally short (5% of height) so the transition is visible but quick.
+ */
+async function renderOutroFadeMask(outPath: string): Promise<void> {
+  const bg = ZEVO_BRAND.visual.backgroundColor; // #0A1628
+  const html = `<!doctype html><html><head><meta charset="utf-8"><style>
+    html, body { margin: 0; padding: 0; width: ${W}px; height: ${H}px; }
+    .mask {
+      width: ${W}px; height: ${H}px;
+      background: linear-gradient(
+        to bottom,
+        rgba(10,22,40,0) 0%,
+        rgba(10,22,40,0) 68%,
+        ${bg} 73%,
+        ${bg} 100%
+      );
+    }
+  </style></head><body><div class="mask"></div></body></html>`;
+  const { chromium } = await import("playwright");
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage({ viewport: { width: W, height: H } });
+    await page.setContent(html, { waitUntil: "networkidle" });
+    await page.screenshot({ path: outPath, omitBackground: true, type: "png", clip: { x: 0, y: 0, width: W, height: H } });
+    await page.close();
+  } finally {
+    await browser.close();
+  }
+}
+
+/**
+ * (Deprecated) Custom HTML-rendered outro — kept for reference but no longer invoked.
+ */
+async function renderCustomOutro(opts: {
+  durationSec: number;
+  outPath: string;
+  workDir: string;
+}): Promise<void> {
+  const dur = opts.durationSec;
+  const pngPath = join(opts.workDir, "outro-card.png");
+  await renderCustomOutroPng(pngPath);
+
+  // Subtle Ken Burns + brightness pulse so the outro feels alive (not a frozen poster).
+  const frames = Math.ceil(dur * SHOT_FPS);
+  const filter =
+    `[0:v]scale=${Math.floor(W * 1.06)}:${Math.floor(H * 1.06)},` +
+    `zoompan=z='min(1.0+0.0006*on,1.04)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=${W}x${H}:fps=${SHOT_FPS},` +
+    // gentle brightness pulse to simulate neon flicker
+    `eq=brightness=0.0:saturation=1.05,format=yuv420p`;
+  const cmd = `ffmpeg -y -loop 1 -i "${pngPath}" -filter_complex "${filter}" -t ${dur} -r ${SHOT_FPS} -c:v libx264 -pix_fmt yuv420p -preset veryfast -crf 20 -an "${opts.outPath}"`;
+  await execp(cmd);
+}
+
+/**
+ * Renders the outro design as a 1080x1920 PNG via Playwright.
+ * Design: dark navy gradient bg with soft emerald radial glow centered,
+ * "ZEVO" wordmark composed of (a) circuit-pattern SVG Z + (b) clean white "EVO" letters,
+ * both glowing emerald via CSS text-shadow / filter.
+ */
+async function renderCustomOutroPng(outPath: string): Promise<void> {
+  const primary = ZEVO_BRAND.visual.primaryColor; // #10DC78
+  const bg = ZEVO_BRAND.visual.backgroundColor;   // #0A1628
+
+  // SVG circuit-Z: stylized Z with internal traces and node dots, emerald stroke
+  const circuitZSvg = `
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <g fill="none" stroke="${primary}" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+        <!-- top bar -->
+        <path d="M30 30 L170 30" />
+        <!-- diagonal -->
+        <path d="M170 30 L30 170" />
+        <!-- bottom bar -->
+        <path d="M30 170 L170 170" />
+        <!-- internal traces -->
+        <path d="M55 55 L120 55 M120 55 L120 75 M70 90 L130 90 M55 130 L120 130 M80 150 L140 150" stroke-width="5" />
+      </g>
+      <!-- node dots -->
+      <g fill="${primary}" filter="url(#glow)">
+        <circle cx="30" cy="30" r="8"/>
+        <circle cx="170" cy="30" r="8"/>
+        <circle cx="30" cy="170" r="8"/>
+        <circle cx="170" cy="170" r="8"/>
+        <circle cx="120" cy="55" r="6"/>
+        <circle cx="120" cy="75" r="6"/>
+        <circle cx="70" cy="90" r="6"/>
+        <circle cx="130" cy="90" r="6"/>
+        <circle cx="80" cy="150" r="6"/>
+        <circle cx="140" cy="150" r="6"/>
+      </g>
+      <defs>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+    </svg>
+  `.trim();
+
+  const html = `<!doctype html><html><head><meta charset="utf-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@800;900&display=swap" rel="stylesheet">
+    <style>
+      html, body { margin: 0; padding: 0; width: ${W}px; height: ${H}px; background: ${bg}; }
+      .stage {
+        width: ${W}px; height: ${H}px;
+        position: relative;
+        background:
+          radial-gradient(circle at 50% 50%, rgba(16,220,120,0.20) 0%, rgba(16,220,120,0.05) 35%, rgba(16,220,120,0) 65%),
+          linear-gradient(180deg, #0A1628 0%, #050B14 100%);
+        display: flex; align-items: center; justify-content: center;
+      }
+      .logo {
+        display: flex; align-items: center; gap: 24px;
+      }
+      .z {
+        width: 360px; height: 360px;
+        filter: drop-shadow(0 0 28px ${primary}AA) drop-shadow(0 0 60px ${primary}55);
+      }
+      .word {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-weight: 900;
+        font-size: 320px;
+        color: ${primary};
+        letter-spacing: -10px;
+        line-height: 1;
+        text-shadow:
+          0 0 24px ${primary}CC,
+          0 0 60px ${primary}66,
+          0 0 100px ${primary}33;
+      }
+    </style></head><body>
+    <div class="stage">
+      <div class="logo">
+        <div class="z">${circuitZSvg}</div>
+        <div class="word">EVO</div>
+      </div>
+    </div>
+  </body></html>`;
+
+  const { chromium } = await import("playwright");
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage({ viewport: { width: W, height: H } });
+    await page.setContent(html, { waitUntil: "networkidle" });
+    await page.screenshot({ path: outPath, omitBackground: false, type: "png", clip: { x: 0, y: 0, width: W, height: H } });
+    await page.close();
+  } finally {
+    await browser.close();
+  }
 }
 
 async function renderCtaCard(opts: {
@@ -160,21 +365,15 @@ async function renderFullCtaCardPng(outPath: string, cta: string, oneLiner: stri
       overflow: hidden;
     }
     .brand {
-      position: absolute; left: 0; right: 0; top: 720px;
+      position: absolute; left: 0; right: 0; top: 820px;
       text-align: center;
-      font-size: 200px; font-weight: 900;
+      font-size: 220px; font-weight: 900;
       letter-spacing: -10px;
       color: white;
     }
     .brand .dot { color: ${ZEVO_BRAND.visual.primaryColor}; }
-    .tagline {
-      position: absolute; left: 0; right: 0; top: 980px;
-      text-align: center;
-      font-size: 56px; font-weight: 500; color: rgba(255,255,255,0.78);
-      letter-spacing: -1px;
-    }
     .pill {
-      position: absolute; left: 140px; top: 1240px;
+      position: absolute; left: 140px; top: 1200px;
       width: 800px; height: 220px;
       background: ${ZEVO_BRAND.visual.primaryColor};
       border-radius: 110px;
@@ -183,18 +382,10 @@ async function renderFullCtaCardPng(outPath: string, cta: string, oneLiner: stri
       letter-spacing: -2px;
       box-shadow: 0 30px 60px rgba(16,220,120,0.32);
     }
-    .social {
-      position: absolute; left: 0; right: 0; bottom: 120px;
-      text-align: center;
-      font-size: 38px; font-weight: 700; color: rgba(255,255,255,0.55);
-      letter-spacing: 1px;
-    }
   </style></head><body>
     <div class="card">
       <div class="brand">zevo<span class="dot">.</span></div>
-      <div class="tagline">${oneLiner}</div>
       <div class="pill">${cta}</div>
-      <div class="social">${ZEVO_BRAND.social.instagram.replace("@", "")} · ${ZEVO_BRAND.social.x.replace("@", "")}</div>
     </div>
   </body></html>`;
 
@@ -357,16 +548,43 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
       await mkdir(workDir, { recursive: true });
 
       console.log(`[render] ${concept.id} [${lang}]...`);
+
+      // 1) Generate per-shot voiceovers FIRST so we can sync each shot's duration to its VO.
+      const voLines = concept.shotlist.map((s) => s.voiceover[lang]);
+      const perShotVo = await generateVoiceoverPerShot({
+        lines: voLines,
+        lang,
+        outDir: workDir,
+        prefix: "vo",
+      });
+      const voProvider = perShotVo.find((v) => v.provider !== "skipped")?.provider ?? "skipped";
+
+      // 2) Render each shot with duration = max(concept-hint, vo-duration + 0.4s breathing room).
+      //    This guarantees the voiceover finishes before the cut, eliminating drift.
       const shotParts: { path: string; durationSec: number }[] = [];
       const shotMeta: RenderedAd["shots"] = [];
+      const voPaths: (string | null)[] = [];
 
       for (let i = 0; i < concept.shotlist.length; i++) {
         const shot = concept.shotlist[i];
         const [start, end] = shot.seconds;
-        const dur = Math.max(1, end - start);
+        const hintDur = Math.max(1, end - start);
+        const voEntry = perShotVo[i];
+        const voDur = voEntry?.path ? await probeDuration(voEntry.path) : 0;
+        // Use whichever is longer: planned duration or actual VO + breathing room.
+        const dur = Math.max(hintDur, voDur > 0 ? voDur + 0.4 : 0);
         const asset = manifest[concept.id]?.find((m: any) => m.shotIdx === i);
         const shotPath = join(workDir, `shot-${i}.mp4`);
-        const caption = shot.onScreenText?.[lang];
+        // Caption = spoken voiceover text (so the on-screen words match what's heard).
+        // If alignment is available, each word reveals at its actual spoken moment.
+        // If shot has no voiceover (e.g. logo outro shot), no caption is rendered.
+        const voWords = voEntry?.words ?? [];
+        let caption: string | undefined;
+        let wordStartTimes: number[] | undefined;
+        if (voWords.length > 0) {
+          caption = voWords.map((w) => w.text).join(" ");
+          wordStartTimes = voWords.map((w) => w.startSec);
+        }
         const sourceKind =
           asset?.source === "brand-image"
             ? "brand-image"
@@ -380,10 +598,12 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
           caption,
           captionWorkDir: caption ? workDir : undefined,
           captionPrefix: caption ? `caption-${i}` : undefined,
+          wordStartTimes,
           outPath: shotPath,
           kenBurnsDirection: i % 2 === 0 ? "in" : "out",
         });
         shotParts.push({ path: shotPath, durationSec: dur });
+        voPaths.push(voEntry?.path ?? null);
         shotMeta.push({
           seconds: [start, end],
           sourceUrl: asset?.sourceUrl,
@@ -392,26 +612,61 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
         });
       }
 
-      // Polished end card (2.2s)
-      const ctaPath = join(workDir, `cta.mp4`);
-      const ctaDur = 2.2;
-      await renderCtaCard({
-        cta: concept.cta[lang],
-        oneLiner: ZEVO_BRAND.oneLiner[lang],
-        durationSec: ctaDur,
-        outPath: ctaPath,
-        workDir,
-      });
-      shotParts.push({ path: ctaPath, durationSec: ctaDur });
+      // 3) Veo-based outro restored at user request — but with a SOFT GRADIENT FADE
+      //    over the bottom region (no hard rectangles, no aggressive crop). The fade
+      //    smoothly blends App Store icons + Play Store icons + Veo watermark into the
+      //    dark-navy background. Logo + tagline stay crisp.
+      const logoOutroPath = resolve(process.cwd(), "brand-assets", "videos", "logo-reveal.mp4");
+      if (existsSync(logoOutroPath)) {
+        const outroNatural = await probeDuration(logoOutroPath);
+        const outroDur = outroNatural;
+        const outroShotPath = join(workDir, "outro.mp4");
+        await renderOutroShot({
+          sourcePath: logoOutroPath,
+          durationSec: outroDur,
+          outPath: outroShotPath,
+          workDir,
+        });
+        shotParts.push({ path: outroShotPath, durationSec: outroDur });
+        voPaths.push(null); // no VO over outro
+      }
 
-      // Concat with crossfades
+      // 5) Concat with crossfades
       const concatPath = join(workDir, "concat.mp4");
       await concatWithCrossfade(shotParts, concatPath);
 
-      // Voiceover
-      const voScript = concept.shotlist.map((s) => s.voiceover[lang]).join(" ... ");
+      // 6) Build a combined VO track by placing each shot's audio at its computed shot start time
+      //    (accounting for crossfade overlap). Empty entries (no VO for that shot) are skipped.
       const voPath = join(workDir, "vo.mp3");
-      const voProvider = await generateVoiceover({ text: voScript, lang, outPath: voPath });
+      const voTotalDur = await probeDuration(concatPath);
+      const haveAnyVo = voPaths.some((p) => p !== null);
+      if (haveAnyVo) {
+        // shotStartAcc = global start time of shot i in the crossfaded output.
+        // With chained xfade, shot (i+1) starts XFADE_DUR before shot i ends, so each
+        // increment subtracts XFADE_DUR. (Previously we skipped subtraction for shot 0,
+        // which made every audio delay XFADE_DUR too LATE → captions ahead of voice
+        // at every cut. This now aligns audio with the visual start exactly.)
+        let shotStartAcc = 0;
+        const voInputs: string[] = [];
+        const voFilters: string[] = [];
+        let voIdx = 0;
+        for (let i = 0; i < shotParts.length; i++) {
+          const p = voPaths[i];
+          if (p) {
+            voInputs.push(`-i "${p}"`);
+            const delayMs = Math.max(0, Math.round(shotStartAcc * 1000));
+            voFilters.push(`[${voIdx}:a]adelay=${delayMs}:all=1[v${voIdx}]`);
+            voIdx++;
+          }
+          shotStartAcc += shotParts[i].durationSec - XFADE_DUR;
+        }
+        if (voIdx > 0) {
+          const mixLabels = Array.from({ length: voIdx }, (_, k) => `[v${k}]`).join("");
+          voFilters.push(`${mixLabels}amix=inputs=${voIdx}:duration=longest:normalize=0[aout]`);
+          const cmd = `ffmpeg -y ${voInputs.join(" ")} -filter_complex "${voFilters.join(";")}" -map "[aout]" -t ${voTotalDur} -c:a libmp3lame -b:a 192k "${voPath}"`;
+          await execp(cmd);
+        }
+      }
 
       const finalPath = join(rendersDir, `${concept.id}-${lang}.mp4`);
       const totalDur = await probeDuration(concatPath);
@@ -430,14 +685,15 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
       await generateWhoosh(whooshPath, 0.45);
       await generateImpact(impactPath);
 
-      // Compute shot end times (cumulative, accounting for XFADE_DUR overlap)
+      // Compute shot end times (= start time of NEXT shot in crossfaded output).
+      // Whoosh SFX play at each cut. Same fix as audio delay above: subtract XFADE_DUR per shot.
       const shotEndTimes: number[] = [];
       let acc = 0;
       for (let i = 0; i < shotParts.length - 1; i++) {
-        acc += shotParts[i].durationSec - (i === 0 ? 0 : XFADE_DUR);
+        acc += shotParts[i].durationSec - XFADE_DUR;
         shotEndTimes.push(acc);
       }
-      // CTA starts when the last (CTA) part begins
+      // Last shot starts at totalDur - dur[last] + XFADE_DUR (its crossfade midpoint)
       const ctaStartTime = Math.max(0, totalDur - shotParts[shotParts.length - 1].durationSec + XFADE_DUR);
 
       const hasVoice = voProvider !== "skipped" && existsSync(voPath);

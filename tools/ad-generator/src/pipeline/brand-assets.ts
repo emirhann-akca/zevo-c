@@ -31,19 +31,48 @@ const FPS = 30;
 let _cache: BrandAsset[] | null = null;
 let _baseDir: string | null = null;
 
-export async function loadBrandAssets(brandAssetsDir: string): Promise<BrandAsset[]> {
-  if (_cache && _baseDir === brandAssetsDir) return _cache;
+/**
+ * Assets that are reserved for the auto-appended outro (NOT exposed to concept generator
+ * or per-shot asset picker — they always run at the very end of every video).
+ */
+const RESERVED_OUTRO_IDS = new Set(["logo-reveal"]);
+
+/**
+ * Per-tip brand-asset whitelists. When the user requests a focused ad type (e.g. nutrition),
+ * we restrict the brand-asset pool to ONLY the IDs relevant to that feature so the AI doesn't
+ * sneak in unrelated UI footage. `null` means "all available" (no restriction).
+ */
+const TIP_WHITELIST: Record<string, Set<string> | null> = {
+  klasik: null,
+  kurucu: null,
+  beslenme: new Set([
+    "nutrition-dashboard",
+    "onboarding-health",
+    "onboarding-injury",
+    "onboarding-age",
+  ]),
+};
+
+let _cacheKey: string | null = null;
+
+export async function loadBrandAssets(brandAssetsDir: string, tip?: string): Promise<BrandAsset[]> {
+  const cacheKey = `${brandAssetsDir}::${tip ?? "all"}`;
+  if (_cache && _cacheKey === cacheKey) return _cache;
   const manifestPath = join(brandAssetsDir, "manifest.json");
   if (!existsSync(manifestPath)) {
     _cache = [];
     _baseDir = brandAssetsDir;
+    _cacheKey = cacheKey;
     return _cache;
   }
   const raw = await readFile(manifestPath, "utf8");
   const json = JSON.parse(raw) as { assets: BrandAsset[] };
-  // Filter to assets whose file actually exists on disk
+  const whitelist = tip ? TIP_WHITELIST[tip] : null;
+  // Filter to assets that (a) exist on disk, (b) aren't reserved for outro, (c) are allowed by tip whitelist
   const usable: BrandAsset[] = [];
   for (const a of json.assets) {
+    if (RESERVED_OUTRO_IDS.has(a.id)) continue;
+    if (whitelist && !whitelist.has(a.id)) continue;
     const abs = resolve(brandAssetsDir, a.path);
     try {
       await stat(abs);
@@ -54,7 +83,9 @@ export async function loadBrandAssets(brandAssetsDir: string): Promise<BrandAsse
   }
   _cache = usable;
   _baseDir = brandAssetsDir;
-  console.log(`[brand-assets] loaded ${usable.length} usable assets`);
+  _cacheKey = cacheKey;
+  const tipLabel = tip && whitelist ? ` (tip=${tip}, whitelist=${whitelist.size} ids)` : "";
+  console.log(`[brand-assets] loaded ${usable.length} usable assets (logo-reveal reserved for auto-outro)${tipLabel}`);
   return usable;
 }
 
@@ -75,7 +106,7 @@ export async function pickBrandAsset(
       system: `You are choosing whether to use a real product screenshot/video instead of stock footage for a shot in a Zevo (AI fitness app) ad. Real product footage is heavily preferred BUT only when it genuinely matches the shot's intent. Reply with either the index (0,1,2,...) of the best matching asset, OR "none" if no asset fits well enough — do not force a match.`,
       user: `Available brand assets:\n${summary}\n\nShot visual: "${shotVisual}"\nVoiceover at this moment: "${voiceoverLine}"\n\nWhich asset index matches? Reply with a single digit or "none".`,
       model: "fast",
-      maxOutputTokens: 16,
+      maxOutputTokens: 512, // Gemini 2.5 burns "thinking" tokens before visible output; 16 was empty
       temperature: 0.1,
     });
     const trimmed = out.trim().toLowerCase();

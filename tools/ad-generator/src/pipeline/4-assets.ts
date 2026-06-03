@@ -111,6 +111,7 @@ export interface GatherOptions {
   outputDir: string;
   conceptIds?: string[];
   brandAssetsDir?: string;
+  tip?: string;
 }
 
 export interface AssetEntry {
@@ -134,9 +135,9 @@ export async function gatherAssets(opts: GatherOptions) {
   const assetsDir = join(opts.outputDir, "assets");
   await mkdir(assetsDir, { recursive: true });
 
-  // Load brand assets (real Zevo screenshots/videos)
+  // Load brand assets (real Zevo screenshots/videos) — filtered by tip when set
   const brandAssetsDir = opts.brandAssetsDir ?? join(process.cwd(), "brand-assets");
-  const brandAssets = useLlm ? await loadBrandAssets(brandAssetsDir) : [];
+  const brandAssets = useLlm ? await loadBrandAssets(brandAssetsDir, opts.tip) : [];
 
   const manifest: Record<string, AssetEntry[]> = {};
 
@@ -144,6 +145,8 @@ export async function gatherAssets(opts: GatherOptions) {
     manifest[concept.id] = [];
     // Track which brand assets are already used in this concept (avoid repeating the same screen)
     const usedBrandIds = new Set<string>();
+    // Track which Pexels video IDs are already used in this concept (avoid repeats)
+    const usedPexelsIds = new Set<number>();
 
     for (let i = 0; i < concept.shotlist.length; i++) {
       const shot = concept.shotlist[i];
@@ -172,13 +175,16 @@ export async function gatherAssets(opts: GatherOptions) {
         continue;
       }
       const query = await visualToQuery(shot.visual, useLlm);
-      const candidates = await searchPexels(query, pexelsKey, 20);
+      const rawCandidates = await searchPexels(query, pexelsKey, 20);
+      // Filter out videos already used in this concept (avoid the same stock clip twice)
+      const candidates = rawCandidates.filter((v) => !usedPexelsIds.has(v.id));
       if (candidates.length === 0) {
-        console.warn(`[assets] no Pexels match for ${concept.id}/${i} "${query}"`);
+        console.warn(`[assets] no NEW Pexels match for ${concept.id}/${i} "${query}" (all ${rawCandidates.length} candidates already used)`);
         continue;
       }
       const pickedIdx = useLlm ? await pickBestCandidate(shot.visual, voLine, candidates) : 0;
       const video = candidates[pickedIdx] ?? candidates[0];
+      usedPexelsIds.add(video.id);
       const fileUrl = pickFile(video);
       if (!fileUrl) continue;
       const localPath = join(assetsDir, `${concept.id}-${i}-${video.id}.mp4`);
