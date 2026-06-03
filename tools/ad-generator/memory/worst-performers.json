@@ -1,0 +1,178 @@
+[
+  {
+    "conceptId": "wasted-effort-form-fix-1",
+    "hookLine": "Tüm squat'larını yanlış yapıyor olabilirsin.",
+    "hookType": "YANLIŞ_YAPIYORSUN",
+    "overallScore": 25,
+    "virality": {
+      "hookStrength": 85,
+      "holdPrediction": 60,
+      "captionHook": 90,
+      "brandSafety": 10
+    },
+    "shotCount": 6,
+    "failureSummary": "This ad is a catastrophic failure due to multiple critical brand violations, including a misspelled logo and a forbidden CTA card.",
+    "primaryFailure": "low brandSafety (10/100)",
+    "capturedAt": "2026-05-25T13:55:15.222Z"
+  },
+  {
+    "conceptId": "klasik-form-check-transformation",
+    "hookLine": "O 'mükemmel' antrenman aslında boşa kürek çekmek.",
+    "hookType": "KLASIK",
+    "overallScore": 28,
+    "virality": {
+      "hookStrength": 40,
+      "holdPrediction": 50,
+      "captionHook": 85,
+      "brandSafety": 5
+    },
+    "shotCount": 6,
+    "failureSummary": "This ad is an immediate FAIL due to critical brand violations, including showing a competitor's app and using a forbidden CTA card.",
+    "primaryFailure": "low brandSafety (5/100)",
+    "capturedAt": "2026-05-25T13:04:11.902Z"
+  },
+  {
+    "conceptId": "form-check-wasted-effort-1",
+    "hookLine": "O kadar ter dökmeye gerçekten değer mi?",
+    "hookType": "KLASIK",
+    "overallScore": 29,
+    "virality": {
+      "hookStrength": 20,
+      "holdPrediction": 5,
+      "captionHook": 90,
+      "brandSafety": 0
+    },
+    "shotCount": 6,
+    "failureSummary": "This ad is an immediate FAIL due to a critical brand violation (forbidden CTA card) and consistently using an off-brand accent color.",
+    "primaryFailure": "low brandSafety (0/100)",
+    "capturedAt": "2026-05-25T13:31:58.596Z"
+  },
+  {
+    "conceptId": "form-check-are-you-sure-1",
+    "hookLine": "Bu hareketi doğru yaptığına emin misin?",
+    "hookType": "KLASIK",
+    "overallScore": 35,
+    "virality": {
+      "hookStrength": 90,
+      "holdPrediction": 60,
+      "captionHook": 95,
+      "brandSafety": 10
+    },
+    "shotCount": 4,
+    "failureSummary": "The ad has a strong hook but fails due to critical brand violations, including a forbidden CTA card, unreadable text, and off-brand colors.",
+    "primaryFailure": "low brandSafety (10/100)",
+    "capturedAt": "2026-05-25T13:18:09.582Z"
+  },
+  {
+    "conceptId": "form-vs-plan-klasik-01",
+    "hookLine": "Her gün salondasın, ama boşa mı kürek çekiyorsun?",
+    "hookType": "KLASIK",
+    "overallScore": 35,
+    "virality": {
+      "hookStrength": 85,
+      "holdPrediction": 80,
+      "captionHook": 90,
+      "brandSafety": 20
+    },
+    "shotCount": 5,
+    "failureSummary": "This ad has a strong hook and narrative concept but fails due to critical brand safety violations, including showing an unrelated app's UI and using dominant off-brand colors.",
+    "primaryFailure": "low brandSafety (20/100)",
+    "capturedAt": "2026-05-25T14:55:43.193Z"
+  },
+  {
+    "conceptId": "plateau-breaker-dynamic-plan",
+    "hookLine": "Her hafta aynı program, aynı ağırlıklar?",
+    "hookType": "KLASIK",
+    "overallScore": 35,
+    "virality": {
+      "hookStrength": 60,
+      "holdPrediction": 40,
+      "captionHook": 85,
+      "brandSafety": 20
+    },
+    "shotCount": 5,
+    "failureSummary": "The ad fails due to a critical brand violation (using an off-brand green accent color) and poor production quality, including unreadable text and a static opening.",
+    "primaryFailure": "low brandSafety (20/100)",
+    "capturedAt": "2026-05-28T16:13:52.330Z"
+  },
+  {
+    "conceptId": "plato-kirici-rekor-v1",
+    "hookLine": "Antrenmanların seni yavaşlatıyor olabilir.",
+    "hookType": "CONTRARIAN",
+    "overallScore": 42,
+    "virality": {
+      "hookStrength": 85,
+      "holdPrediction": 40,
+      "captionHook": 90,
+      "brandSafety": 20
+    },
+    "shotCount": 5,
+    "failureSummary": "The ad has a strong hook but fails due to severe brand inconsistencies, including off-brand colors, a drastic drop in production quality, and poor caption readability.",
+    "primaryFailure": "low brandSafety (20/100)",
+    "capturedAt": "2026-05-28T16:27:32.778Z"
+  },
+  {
+    "conceptId": "klasik-form-correction-1",
+    "hookLine": "Antrenman sakatlıklarının %90'ı form hatalarından kaynaklanıyor.",
+    "hookType": "Shock Stat",
+    "overallScore": 45,
+    "virality": {
+      "hookStrength": 40,
+      "holdPrediction": 75,
+      "captionHook": 90,
+      "brandSafety": 20
+    },
+    "shotCount": 5,
+    "failureSummary": "The ad fails due to critical brand violations, including severe caption/UI text collisions and off-brand colors in the opening shot.",
+    "primaryFailure": "low brandSafety (20/100)",
+    "capturedAt": "2026-05-25T12:46:48.445Z"
+  },
+  {
+    "conceptId": "klasik-form-perfection-1",
+    "hookLine": "En iyi hareketleri yanlış yapıyorsun.",
+    "hookType": "KLASIK",
+    "overallScore": 45,
+    "virality": {
+      "hookStrength": 85,
+      "holdPrediction": 60,
+      "captionHook": 90,
+      "brandSafety": 40
+    },
+    "shotCount": 5,
+    "failureSummary": "The ad has a strong hook but fails due to critical readability issues where captions collide with app UI text.",
+    "primaryFailure": "low brandSafety (40/100)",
+    "capturedAt": "2026-05-28T14:15:49.146Z"
+  },
+  {
+    "conceptId": "wasted-effort-to-payoff",
+    "hookLine": "Her gün aynı efor, aynı ter... peki ya sonuç?",
+    "hookType": "KLASIK",
+    "overallScore": 47,
+    "virality": {
+      "hookStrength": 85,
+      "holdPrediction": 70,
+      "captionHook": 90,
+      "brandSafety": 10
+    },
+    "shotCount": 6,
+    "failureSummary": "The ad fails due to critical brand safety violations, including dominant off-brand colors and severe caption/UI text collision.",
+    "primaryFailure": "low brandSafety (10/100)",
+    "capturedAt": "2026-05-28T13:53:33.848Z"
+  },
+  {
+    "conceptId": "form-over-everything-tr1",
+    "hookLine": "Sadece spor yapmak yetmez.",
+    "hookType": "KLASIK",
+    "overallScore": 50,
+    "virality": {
+      "hookStrength": 0,
+      "holdPrediction": 0,
+      "captionHook": 0,
+      "brandSafety": 0
+    },
+    "shotCount": 6,
+    "failureSummary": "Vision call failed: [VertexAI.GoogleGenerativeAIError]: exception posting request to model",
+    "primaryFailure": "low hookStrength (0/100)",
+    "capturedAt": "2026-05-25T12:46:48.443Z"
+  }
+]

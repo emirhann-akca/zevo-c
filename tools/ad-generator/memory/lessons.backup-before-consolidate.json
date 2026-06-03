@@ -1,0 +1,122 @@
+[
+  {
+    "pattern": "Captions must be positioned in 'safe zones' to avoid obscuring app UI elements (buttons, brand names) or other critical on-screen information.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:05:57.593Z",
+    "lastSeen": "2026-05-24T15:05:57.593Z"
+  },
+  {
+    "pattern": "Text styling (color, highlights, background) must ensure high contrast and readability against all backgrounds, avoiding visual clashes with other on-screen elements.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:05:57.593Z",
+    "lastSeen": "2026-05-24T15:05:57.593Z"
+  },
+  {
+    "pattern": "All brand assets, especially logos, must be fully visible and not cropped or obscured throughout the ad.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:05:57.593Z",
+    "lastSeen": "2026-05-24T15:05:57.593Z"
+  },
+  {
+    "pattern": "Recording artifacts (e.g., screen recording UI, watermarks) reduce professionalism and should be removed from final footage.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:26:28.284Z",
+    "lastSeen": "2026-05-24T15:26:28.284Z"
+  },
+  {
+    "pattern": "Captions should not overlap or be obscured by other on-screen visual elements.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:26:28.284Z",
+    "lastSeen": "2026-05-24T15:26:28.284Z"
+  },
+  {
+    "pattern": "Ensure caption readability by using sufficient contrast with the background, potentially with a text background or scrim.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:26:28.284Z",
+    "lastSeen": "2026-05-24T15:26:28.284Z"
+  },
+  {
+    "pattern": "Keep captions concise for quick readability, especially in fast-scrolling environments.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:26:28.284Z",
+    "lastSeen": "2026-05-24T15:26:28.284Z"
+  },
+  {
+    "pattern": "Never feature competitor logos, UI, or products in ads.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:32:39.137Z",
+    "lastSeen": "2026-05-24T15:32:39.137Z"
+  },
+  {
+    "pattern": "Captions require sufficient contrast against their background for readability, especially on busy or bright frames.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:32:39.137Z",
+    "lastSeen": "2026-05-24T15:32:39.137Z"
+  },
+  {
+    "pattern": "All ad visual elements, including background colors, must adhere to brand guidelines.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:32:39.137Z",
+    "lastSeen": "2026-05-24T15:32:39.137Z"
+  },
+  {
+    "pattern": "Avoid dominant off-brand colors in backgrounds.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:35:52.197Z",
+    "lastSeen": "2026-05-24T15:35:52.197Z"
+  },
+  {
+    "pattern": "Ensure captions and other text do not collide with app UI elements.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:35:52.197Z",
+    "lastSeen": "2026-05-24T15:35:52.197Z"
+  },
+  {
+    "pattern": "Avoid prominent off-brand colors in on-screen clothing or props.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:35:52.197Z",
+    "lastSeen": "2026-05-24T15:35:52.197Z"
+  },
+  {
+    "pattern": "Maintain consistent application of brand-specific colors (e.g., highlights) across all frames.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:35:52.197Z",
+    "lastSeen": "2026-05-24T15:35:52.197Z"
+  },
+  {
+    "pattern": "Captions should be positioned in clear spaces to avoid overlapping critical UI elements (e.g., app UI).",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:41:32.842Z",
+    "lastSeen": "2026-05-24T15:41:32.842Z"
+  },
+  {
+    "pattern": "When displaying phone screens or app interfaces, ensure the entire screen is visible and not cropped.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:41:32.842Z",
+    "lastSeen": "2026-05-24T15:41:32.842Z"
+  },
+  {
+    "pattern": "Caption text must have sufficient contrast against its background to ensure readability.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T15:41:32.842Z",
+    "lastSeen": "2026-05-24T15:41:32.842Z"
+  },
+  {
+    "pattern": "Ensure all visual elements, including character attire, adhere to the approved brand color palette.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T17:56:24.241Z",
+    "lastSeen": "2026-05-24T17:56:24.241Z"
+  },
+  {
+    "pattern": "Captions must be positioned to avoid collision with any background UI elements or text within the footage.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T17:56:24.241Z",
+    "lastSeen": "2026-05-24T17:56:24.241Z"
+  },
+  {
+    "pattern": "Always use the official and approved brand tagline, especially in final branding elements like outros.",
+    "frequency": 1,
+    "firstSeen": "2026-05-24T17:56:24.241Z",
+    "lastSeen": "2026-05-24T17:56:24.241Z"
+  }
+]

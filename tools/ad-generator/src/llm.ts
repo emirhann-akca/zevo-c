@@ -30,6 +30,27 @@ function getVertex(): VertexAI {
   return _vertex;
 }
 
+// Exponential-backoff retry for Vertex AI 429 (quota exceeded) and transient 5xx errors.
+// Most concept/asset/QC calls hit Vertex in rapid bursts which triggers rate limiting; a
+// 4-attempt backoff (1s, 2s, 4s, 8s) usually rides through the throttle window.
+async function withRetry<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      const msg = err?.message ?? String(err);
+      const retriable = /429|RESOURCE_EXHAUSTED|503|UNAVAILABLE|ECONNRESET|ETIMEDOUT/i.test(msg);
+      if (!retriable || attempt === 3) throw err;
+      const waitMs = 1000 * Math.pow(2, attempt);
+      console.warn(`[llm:${label}] ${msg.slice(0, 80)} — retrying in ${waitMs}ms (attempt ${attempt + 1}/4)`);
+      await new Promise((r) => setTimeout(r, waitMs));
+      lastErr = err;
+    }
+  }
+  throw lastErr;
+}
+
 const SAFETY = [
   { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
   { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
@@ -59,9 +80,9 @@ export async function generate(opts: GenerateOptions): Promise<string> {
     safetySettings: SAFETY,
   });
 
-  const result = await model.generateContent({
+  const result = await withRetry("generate", () => model.generateContent({
     contents: [{ role: "user", parts: [{ text: opts.user }] }],
-  });
+  }));
   const candidates = result.response.candidates ?? [];
   const text = candidates[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
   if (!text) throw new Error("Vertex AI returned empty response");
@@ -106,9 +127,53 @@ export async function generateWithImages(opts: VisionPickOptions): Promise<strin
     }
   }
 
-  const result = await model.generateContent({ contents: [{ role: "user", parts }] });
+  const result = await withRetry("vision", () => model.generateContent({ contents: [{ role: "user", parts }] }));
   const candidates = result.response.candidates ?? [];
   const text = candidates[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
+  return text;
+}
+
+export interface VisionLocalOptions {
+  system: string;
+  user: string;
+  imagePaths: string[];
+  model?: "heavy" | "fast";
+  maxOutputTokens?: number;
+  temperature?: number;
+}
+
+/**
+ * Multimodal with LOCAL image files (read from disk → inline base64). Used by the QC stage
+ * to feed sampled video frames into Gemini Vision for quality review.
+ */
+export async function generateWithLocalImages(opts: VisionLocalOptions): Promise<string> {
+  const { readFile } = await import("node:fs/promises");
+  const { extname } = await import("node:path");
+  const modelName = opts.model === "fast" ? FAST_MODEL : HEAVY_MODEL;
+  const model = getVertex().getGenerativeModel({
+    model: modelName,
+    systemInstruction: { role: "system", parts: [{ text: opts.system }] },
+    generationConfig: {
+      temperature: opts.temperature ?? 0.2,
+      maxOutputTokens: opts.maxOutputTokens ?? 4096,
+    },
+    safetySettings: SAFETY,
+  });
+
+  const parts: any[] = [{ text: opts.user }];
+  for (let i = 0; i < opts.imagePaths.length; i++) {
+    const p = opts.imagePaths[i];
+    const ext = extname(p).toLowerCase();
+    const mime = ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
+    const buf = await readFile(p);
+    parts.push({ text: `\nFrame ${i + 1}:` });
+    parts.push({ inlineData: { mimeType: mime, data: buf.toString("base64") } });
+  }
+
+  const result = await withRetry("vision-local", () => model.generateContent({ contents: [{ role: "user", parts }] }));
+  const candidates = result.response.candidates ?? [];
+  const text = candidates[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
+  if (!text) throw new Error("Vertex AI returned empty response (vision)");
   return text;
 }
 

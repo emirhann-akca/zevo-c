@@ -24,7 +24,12 @@ const BG = ZEVO_BRAND.visual.backgroundColor.replace("#", "");
 const COLOR_GRADE = "eq=contrast=1.08:saturation=1.12:gamma=0.98,unsharp=5:5:0.6:5:5:0.0";
 
 const SHOT_FPS = 30;
-const XFADE_DUR = 0.4; // seconds of crossfade between adjacent shots
+// Crossfade between adjacent shots. Shorter = tighter cuts, faster pace.
+// Override via env: XFADE_DUR_SEC=0.15 (snappy) ... 0.5 (slow)
+const XFADE_DUR = parseFloat(process.env.XFADE_DUR_SEC ?? "0.25");
+// Breathing room AFTER the voiceover ends on each shot (silent tail). Lower = more rapid cuts.
+// Override via env: INTER_SHOT_GAP_SEC=0.05 (very tight) ... 0.5 (relaxed)
+const INTER_SHOT_GAP = parseFloat(process.env.INTER_SHOT_GAP_SEC ?? "0.15");
 
 async function renderShot(opts: {
   sourcePath?: string;
@@ -64,12 +69,13 @@ async function renderShot(opts: {
       `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,trim=duration=${dur},setpts=PTS-STARTPTS,format=yuv420p[v0]`
     );
   } else if (opts.sourcePath && existsSync(opts.sourcePath)) {
-    // Pexels stock video → conform + color grade for cinematic consistency
+    // Pexels stock video → conform + color grade. NO zoompan: applying zoompan to a video
+    // stream with d=totalFrames effectively repeats each input frame d times, which freezes
+    // the playback (the user sees a "Ken Burns photo" instead of a moving video). Stock video
+    // already has its own motion — let it play naturally.
     inputs.push(`-stream_loop -1 -i "${opts.sourcePath}"`);
-    const zoomEnd = 1.06;
-    const totalFrames = Math.ceil(dur * SHOT_FPS);
     filters.push(
-      `[0:v]scale=${W * 1.15}:${H * 1.15}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,trim=duration=${dur},setpts=PTS-STARTPTS,${COLOR_GRADE},zoompan=z='min(zoom+0.0008,${zoomEnd})':d=${totalFrames}:s=${W}x${H}:fps=${SHOT_FPS},format=yuv420p[v0]`
+      `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,trim=duration=${dur},setpts=PTS-STARTPTS,${COLOR_GRADE},fps=${SHOT_FPS},format=yuv420p[v0]`
     );
   } else {
     inputs.push(`-f lavfi -i color=c=0x${BG}:s=${W}x${H}:d=${dur}:r=${SHOT_FPS}`);
@@ -156,17 +162,27 @@ async function renderOutroShot(opts: {
   workDir: string;
 }): Promise<void> {
   const dur = opts.durationSec;
-  // Generate the gradient mask PNG (cached per workDir — cheap regardless)
-  const maskPath = join(opts.workDir, "outro-fade-mask.png");
-  await renderOutroFadeMask(maskPath);
-
-  // Compose: scale source to 9:16, overlay the gradient mask, then trim/format.
+  // The new user-uploaded logo-reveal already includes the brand tagline + App Store + Google
+  // Play badges as INTENTIONAL design — we no longer fade the bottom. Just scale to 9:16 and
+  // trim. (Legacy: previously masked bottom 27% to hide Veo watermark; that source is gone.)
+  // To restore the fade behavior, set OUTRO_FADE_MASK=1 in .env.
+  const useFadeMask = process.env.OUTRO_FADE_MASK === "1";
+  if (useFadeMask) {
+    const maskPath = join(opts.workDir, "outro-fade-mask.png");
+    await renderOutroFadeMask(maskPath);
+    const filter =
+      `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1[base];` +
+      `[1:v]format=rgba[mask];` +
+      `[base][mask]overlay=0:0:format=auto,` +
+      `trim=duration=${dur},setpts=PTS-STARTPTS,format=yuv420p`;
+    const cmd = `ffmpeg -y -stream_loop -1 -i "${opts.sourcePath}" -loop 1 -i "${maskPath}" -filter_complex "${filter}" -t ${dur} -r ${SHOT_FPS} -c:v libx264 -pix_fmt yuv420p -preset veryfast -crf 20 -an "${opts.outPath}"`;
+    await execp(cmd);
+    return;
+  }
+  // Clean pass-through: scale to 9:16 and trim. The source video is shown AS-IS.
   const filter =
-    `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1[base];` +
-    `[1:v]format=rgba[mask];` +
-    `[base][mask]overlay=0:0:format=auto,` +
-    `trim=duration=${dur},setpts=PTS-STARTPTS,format=yuv420p`;
-  const cmd = `ffmpeg -y -stream_loop -1 -i "${opts.sourcePath}" -loop 1 -i "${maskPath}" -filter_complex "${filter}" -t ${dur} -r ${SHOT_FPS} -c:v libx264 -pix_fmt yuv420p -preset veryfast -crf 20 -an "${opts.outPath}"`;
+    `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,trim=duration=${dur},setpts=PTS-STARTPTS,format=yuv420p`;
+  const cmd = `ffmpeg -y -stream_loop -1 -i "${opts.sourcePath}" -filter_complex "${filter}" -t ${dur} -r ${SHOT_FPS} -c:v libx264 -pix_fmt yuv420p -preset veryfast -crf 20 -an "${opts.outPath}"`;
   await execp(cmd);
 }
 
@@ -430,7 +446,7 @@ async function concatWithCrossfade(parts: { path: string; durationSec: number }[
 
 async function muxAudio(videoPath: string, audioPath: string, outPath: string, totalDur: number): Promise<void> {
   const fadeOutStart = Math.max(0, totalDur - 0.4);
-  const cmd = `ffmpeg -y -i "${videoPath}" -i "${audioPath}" -filter_complex "[1:a]apad=whole_dur=${totalDur},afade=t=in:st=0:d=0.2,afade=t=out:st=${fadeOutStart.toFixed(2)}:d=0.4,volume=1.0[a]" -map 0:v -map "[a]" -t ${totalDur} -c:v copy -c:a aac -b:a 192k "${outPath}"`;
+  const cmd = `ffmpeg -y -i "${videoPath}" -i "${audioPath}" -filter_complex "[1:a]apad=whole_dur=${totalDur},afade=t=in:st=0:d=0.2,afade=t=out:st=${fadeOutStart.toFixed(2)}:d=0.4,volume=1.0[a]" -map 0:v -map "[a]" -t ${totalDur} -c:v copy -c:a aac -b:a 192k -movflags +faststart "${outPath}"`;
   await execp(cmd);
 }
 
@@ -445,7 +461,7 @@ async function muxRichAudio(
   videoPath: string,
   voicePath: string | null,
   musicPath: string | null,
-  whooshPath: string,
+  whooshPath: string | null,
   impactPath: string,
   shotEndTimes: number[], // cumulative end times of each non-final shot
   ctaStartTime: number,
@@ -474,16 +490,18 @@ async function muxRichAudio(
     inputIdx++;
   }
 
-  // Whoosh at each non-final shot transition: place it -0.2s before the cut.
+  // Whoosh at each non-final shot transition (opt-in). Skipped entirely when whooshPath is null.
   const whooshLabels: string[] = [];
-  for (let i = 0; i < shotEndTimes.length; i++) {
-    inputs.push(`-i "${whooshPath}"`);
-    const delayMs = Math.max(0, Math.round((shotEndTimes[i] - 0.2) * 1000));
-    audioStreams.push(
-      `[${inputIdx}:a]adelay=${delayMs}|${delayMs},volume=0.7[w${i}]`
-    );
-    whooshLabels.push(`[w${i}]`);
-    inputIdx++;
+  if (whooshPath) {
+    for (let i = 0; i < shotEndTimes.length; i++) {
+      inputs.push(`-i "${whooshPath}"`);
+      const delayMs = Math.max(0, Math.round((shotEndTimes[i] - 0.2) * 1000));
+      audioStreams.push(
+        `[${inputIdx}:a]adelay=${delayMs}|${delayMs},volume=0.7[w${i}]`
+      );
+      whooshLabels.push(`[w${i}]`);
+      inputIdx++;
+    }
   }
 
   // Impact at CTA reveal
@@ -509,7 +527,7 @@ async function muxRichAudio(
   );
 
   const filter = audioStreams.join(";");
-  const cmd = `ffmpeg -y ${inputs.join(" ")} -filter_complex "${filter}" -map 0:v -map "[aout]" -t ${totalDur} -c:v copy -c:a aac -b:a 192k "${outPath}"`;
+  const cmd = `ffmpeg -y ${inputs.join(" ")} -filter_complex "${filter}" -map 0:v -map "[aout]" -t ${totalDur} -c:v copy -c:a aac -b:a 192k -movflags +faststart "${outPath}"`;
   await execp(cmd);
 }
 
@@ -571,9 +589,24 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
         const hintDur = Math.max(1, end - start);
         const voEntry = perShotVo[i];
         const voDur = voEntry?.path ? await probeDuration(voEntry.path) : 0;
-        // Use whichever is longer: planned duration or actual VO + breathing room.
-        const dur = Math.max(hintDur, voDur > 0 ? voDur + 0.4 : 0);
         const asset = manifest[concept.id]?.find((m: any) => m.shotIdx === i);
+        // Probe the source asset's natural duration so we can cap the shot length to it.
+        // Rationale: if the brand video is only 2s but the VO is 3s, we'd rather end the shot
+        // at 2s (and let the VO tail get clipped at the mix step) than loop the visual.
+        // For Pexels we don't cap because their videos are reliably long enough.
+        let sourceDur = 0;
+        if (asset?.localPath && (asset.source === "brand-video" || asset.source === "brand-image")) {
+          sourceDur = await probeDuration(asset.localPath).catch(() => 0);
+        }
+        // Compute desired duration from VO (or hint if no VO).
+        const desiredDur = voDur > 0 ? voDur + INTER_SHOT_GAP : hintDur;
+        // Cap: never exceed the source video's natural length when the source is a brand asset.
+        // Only the visual is shortened — VO mp3 is unchanged at render time but will be trimmed
+        // at the audio mix step (its mapping uses the shot's actual duration).
+        const dur = sourceDur > 0 ? Math.min(desiredDur, sourceDur) : desiredDur;
+        if (sourceDur > 0 && desiredDur > sourceDur + 0.05) {
+          console.warn(`[render] shot ${i} (${asset?.brandAssetId}): VO needs ${desiredDur.toFixed(1)}s but asset is only ${sourceDur.toFixed(1)}s — trimming shot to asset length (no loop).`);
+        }
         const shotPath = join(workDir, `shot-${i}.mp4`);
         // Caption = spoken voiceover text (so the on-screen words match what's heard).
         // If alignment is available, each word reveals at its actual spoken moment.
@@ -608,7 +641,11 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
           seconds: [start, end],
           sourceUrl: asset?.sourceUrl,
           sourcePath: asset?.localPath,
-          provider: asset ? (asset.source === "pexels" ? "pexels" : "placeholder") : "placeholder",
+          provider: asset
+            ? (asset.source === "pexels" ? "pexels"
+              : asset.source === "curated-stock" ? "curated-stock"
+              : "placeholder")
+            : "placeholder",
         });
       }
 
@@ -655,7 +692,12 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
           if (p) {
             voInputs.push(`-i "${p}"`);
             const delayMs = Math.max(0, Math.round(shotStartAcc * 1000));
-            voFilters.push(`[${voIdx}:a]adelay=${delayMs}:all=1[v${voIdx}]`);
+            // Trim each VO to its shot's visual duration so a long VO does not bleed into the
+            // next shot's audio. The visual is already capped to source length above — match
+            // the VO. afade=out softens the cut so it doesn't feel like a hard chop.
+            const shotDurMs = (shotParts[i].durationSec).toFixed(3);
+            const fadeStart = Math.max(0, shotParts[i].durationSec - 0.15).toFixed(3);
+            voFilters.push(`[${voIdx}:a]atrim=duration=${shotDurMs},afade=t=out:st=${fadeStart}:d=0.15,adelay=${delayMs}:all=1[v${voIdx}]`);
             voIdx++;
           }
           shotStartAcc += shotParts[i].durationSec - XFADE_DUR;
@@ -679,10 +721,12 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
         outPath: musicPath,
       });
 
-      // SFX: whoosh + impact (procedural, always available)
+      // SFX: whoosh (at scene cuts) + impact (at outro). Whoosh is OPT-IN via SFX_WHOOSH=1 —
+      // user prefers a clean cut without transition sweep. Impact remains on for outro emphasis.
+      const whooshEnabled = process.env.SFX_WHOOSH === "1";
       const whooshPath = join(workDir, "whoosh.wav");
       const impactPath = join(workDir, "impact.wav");
-      await generateWhoosh(whooshPath, 0.45);
+      if (whooshEnabled) await generateWhoosh(whooshPath, 0.45);
       await generateImpact(impactPath);
 
       // Compute shot end times (= start time of NEXT shot in crossfaded output).
@@ -702,7 +746,7 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
           concatPath,
           hasVoice ? voPath : null,
           musicResult,
-          whooshPath,
+          whooshEnabled ? whooshPath : null,
           impactPath,
           shotEndTimes,
           ctaStartTime,

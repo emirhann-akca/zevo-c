@@ -1,0 +1,145 @@
+{
+  "$schema": "Each asset describes a real Zevo app screen/feature. The concept generator and asset picker prefer these over Pexels stock when there is a semantic match for the shot.",
+  "assets": [
+    {
+      "id": "ai-form-squat-live",
+      "type": "video",
+      "path": "videos/ai-form-squat-live.mp4",
+      "description": "Live AR pose detection while user does a SQUAT at home. Phone camera view: person in dark workout clothes standing, cyan AR skeleton overlay tracking joints in real-time. Form score badge '50' (yellow ring) top-left, 'Squat 0:48' timer at top, 'TEKRAR 0/12' rep counter, 'ÜSTTE ✓' depth checkpoint marker. Home setting with curtains, window, wooden floor. Shaky-cam phone-held feel.",
+      "tags": ["form check", "squat", "AR overlay", "home workout", "pose detection", "real product", "low score", "problem state"],
+      "feature": "ai-form-check",
+      "narrative": "problem-state — user training at home with no form coaching, score is mid",
+      "duration_hint_sec": 3.5
+    },
+    {
+      "id": "ai-form-shoulder-live",
+      "type": "video",
+      "path": "videos/ai-form-shoulder-live.mp4",
+      "description": "Live AR pose detection while user does SHOULDER PRESS. Cyan AR skeleton tracks joints accurately on user in dark clothes. 'Shoulder Press 2:18' timer top, 'TEKRAR 0/12' counter, 'HAZIR' (ready) status marker. Home setting with wooden floor, dumbbells visible behind feet. Real product UI captured on phone camera.",
+      "tags": ["form check", "shoulder press", "AR overlay", "home workout", "real product", "pose detection"],
+      "feature": "ai-form-check",
+      "narrative": "feature-demo — AI is tracking the exercise in real time",
+      "duration_hint_sec": 4.0
+    },
+    {
+      "id": "logo-reveal",
+      "type": "video",
+      "path": "videos/logo-reveal.mp4",
+      "description": "Neon-emerald ZEVO logo reveal animation. Dark navy background, 'Z' letter rendered with circuit-board / tech-pattern strokes, 'E' letter clean. Glowing emerald color matches Zevo brand. Vertical 9:16 native. Ideal as cold-open hook or final CTA outro card before 'Hemen Dene'.",
+      "tags": ["logo", "brand reveal", "cta", "outro", "intro", "hook", "vertical 9:16", "neon"],
+      "feature": "brand",
+      "narrative": "brand-magic — cold open hook OR final reveal before CTA",
+      "duration_hint_sec": 2.5
+    },
+    {
+      "id": "home-calendar",
+      "type": "video",
+      "path": "videos/home-calendar.mp4",
+      "description": "Zevo home screen on iPhone: weekly day-of-week strip (ÇAR PER CUM CMT PAZ PZT) with current day '10' highlighted emerald, 'Fitness' tag pill button selected at top, bottom nav showing 'Anasayfa' / 'Koşu'. User thumb tapping/scrolling. Dark navy theme with emerald accents — strong brand color presence.",
+      "tags": ["home screen", "calendar", "app UI", "navigation", "real product", "dashboard"],
+      "feature": "home-dashboard",
+      "narrative": "neutral-state — quick UI showcase of clean home screen",
+      "duration_hint_sec": 2.5
+    },
+    {
+      "id": "workout-shoulder-day",
+      "type": "video",
+      "path": "videos/workout-shoulder-day.mp4",
+      "description": "Workout screen 'Gün 5 — Omuz' (Day 5 Shoulder). Large timer '0:01' card. Warm-up section lists: Yürüyüş/Hafif Koşu 1x3min, Dinamik Esneme 1x2min, Kol Çevirme 2x15reps. Workout section starts with Overhead Press. Bottom: 'Geri' / 'Sonraki Hareket' / 'Bitir' buttons. Dark navy + emerald UI. User thumb scrolling.",
+      "tags": ["workout plan", "exercise list", "shoulder day", "app UI", "structured program", "real product"],
+      "feature": "workout-plan",
+      "narrative": "transformation-state — structured AI program ready, day 5 of plan",
+      "duration_hint_sec": 3.0
+    },
+    {
+      "id": "workout-fullbody-squat",
+      "type": "video",
+      "path": "videos/workout-fullbody-squat.mp4",
+      "description": "Workout screen '6. Gün - Full Body'. Timer '0:01' card, '0/8 hareket' progress 0%. Warm-up: Hafif Koşu 1x30sn, Dinamik Germe 1x30sn. Workout section: 'Squat 3 sets x 12 reps' visible. Same Zevo dark-navy + emerald UI. Phone-held shaky feel.",
+      "tags": ["workout plan", "full body", "squat", "app UI", "structured program", "real product"],
+      "feature": "workout-plan",
+      "narrative": "feature-demo — AI-generated structured workout plan",
+      "duration_hint_sec": 3.0
+    },
+    {
+      "id": "nutrition-dashboard",
+      "type": "video",
+      "path": "videos/nutrition-dashboard.mp4",
+      "description": "Nutrition dashboard. Day strip top (ÇAR through SAL, current PZT 11 highlighted). 'Beslenme Günlük hedef' card with large progress ring '0% Tamamlandı', 'Alınan: 0', 'Günlük hedef: 2085'. Below: 'Diyetler' section with '1. Gün 2085' (7 günlük plan). Bottom: 'Ana Sayfa', big emerald '+' button, 'Öğünlerim'. Real product UI.",
+      "tags": ["nutrition", "diet plan", "calorie tracker", "app UI", "real product", "dashboard"],
+      "feature": "nutrition-planning",
+      "narrative": "feature-demo — AI-built daily calorie plan, ready to track",
+      "duration_hint_sec": 3.0
+    },
+    {
+      "id": "onboarding-sport",
+      "type": "video",
+      "path": "videos/onboarding-sport.mp4",
+      "description": "Onboarding step: 'Hangi spor dalını seçiyorsunuz?' (Which sport do you do?). Two big tiles: Fitness (dumbbell icon) — being tapped, Pilates (meditation icon). Below: Yoga tile. Progress bar emerald top. Bottom: Geri / İleri buttons. Personalization flow.",
+      "tags": ["onboarding", "personalization", "sport selection", "app UI", "user journey", "real product"],
+      "feature": "onboarding-personalization",
+      "narrative": "setup-state — first-time user being personalized",
+      "duration_hint_sec": 2.5
+    },
+    {
+      "id": "onboarding-injury",
+      "type": "video",
+      "path": "videos/onboarding-injury.mp4",
+      "description": "Onboarding step: 'Herhangi bir sakatlığın var mı?' (Do you have an injury?). Sub: 'Antrenmanlarını buna göre uyarlayacağız' (We'll adapt your workouts). Options list: Sakatlığım yok / Bel-Sırt / Diz / Omuz / Bilek-El / Ayak bileği / Boyun. Demonstrates Zevo adapts to user's body.",
+      "tags": ["onboarding", "injury awareness", "personalization", "safety", "app UI", "real product"],
+      "feature": "onboarding-personalization",
+      "narrative": "trust-state — Zevo asks about injuries to keep user safe",
+      "duration_hint_sec": 3.0
+    },
+    {
+      "id": "onboarding-health",
+      "type": "video",
+      "path": "videos/onboarding-health.mp4",
+      "description": "Onboarding step: 'Herhangi bir sağlık sorununuz var mı?' (Any health conditions?). Sub: 'Güvenliğiniz için antrenmanlarınızı uyarlayacağız' (We'll adapt your workouts for your safety). Options: Sağlık sorunum yok / Kalp Rahatsızlığı / Tansiyon / Diyabet / Astım (highlighted) / Eklem Sorunu / Diğer. Vertical 9:16 native.",
+      "tags": ["onboarding", "health conditions", "personalization", "safety", "app UI", "real product", "vertical 9:16"],
+      "feature": "onboarding-personalization",
+      "narrative": "trust-state — Zevo treats health conditions seriously",
+      "duration_hint_sec": 3.0
+    },
+    {
+      "id": "onboarding-age",
+      "type": "video",
+      "path": "videos/onboarding-age.mp4",
+      "description": "Onboarding step: 'Kaç yaşındasın?' (How old are you?). Vertical wheel scroller showing 21/22/23/24/25 with '23' highlighted in emerald rounded card. '23 yaşındasın' confirmation text. Bottom emerald 'İleri >' button glowing. Smooth wheel selector interaction.",
+      "tags": ["onboarding", "age picker", "personalization", "app UI", "real product"],
+      "feature": "onboarding-personalization",
+      "narrative": "setup-state — age-based program tuning",
+      "duration_hint_sec": 2.5
+    },
+    {
+      "id": "squat-form-home",
+      "type": "image",
+      "path": "images/squat-form-home.jpg",
+      "description": "Static screenshot — Live AR pose detection while user does a squat at home. Cyan skeleton overlay on user mid-rep, 'Squat 1:06' timer, 'TEKRAR 1/12' counter, form score badge '45' (yellow ring) on top-left, 'DİPTE ✓' depth-check marker. Home setting (wall, window, wooden floor).",
+      "tags": ["form check", "squat", "AR overlay", "home workout", "pose detection", "low score", "problem state"],
+      "feature": "ai-form-check",
+      "narrative": "problem-state — user training alone, no idea their form is bad",
+      "duration_hint_sec": 3.5
+    },
+    {
+      "id": "shoulder-press-gym",
+      "type": "image",
+      "path": "images/shoulder-press-gym.jpg",
+      "description": "Static screenshot — Shoulder press in a commercial gym. Cyan AR skeleton overlay tracking the user mid-rep. Form score badge '100' (emerald ring), 'Yük 80' (load 80kg) emoji badge, 'TEKRAR 2/12', 'Shoulder Press 2:58' timer, 'DİPTE ✓' marker. Mirror wall, dumbbells, kettlebells in background.",
+      "tags": ["form check", "shoulder press", "gym", "AR overlay", "perfect form", "weight tracking", "transformation state"],
+      "feature": "ai-form-check",
+      "narrative": "transformation-state — same user, perfect form, scaling up weight",
+      "duration_hint_sec": 3.5
+    },
+    {
+      "id": "zevo-gps-route",
+      "type": "image",
+      "path": "images/zevo-gps-route.jpg",
+      "description": "Static screenshot — Dark-themed run map (Strava-like) with a GPS route that literally spells 'ZEVO' in emerald green over Sakarya city streets. Stats overlay: Pace 8'30\"/mi, Elevation 150ft, Distance 3.20mi. Brand name 'ZEVO' written at top.",
+      "tags": ["run tracking", "GPS", "map", "Strava-killer", "brand reveal", "creative running", "viral"],
+      "feature": "run-tracking",
+      "narrative": "brand-magic — use as hook (cold open) or as final reveal before CTA",
+      "duration_hint_sec": 3.0
+    }
+  ]
+}

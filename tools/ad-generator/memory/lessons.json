@@ -1,0 +1,116 @@
+[
+  {
+    "pattern": "Ensure captions are readable on *all* backgrounds by using a solid background block or a high-contrast text color with a subtle scrim, especially over busy or bright footage.",
+    "frequency": 22,
+    "firstSeen": "2026-05-24T15:05:57.593Z",
+    "lastSeen": "2026-05-28T16:27:32.778Z"
+  },
+  {
+    "pattern": "Captions must be positioned to avoid collision or close proximity with on-screen app UI text elements.",
+    "frequency": 17,
+    "firstSeen": "2026-05-25T13:35:49.248Z",
+    "lastSeen": "2026-05-28T16:22:15.964Z"
+  },
+  {
+    "pattern": "Strictly adhere to brand color guidelines for *all* visual elements: backgrounds, props, character attire, and UI highlights. Avoid dominant off-brand colors.",
+    "frequency": 17,
+    "firstSeen": "2026-05-24T15:05:57.593Z",
+    "lastSeen": "2026-05-28T16:27:32.778Z"
+  },
+  {
+    "pattern": "Never feature competitor logos, UI, products, or any identifiable competitor branding in any ad creative.",
+    "frequency": 10,
+    "firstSeen": "2026-05-24T15:05:57.593Z",
+    "lastSeen": "2026-05-28T16:22:15.964Z"
+  },
+  {
+    "pattern": "Captions placed in the bottom 25% of the frame collide with app UI buttons; use the top half or add a translucent scrim to create a clear safe zone.",
+    "frequency": 8,
+    "firstSeen": "2026-05-24T15:05:57.593Z",
+    "lastSeen": "2026-05-28T12:13:15.686Z"
+  },
+  {
+    "pattern": "All brand assets (logos, taglines, app screens) must be fully visible, uncropped, and use the official, approved versions. Never crop the app screen or obscure the logo.",
+    "frequency": 7,
+    "firstSeen": "2026-05-24T15:05:57.593Z",
+    "lastSeen": "2026-05-25T13:21:36.935Z"
+  },
+  {
+    "pattern": "Static text cards or visuals significantly reduce engagement and should be replaced with dynamic content to maintain viewer interest.",
+    "frequency": 5,
+    "firstSeen": "2026-05-25T13:31:58.596Z",
+    "lastSeen": "2026-05-28T14:15:49.146Z"
+  },
+  {
+    "pattern": "Remove all recording artifacts (e.g., screen recording UI, watermarks, timestamps) to maintain a professional appearance.",
+    "frequency": 3,
+    "firstSeen": "2026-05-24T15:05:57.593Z",
+    "lastSeen": "2026-05-25T12:19:07.409Z"
+  },
+  {
+    "pattern": "Keep captions to a maximum of 1-2 lines for quick readability in fast-scrolling feeds; avoid dense paragraphs.",
+    "frequency": 3,
+    "firstSeen": "2026-05-24T15:05:57.593Z",
+    "lastSeen": "2026-05-25T12:19:07.409Z"
+  },
+  {
+    "pattern": "The final call-to-action (CTA) or outro must exclusively use the official, pre-rendered brand logo-reveal video.",
+    "frequency": 3,
+    "firstSeen": "2026-05-25T13:31:58.596Z",
+    "lastSeen": "2026-05-25T13:48:43.669Z"
+  },
+  {
+    "pattern": "Screen recordings used in ads must exhibit clear lighting and high visual clarity.",
+    "frequency": 2,
+    "firstSeen": "2026-05-25T13:21:36.935Z",
+    "lastSeen": "2026-05-28T13:42:49.886Z"
+  },
+  {
+    "pattern": "Captions must not obscure critical visual information or overlays.",
+    "frequency": 2,
+    "firstSeen": "2026-05-28T12:01:32.035Z",
+    "lastSeen": "2026-05-28T14:07:43.974Z"
+  },
+  {
+    "pattern": "Captions require sufficient contrast against their background; consider using a scrim or solid background for complex or light scenes.",
+    "frequency": 2,
+    "firstSeen": "2026-05-28T13:42:49.886Z",
+    "lastSeen": "2026-05-28T14:09:45.247Z"
+  },
+  {
+    "pattern": "Chaotic or unprofessional transition effects negatively impact readability and brand perception.",
+    "frequency": 2,
+    "firstSeen": "2026-05-25T14:50:02.052Z",
+    "lastSeen": "2026-05-28T16:13:52.330Z"
+  },
+  {
+    "pattern": "Opening shots should be dynamic or visually interesting to maximize hook strength.",
+    "frequency": 2,
+    "firstSeen": "2026-05-28T14:09:45.247Z",
+    "lastSeen": "2026-05-28T16:13:52.330Z"
+  },
+  {
+    "pattern": "Avoid low-quality, amateur, or poorly framed footage; ensure all visuals are professional and well-produced.",
+    "frequency": 2,
+    "firstSeen": "2026-05-25T13:48:43.669Z",
+    "lastSeen": "2026-05-28T16:27:32.778Z"
+  },
+  {
+    "pattern": "Visually demonstrate app functionality rather than relying on abstract text descriptions.",
+    "frequency": 1,
+    "firstSeen": "2026-05-28T12:00:53.681Z",
+    "lastSeen": "2026-05-28T12:00:53.681Z"
+  },
+  {
+    "pattern": "Integrate brand colors early in the ad to establish brand presence.",
+    "frequency": 1,
+    "firstSeen": "2026-05-28T13:51:27.832Z",
+    "lastSeen": "2026-05-28T13:51:27.832Z"
+  },
+  {
+    "pattern": "Ensure a consistent visual style across all frames to avoid a disjointed or unprofessional appearance.",
+    "frequency": 1,
+    "firstSeen": "2026-05-28T16:27:32.778Z",
+    "lastSeen": "2026-05-28T16:27:32.778Z"
+  }
+]

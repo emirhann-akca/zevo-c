@@ -1,0 +1,47 @@
+[
+  {
+    "conceptId": "form-check-plateau-breaker-1",
+    "hookLine": "O mükemmel görünen formu... gerçekten doğru mu?",
+    "hookType": "KLASIK",
+    "overallScore": 88,
+    "virality": {
+      "hookStrength": 75,
+      "holdPrediction": 85,
+      "captionHook": 95,
+      "brandSafety": 95
+    },
+    "shotCount": 6,
+    "rationale": "This ad follows the classic Problem-Agitation-Solution structure. It hooks viewers with a common gym anxiety (incorrect form), connects it to a major pain point (plateaus), and then presents Zevo's features (personalized plans and AI form check) as the definitive solution. The narrative arc builds from uncertainty to confidence, ending on an empowering emotional peak. The use of three distinct brand assets grounds the ad in the real product experience.",
+    "capturedAt": "2026-05-28T13:30:03.882Z"
+  },
+  {
+    "conceptId": "plato-yok-et-v1",
+    "hookLine": "Aylardır salondasın... ama sonuçlar aynı mı?",
+    "hookType": "KLASIK",
+    "overallScore": 84,
+    "virality": {
+      "hookStrength": 65,
+      "holdPrediction": 90,
+      "captionHook": 95,
+      "brandSafety": 85
+    },
+    "shotCount": 6,
+    "rationale": "This concept follows the classic Problem-Agitation-Solution structure. It opens with a highly relatable frustration for gym-goers (hitting a plateau), visually demonstrates the 'why' (poor form) using the '[ai-form-squat-reps]' asset, then presents Zevo's AI Form Check as the direct solution. The narrative arc builds from frustration to empowerment, culminating in a confident, celebratory shot. By using multiple real assets like '[ai-form-squat-transformation]' and '[ai-form-shoulder-high-score]', the ad provides tangible proof of the feature's value, making the final CTA more compelling.",
+    "capturedAt": "2026-05-25T14:44:00.946Z"
+  },
+  {
+    "conceptId": "plan-to-perfection-1",
+    "hookLine": "Her gün salondasın, ama ayna aynı mı söylüyor?",
+    "hookType": "AÇIK SORU",
+    "overallScore": 65,
+    "virality": {
+      "hookStrength": 95,
+      "holdPrediction": 90,
+      "captionHook": 95,
+      "brandSafety": 50
+    },
+    "shotCount": 5,
+    "rationale": "This ad uses a dynamic visual narrative to fix the 'static slideshow' issue. It hooks with a relatable struggle (frustrated lifter), agitates with chaotic visuals representing 'no plan', presents Zevo's plan generation as the clear solution, proves its value with a dynamic split-screen of the AI form check, and concludes with a shot of the user's success, directly addressing the initial problem. The quick cuts and mix of real footage with app UI will maximize viewer hold.",
+    "capturedAt": "2026-05-25T14:27:21.800Z"
+  }
+]

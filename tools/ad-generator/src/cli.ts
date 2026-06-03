@@ -7,11 +7,13 @@ import { generateConcepts } from "./pipeline/3-concept.ts";
 import { gatherAssets } from "./pipeline/4-assets.ts";
 import { renderAds } from "./pipeline/6-render.ts";
 import { publishToMeta } from "./pipeline/7-publish.ts";
+import { runQc } from "./pipeline/8-qc.ts";
+import { iterateDecisionLoop } from "./pipeline/9-iterate.ts";
 
 config();
 
-type Phase = "discover" | "analyze" | "concept" | "assets" | "render" | "publish";
-const ALL_PHASES: Phase[] = ["discover", "analyze", "concept", "assets", "render", "publish"];
+type Phase = "discover" | "analyze" | "concept" | "assets" | "render" | "qc" | "iterate" | "publish";
+const ALL_PHASES: Phase[] = ["discover", "analyze", "concept", "assets", "render", "qc", "iterate", "publish"];
 
 interface CliFlags {
   count: number;
@@ -25,7 +27,10 @@ interface CliFlags {
   headful: boolean;
   dryRun: boolean;
   date?: string;
-  tip: "klasik" | "kurucu" | "beslenme";
+  tip: "zevo-template" | "klasik" | "motivasyon" | "kurucu" | "beslenme";
+  viralityThreshold: number;
+  maxRetries: number;
+  targetDuration: number;
 }
 
 // Nutrition-focused competitor keywords used when tip=beslenme
@@ -52,6 +57,9 @@ function parseFlags(argv: string[]): CliFlags {
     headful: false,
     dryRun: false,
     tip: "klasik",
+    viralityThreshold: 60,
+    maxRetries: 0,
+    targetDuration: 20,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -67,7 +75,10 @@ function parseFlags(argv: string[]): CliFlags {
     else if (a === "--headful") flags.headful = true;
     else if (a === "--dry-run") flags.dryRun = true;
     else if (a === "--date") flags.date = next();
-    else if (a === "--tip") flags.tip = next() as "klasik" | "kurucu" | "beslenme";
+    else if (a === "--tip") flags.tip = next() as "zevo-template" | "klasik" | "motivasyon" | "kurucu" | "beslenme";
+    else if (a === "--virality-threshold") flags.viralityThreshold = Number(next());
+    else if (a === "--max-retries") flags.maxRetries = Number(next());
+    else if (a === "--target-duration") flags.targetDuration = Number(next());
   }
   return flags;
 }
@@ -116,6 +127,7 @@ async function main() {
       outputDir,
       count: flags.count,
       type: flags.tip,
+      targetDuration: flags.targetDuration,
     });
   }
 
@@ -137,6 +149,21 @@ async function main() {
       outputDir,
       langs: flags.langs,
       conceptIds: flags.conceptIds,
+    });
+  }
+
+  if (shouldRun("qc", flags)) {
+    console.log("\n→ Phase 8: Gemini Vision QC review...");
+    await runQc({ outputDir, cleanupFrames: false });
+  }
+
+  if (shouldRun("iterate", flags)) {
+    console.log(`\n→ Phase 9: Decision loop (threshold=${flags.viralityThreshold}, maxRetries=${flags.maxRetries})...`);
+    await iterateDecisionLoop({
+      outputDir,
+      threshold: flags.viralityThreshold,
+      maxRetries: flags.maxRetries,
+      langs: flags.langs,
     });
   }
 
