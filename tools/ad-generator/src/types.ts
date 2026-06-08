@@ -76,13 +76,13 @@ export const RenderedAdSchema = z.object({
   width: z.number(),
   height: z.number(),
   brandOverlayApplied: z.boolean(),
-  voiceoverProvider: z.enum(["elevenlabs", "macos-say", "skipped"]),
+  voiceoverProvider: z.enum(["edge-tts", "elevenlabs", "macos-say", "skipped"]),
   shots: z.array(
     z.object({
       seconds: z.tuple([z.number(), z.number()]),
       sourceUrl: z.string().optional(),
       sourcePath: z.string().optional(),
-      provider: z.enum(["pexels", "placeholder"]),
+      provider: z.enum(["pexels", "pixabay", "stock", "curated-stock", "placeholder"]),
     })
   ),
 });

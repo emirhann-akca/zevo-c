@@ -6,15 +6,17 @@ import { generate } from "../llm.ts";
 import { loadBrandAssets, type BrandAsset } from "./brand-assets.ts";
 import { AdConceptSchema, type AdAnalysis, type AdConcept } from "../types.ts";
 import { loadLessons, loadTopPerformers, loadWorstPerformers, buildMemoryPromptSection } from "./memory.ts";
+import { loadHookLibrary, buildHookPromptSection } from "./hooks.ts";
+import { loadMarketInsights, buildMarketInsightsPromptSection } from "./market-insights.ts";
 
 // Active tip taxonomy. Core modes: shared template / free creative / minimalist no-UI,
 // plus the retained narrative modes `kurucu` (founder story) and `beslenme` (nutrition hero).
 // Truly-removed legacy types (form-check, antrenman, basari) still PARSE for back-compat and
 // map to the closest current mode (`klasik`).
-export type ConceptType = "zevo-template" | "klasik" | "motivasyon" | "kurucu" | "beslenme";
+export type ConceptType = "zevo-template" | "klasik" | "motivasyon" | "kurucu" | "beslenme" | "donusum" | "pattern-interrupt";
 export type ConceptTypeLegacy = ConceptType | "form-check" | "antrenman" | "basari";
 function normalizeType(t: ConceptTypeLegacy | string | undefined): ConceptType {
-  if (t === "zevo-template" || t === "klasik" || t === "motivasyon" || t === "kurucu" || t === "beslenme") return t;
+  if (t === "zevo-template" || t === "klasik" || t === "motivasyon" || t === "kurucu" || t === "beslenme" || t === "donusum" || t === "pattern-interrupt") return t;
   // form-check, antrenman, basari, anything else → klasik (most flexible)
   return "klasik";
 }
@@ -33,9 +35,11 @@ Brand rules you NEVER violate:
 **NARRATIVE QUALITY — critical for TR audience (most common complaint: ads feel "cırt", jerky, with gaps):**
 - Each shot's voiceover MUST flow naturally into the next. Read aloud: if there's an awkward jump between shots, rewrite.
 - Avoid one-liners that "drop" without setup. Build → tension → release.
-- Use micro-connectors between sentences: "Çünkü...", "Bu yüzden...", "Şimdi...", "Ve...", "Artık..." — these are the glue.
+- **EACH SHOT'S VOICEOVER MUST BE A COMPLETE, SELF-CONTAINED CLAUSE.** Every shot is voiced SEPARATELY (its own TTS clip with a tiny pause before/after), so a shot that ends mid-thought sounds broken.
+- **HARD RULE — never START or END a shot's voiceover on a bare conjunction or postposition.** Forbidden as the FIRST or LAST word of any shot line: "ve", "ama", "fakat", "ancak", "çünkü", "ki", "ya da", "veya", "ile", "için", "de/da", "hem". (A connector like "çünkü"/"bu yüzden" is fine ONLY when it both opens AND the SAME line completes the full thought — e.g. "Çünkü herkese aynı program işe yaramaz." is OK; "...bir adıma dönüşüyor" then next shot "Zevo ile" is FORBIDDEN — the "Zevo ile" must finish its own clause or merge into the previous line.)
+- Connectors belong INSIDE a clause to bind two parts of the SAME shot, not stranded at a shot boundary. Read each shot line alone: if it sounds unfinished or like a fragment, rewrite it into a full sentence.
 - Don't pack a new idea into every shot. Two related shots that develop ONE idea > five shots each pushing a different idea.
-- Voiceover per shot should be 5-12 words in TR. Longer than 12 → split. Shorter than 5 → feels rushed/jerky.
+- Voiceover per shot should be 5-12 words in TR, and each must end on a natural sentence-final word (verb/noun), never a linking word. Longer than 12 → split at a clause boundary, not mid-clause. Shorter than 5 → feels rushed/jerky.
 - Open with a HOOK that earns the next 3 seconds (a question, a contradiction, a "wait, what?" moment). Don't open with the feature.
 - End with payoff, not a generic CTA — the brand name + final hook line, the CTA appears in the outro card automatically.
 - Each shot should have a PURPOSE in the arc: hook → problem → escalation → solution → proof → brand.
@@ -86,7 +90,7 @@ Rules:
 - Output EXACTLY 5 shots — no more, no less.
 - Shots 1, 2, 3 visual MUST be a brand asset ID copied EXACTLY (lowercase, with hyphens) from the lists above. Any other value is invalid.
 - Shots 0 and 4 visual MUST be a generic Pexels query (NO UI mention, NO competitor brands, NO color names like "red"/"orange").
-- Voiceover lines must FLOW as a single coherent script across the 5 shots — total 12-15 Turkish words combined, easy to read at TTS rate +25%.
+- Voiceover lines must FLOW as a single coherent script across the 5 shots — total 12-15 Turkish words combined, easy to read at a natural TTS rate.
 - onScreenText for shots 1-3 can echo a key word (max 3 words). For shots 0 and 4, leave onScreenText empty.
 - Each voiceover line should land in ~2-3 seconds of speech (avoid stuffing a long sentence into a 3s shot).`;
 }
@@ -145,6 +149,43 @@ const BESLENME_PROMPT = BASE_SYSTEM_PROMPT + `
 - DON'T say "diet" — say "beslenme planı". Don't say "kilo ver" — say "hedefine ulaş". Don't moralize.
 - Voice should sound like a friend who finally found something that works — relief and slight surprise, not "buy this".`;
 
+const DONUSUM_PROMPT = BASE_SYSTEM_PROMPT + `
+
+**This is a DÖNÜŞÜM (before/after transformation) ad — the single most proven fitness format. The arc is literally ÖNCE (before) → DÖNÜM NOKTASI (turning point = Zevo) → SONRA (after). The emotional payoff is the contrast.**
+
+Core idea: the viewer sees themselves in the "ÖNCE" — months of effort, no results, no feedback, about to quit. Zevo is the turning point that makes the "SONRA" finally happen. The transformation is EARNED through consistency + personalized feedback, NOT a magic-pill fake before/after.
+
+**STRUCTURE (4-5 shots):**
+- **Shot 0 — ÖNCE (the before, Pexels HOOK, NO UI):** a cinematic moment of struggle/stagnation. Examples: "tired man slumped gym bench", "woman frustrated mirror gym", "exhausted person sitting workout floor", "discouraged athlete catching breath". Mood: low energy, muted. onScreenText: "ÖNCE" (or empty). The voiceover hook names the pain: "Aylardır deniyorsun ama hiçbir şey değişmiyor."
+- **Shot 1 — neden öyleydi (Pexels OR onboarding UI):** explain WHY before failed — no plan that fits you, no one correcting your form, generic programs. UI may appear (onboarding question) showing Zevo getting personal. Voiceover: "Çünkü herkese aynı program işe yaramaz."
+- **Shot 2 — DÖNÜM NOKTASI (Zevo, HERO UI):** Zevo enters. Show the differentiator — AI form check (skeletal overlay + form score) OR the personalized plan. This is the "işte o an değişti" beat. Voiceover: "Sonra her tekrarını izleyen, formunu düzelten bir antrenör cebine girdi."
+- **Shot 3-4 — SONRA (the after, Pexels PAYOFF, triumphant):** the transformation realized — confident, strong, consistent, energetic. Examples: "confident athlete strong pose gym", "runner finish line arms raised", "woman dancing victory workout", "fit man celebrating mirror". Mood: bright, high energy — the visual OPPOSITE of shot 0. onScreenText: "SONRA". Voiceover lands the payoff + brand.
+
+**RULES:**
+- The ÖNCE and SONRA shots must feel visually CONTRASTING (before = drained/static; after = vivid/triumphant). Pick Pexels queries that reflect this.
+- You MAY use onScreenText "ÖNCE" on shot 0 and "SONRA" on the after shot for an explicit before/after frame (max 1-2 words). Other shots: echo a key word only.
+- Honest transformation: the change came from CONSISTENCY that Zevo enabled (it fit them + corrected them), not from a 7-day miracle. Don't promise specific kilos or timelines.
+- App UI (form-check, onboarding, nutrition, workout-plan) is ALLOWED in the turning-point/middle shots — Zevo IS the reason for the change, so showing the product is on-message here.
+- Voiceover flows as ONE story across shots, TR 5-12 words each. Each shot line is a COMPLETE sentence — never end a shot on "ile/ve/ama/çünkü". The final SONRA shot must end on a finished payoff (e.g. "...artık her antrenman bir adıma dönüşüyor." NOT "...bir adıma dönüşüyor" then "Zevo ile").`;
+
+const PATTERN_INTERRUPT_PROMPT = BASE_SYSTEM_PROMPT + `
+
+**This is a PATTERN-INTERRUPT ad — the scroll-stopper format. You open on a topic that has NOTHING to do with fitness, hijack the viewer's attention, then PIVOT to Zevo with a believable bridge. The pivot is the payoff. This is high-risk/high-reward: it lives or dies on the BRIDGE being logical, not random.**
+
+Core mechanic (the proven 3-beat structure):
+1. **OPENER (shot 0, ~3s) — the unrelated hook:** open on something the viewer does NOT expect from a fitness ad — a car/servis analogy, a phone-battery panic, a GPS/navigation idea, a tech habit, an everyday frustration. Cinematic Pexels footage that matches the OPENER's literal topic (e.g. "car mechanic garage", "phone low battery screen closeup", "person lost driving night"), NOT a gym shot, NOT app UI. The voiceover states a confident, slightly absurd-but-true claim about that unrelated thing. onScreenText may echo the absurd claim (max ~4 words).
+2. **BRIDGE (shot 1, ~3-4s) — the pivot sentence:** this is the MOST IMPORTANT line. Connect the unrelated opener to the viewer's own training in ONE logical/emotional sentence. The viewer should think "...oh, that's actually true about me." Visual can start transitioning toward fitness (Pexels person training, OR a quick onboarding UI). Example bridge: "Ama vücudunu hiç kontrol ettirmeden yıllarca zorluyorsun."
+3. **REVEAL + PAYOFF (shots 2-4):** Zevo enters as the answer the bridge set up. Show the differentiator (AI form check / personalized plan / nutrition) — UI is fully on-message here. End on a confident payoff + brand. Last story shot = emotional/energy peak (Pexels triumph).
+
+**RULES:**
+- The OPENER must genuinely surprise — if a fitness viewer could predict it, it's not a pattern interrupt. But it must be relatable (everyone services a car / fears a dead battery / uses GPS).
+- The BRIDGE must be airtight. If the analogy is a stretch, the concept fails — rewrite until the connection is obvious in hindsight.
+- Do NOT mention Zevo or any fitness feature in shot 0. The whole point is the viewer doesn't see it coming.
+- Shot 0 visual = a Pexels query about the OPENER's literal topic (NO UI, NO gym unless the opener is about a gym). Shots 2+ may use brand UI assets.
+- Voiceover flows as ONE arc; TR 5-12 words per shot. Each shot line is a COMPLETE sentence and must never start OR end on a bare conjunction/postposition (ve/ama/çünkü/ile).
+- Use the pattern-interrupt examples from the HOOK LIBRARY (opener → bridge → pivot) as style reference, but write fresh material.
+- Set "hookType" to "pattern-interrupt".`;
+
 function getSystemPrompt(typeRaw: ConceptType | string, brandAssets: BrandAsset[] = []): string {
   const type = normalizeType(typeRaw);
   if (type === "zevo-template") {
@@ -160,13 +201,17 @@ function getSystemPrompt(typeRaw: ConceptType | string, brandAssets: BrandAsset[
       return KURUCU_PROMPT;
     case "beslenme":
       return BESLENME_PROMPT;
+    case "donusum":
+      return DONUSUM_PROMPT;
+    case "pattern-interrupt":
+      return PATTERN_INTERRUPT_PROMPT;
     case "klasik":
     default:
       return KLASIK_PROMPT;
   }
 }
 
-function buildUserPrompt(analyses: AdAnalysis[], brandAssets: BrandAsset[], count: number, memorySection: string = "", targetDuration: number = 20): string {
+function buildUserPrompt(analyses: AdAnalysis[], brandAssets: BrandAsset[], count: number, memorySection: string = "", targetDuration: number = 20, hookSection: string = "", marketSection: string = ""): string {
   const brandSection =
     brandAssets.length > 0
       ? [
@@ -189,6 +234,8 @@ function buildUserPrompt(analyses: AdAnalysis[], brandAssets: BrandAsset[], coun
     JSON.stringify(analyses, null, 2),
     `\`\`\``,
     brandSection,
+    hookSection,
+    marketSection,
     memorySection,
     ``,
     `Generate ${count} ORIGINAL ad concepts for Zevo. Diversify across hook types — do not produce ${count} variants of the same concept.`,
@@ -226,7 +273,14 @@ function extractJsonArray(text: string): unknown[] {
   const start = raw.indexOf("[");
   const end = raw.lastIndexOf("]");
   if (start === -1 || end === -1) throw new Error("no JSON array found in model output");
-  return JSON.parse(raw.slice(start, end + 1));
+  const slice = raw.slice(start, end + 1);
+  try {
+    return JSON.parse(slice);
+  } catch (err) {
+    // Cheap repair pass: strip trailing commas before } or ] (the most common LLM JSON defect).
+    const repaired = slice.replace(/,(\s*[}\]])/g, "$1");
+    return JSON.parse(repaired);
+  }
 }
 
 export async function generateConcepts(opts: {
@@ -279,20 +333,46 @@ export async function generateConcepts(opts: {
   }
 
   const targetDuration = opts.targetDuration ?? 20;
-  const text = await generate({
-    system: getSystemPrompt(type, brandAssets),
-    user: buildUserPrompt(analyses, brandAssets, count, memorySection, targetDuration),
-    model: "heavy",
-    maxOutputTokens: 8192,
-    temperature: 0.85,
-  });
+  const hookLib = await loadHookLibrary(process.cwd());
+  const hookSection = hookLib ? buildHookPromptSection(hookLib) : "";
+  if (hookLib) console.log(`[concept] hook library loaded: ${hookLib.techniques.length} techniques`);
+  const marketInsights = await loadMarketInsights(process.cwd());
+  const marketSection = marketInsights ? buildMarketInsightsPromptSection(marketInsights) : "";
+  if (marketInsights) console.log(`[concept] market insights loaded: +${marketInsights.add.length} do, -${marketInsights.remove.length} avoid, ${marketInsights.benchmarks.length} targets`);
+  const systemPrompt = getSystemPrompt(type, brandAssets);
+  const userPrompt = buildUserPrompt(analyses, brandAssets, count, memorySection, targetDuration, hookSection, marketSection);
 
-  const arr = extractJsonArray(text);
+  // The heavy model occasionally emits malformed JSON (unescaped quotes inside Turkish
+  // voiceover strings, truncation, etc.). LLM output is stochastic, so re-rolling almost
+  // always yields valid JSON. Try up to 3 times; nudge temperature down each retry for
+  // more deterministic formatting. Succeed as soon as we parse >=1 valid concept.
   const concepts: AdConcept[] = [];
-  for (const item of arr) {
-    const parsed = AdConceptSchema.safeParse(item);
-    if (parsed.success) concepts.push(parsed.data);
-    else console.warn("[concept] schema fail:", parsed.error.issues.slice(0, 3));
+  let lastErr: unknown = null;
+  for (let attempt = 0; attempt < 3 && concepts.length === 0; attempt++) {
+    try {
+      const text = await generate({
+        system: systemPrompt,
+        user: userPrompt,
+        model: "heavy",
+        maxOutputTokens: 8192,
+        temperature: attempt === 0 ? 0.85 : 0.5,
+      });
+      const arr = extractJsonArray(text);
+      for (const item of arr) {
+        const parsed = AdConceptSchema.safeParse(item);
+        if (parsed.success) concepts.push(parsed.data);
+        else console.warn("[concept] schema fail:", parsed.error.issues.slice(0, 3));
+      }
+      if (concepts.length === 0) {
+        console.warn(`[concept] attempt ${attempt + 1}/3 produced 0 valid concepts — retrying`);
+      }
+    } catch (err) {
+      lastErr = err;
+      console.warn(`[concept] attempt ${attempt + 1}/3 failed to parse model output (${(err as Error).message.slice(0, 80)}) — retrying`);
+    }
+  }
+  if (concepts.length === 0) {
+    throw new Error(`Concept generation failed after 3 attempts: ${lastErr ? (lastErr as Error).message : "no valid concepts parsed"}`);
   }
 
   const outPath = join(opts.outputDir, "concepts.json");

@@ -4,11 +4,12 @@ import { exec } from "node:child_process";
 import { promisify } from "node:util";
 import { join, resolve } from "node:path";
 import { ZEVO_BRAND } from "../brand.ts";
-import { generateVoiceover, generateVoiceoverPerShot } from "./5-voiceover.ts";
-import { generateMusic, buildMusicPrompt } from "./5-music.ts";
+import { generateVoiceover, generateVoiceoverPerShot, generateVoiceoverContinuous } from "./5-voiceover.ts";
+import { generateMusic, buildMusicPrompt, selectLocalMusic } from "./5-music.ts";
 import { generateWhoosh, generateImpact } from "./sfx.ts";
-import { renderCaptionPng, renderKineticCaptions, closeRenderer } from "./caption-renderer.ts";
+import { renderCaptionPng, renderKineticCaptions, renderCaptionScrim, closeRenderer } from "./caption-renderer.ts";
 import { imageToKenBurnsClip, videoToShotClip } from "./brand-assets.ts";
+import { pickLook } from "./looks.ts";
 import { type AdConcept, type RenderedAd } from "../types.ts";
 
 const execpBase = promisify(exec);
@@ -19,9 +20,28 @@ const H = 1920;
 const ACCENT = ZEVO_BRAND.visual.primaryColor.replace("#", "");
 const BG = ZEVO_BRAND.visual.backgroundColor.replace("#", "");
 
-// Color-grade filter: subtle contrast + saturation + slight teal-shadow / warm-highlight (cinematic feel).
-// Applied to every shot so cuts between disparate stock clips feel coherent.
-const COLOR_GRADE = "eq=contrast=1.08:saturation=1.12:gamma=0.98,unsharp=5:5:0.6:5:5:0.0";
+// Color-grade for STOCK footage. Previously too "cinematic"/soft (sat +12%, gamma 0.98 = darker),
+// which made our clips look dull/washed-out next to the punchy, oversaturated content that
+// dominates TikTok/Reels feeds. Now feed-punchy: higher saturation + a touch of brightness +
+// vibrance (boosts muted colors more than already-vivid ones → natural pop, not neon). Tunable:
+//   GRADE_SAT, GRADE_CONTRAST, GRADE_GAMMA, GRADE_BRIGHT, GRADE_VIBRANCE (set any to override).
+// NOTE: stock & brand grades are deliberately kept CLOSE so the cut between Pexels
+// footage and Zevo app footage doesn't read as a sudden saturation/brightness drop
+// (user feedback: "Pexels çok renkli, bizim kısımlara geçince düşüyor"). Stock was
+// pulled down from 1.30/0.30 and brand lifted up so they meet near sat≈1.18.
+const G_SAT = process.env.GRADE_SAT ?? "1.18";
+const G_CON = process.env.GRADE_CONTRAST ?? "1.10";
+const G_GAM = process.env.GRADE_GAMMA ?? "1.03";
+const G_BRI = process.env.GRADE_BRIGHT ?? "0.02";
+const G_VIB = process.env.GRADE_VIBRANCE ?? "0.16";
+const COLOR_GRADE = `eq=contrast=${G_CON}:saturation=${G_SAT}:gamma=${G_GAM}:brightness=${G_BRI},vibrance=intensity=${G_VIB},unsharp=5:5:0.8:5:5:0.0`;
+
+// Gentle "lift" for BRAND app footage (dark-navy UI) so it doesn't visually sink in the feed.
+// We deliberately keep it lighter than the stock grade (no vibrance, no hue shift) so the UI
+// text stays crisp & true-to-product — just a brightness/contrast/saturation nudge. The unsharp
+// keeps small UI text legible after scaling. Disable with BRAND_PUNCH=0.
+const BRAND_PUNCH = process.env.BRAND_PUNCH !== "0";
+const BRAND_GRADE = "eq=contrast=1.10:saturation=1.18:gamma=1.05:brightness=0.04,vibrance=intensity=0.10,unsharp=5:5:0.5:5:5:0.0";
 
 const SHOT_FPS = 30;
 // Crossfade between adjacent shots. Shorter = tighter cuts, faster pace.
@@ -30,6 +50,15 @@ const XFADE_DUR = parseFloat(process.env.XFADE_DUR_SEC ?? "0.25");
 // Breathing room AFTER the voiceover ends on each shot (silent tail). Lower = more rapid cuts.
 // Override via env: INTER_SHOT_GAP_SEC=0.05 (very tight) ... 0.5 (relaxed)
 const INTER_SHOT_GAP = parseFloat(process.env.INTER_SHOT_GAP_SEC ?? "0.15");
+
+// Caption styling — env-tunable so we can produce visually distinct edits without code changes.
+//   CAP_FONT_SIZE  (default 52)   — bigger = punchier kinetic typography
+//   CAP_UPPERCASE  (1 to enable)  — ALL-CAPS Instagram/TikTok punch style
+//   CAP_Y          (0..1)         — vertical anchor of caption center (0.5 = screen center,
+//                                   default keeps the legacy lower-third placement)
+const CAP_FONT_SIZE = parseInt(process.env.CAP_FONT_SIZE ?? "52", 10);
+const CAP_UPPERCASE = process.env.CAP_UPPERCASE === "1";
+const CAP_Y_OVERRIDE = process.env.CAP_Y ? parseFloat(process.env.CAP_Y) : null;
 
 async function renderShot(opts: {
   sourcePath?: string;
@@ -45,28 +74,56 @@ async function renderShot(opts: {
    * Otherwise, reveal is evenly distributed across the shot.
    */
   wordStartTimes?: number[];
+  /**
+   * Explicit caption word tokens (from the TTS word boundaries). When provided these are used
+   * verbatim as karaoke frames so the frame count always equals `wordStartTimes.length` and the
+   * per-word alignment never falls back to even-distribution (the cause of audio/caption drift).
+   */
+  captionTokens?: string[];
   outPath: string;
   kenBurnsDirection?: "in" | "out";
+  /** Per-video "look" color grades (rotating presets). Default to the module signature grade. */
+  stockGrade?: string;
+  brandGrade?: string;
+  /** Beat-synced entry punch: a quick zoom-in on shot start for rhythmic energy. */
+  beatPunch?: boolean;
 }): Promise<void> {
   const dur = Math.max(1, opts.durationSec);
+  const stockGrade = opts.stockGrade ?? COLOR_GRADE;
+  const brandGrade = opts.brandGrade ?? BRAND_GRADE;
+  // Beat-synced entry "punch": a quick zoom-in (1.06→1.0) over the first ~0.35s of the shot, so
+  // each cut lands with a rhythmic visual hit. zoompan d=1 keeps video playing (no freeze).
+  const punchFrames = Math.max(1, Math.round(0.35 * SHOT_FPS));
+  const beatPunchExpr = opts.beatPunch
+    ? `,zoompan=z='if(lt(on,${punchFrames}),1.060-0.060*on/${punchFrames},1.0)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=${W}x${H}:fps=${SHOT_FPS}`
+    : "";
 
   const inputs: string[] = [];
   const filters: string[] = [];
 
+  // Brand app footage (screen recordings of a hand holding the phone) is shot ~9:16, so it
+  // FILLS the frame edge-to-edge — no blurred letterbox border (user explicitly rejected the
+  // blur around the phone). The caption sits over the bottom with its soft gradient scrim for
+  // legibility. Cinematic Pexels shots are treated the same way (full-bleed).
+  const isBrandUI = opts.sourceKind === "brand-video" || opts.sourceKind === "brand-image";
+
   if (opts.sourcePath && existsSync(opts.sourcePath) && opts.sourceKind === "brand-image") {
-    // Brand image → Ken Burns clip (no color-grade — UI screenshots should stay crisp/unmodified)
+    // Brand image → full-bleed cover crop + gentle lift + subtle zoom for life (no blur border).
     const frames = Math.ceil(dur * SHOT_FPS);
-    const dir = opts.kenBurnsDirection ?? "in";
-    const zoomExpr = dir === "in" ? `min(1.0+0.0008*on,1.08)` : `max(1.08-0.0008*on,1.0)`;
     inputs.push(`-loop 1 -i "${opts.sourcePath}"`);
+    const brandLiftImg = BRAND_PUNCH ? `,${brandGrade}` : "";
     filters.push(
-      `[0:v]scale=${W * 1.2}:${H * 1.2}:force_original_aspect_ratio=increase,crop=${Math.floor(W * 1.1)}:${Math.floor(H * 1.1)},zoompan=z='${zoomExpr}':x='iw/2-(iw/zoom/2)+sin(on/30)*8':y='ih/2-(ih/zoom/2)':d=${frames}:s=${W}x${H}:fps=${SHOT_FPS},format=yuv420p[v0]`
+      `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H}${brandLiftImg},zoompan=z='min(1.0+0.0004*on,1.06)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=${W}x${H}:fps=${SHOT_FPS},setsar=1,format=yuv420p[v0]`
     );
   } else if (opts.sourcePath && existsSync(opts.sourcePath) && opts.sourceKind === "brand-video") {
-    // Brand video → conform to 9:16 WITHOUT color grade (preserve product look)
+    // Brand video → full-bleed cover crop + gentle lift (no blur border).
     inputs.push(`-stream_loop -1 -i "${opts.sourcePath}"`);
+    const brandLift = BRAND_PUNCH ? `,${brandGrade}` : "";
+    // NOTE: beat-punch (zoompan) is intentionally NOT applied to brand UI footage — a zoom on the
+    // app screen looks wrong, and zoompan + the multi-caption overlay chain on these 4K/rotated
+    // brand sources causes an ffmpeg "Conversion failed!". Punch stays on cinematic stock only.
     filters.push(
-      `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,trim=duration=${dur},setpts=PTS-STARTPTS,format=yuv420p[v0]`
+      `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,trim=duration=${dur},setpts=PTS-STARTPTS${brandLift},fps=${SHOT_FPS},format=yuv420p[v0]`
     );
   } else if (opts.sourcePath && existsSync(opts.sourcePath)) {
     // Pexels stock video → conform + color grade. NO zoompan: applying zoompan to a video
@@ -75,7 +132,7 @@ async function renderShot(opts: {
     // already has its own motion — let it play naturally.
     inputs.push(`-stream_loop -1 -i "${opts.sourcePath}"`);
     filters.push(
-      `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,trim=duration=${dur},setpts=PTS-STARTPTS,${COLOR_GRADE},fps=${SHOT_FPS},format=yuv420p[v0]`
+      `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,trim=duration=${dur},setpts=PTS-STARTPTS,${stockGrade}${beatPunchExpr},fps=${SHOT_FPS},format=yuv420p[v0]`
     );
   } else {
     inputs.push(`-f lavfi -i color=c=0x${BG}:s=${W}x${H}:d=${dur}:r=${SHOT_FPS}`);
@@ -88,11 +145,11 @@ async function renderShot(opts: {
     // Render N kinetic frames (one per word revealed)
     const frames = await renderKineticCaptions(opts.caption, opts.captionWorkDir, opts.captionPrefix, {
       width: W - 240,
-      height: 360,
-      fontSize: 52,
-      uppercase: false, // Instagram-style mixed-case is more natural
+      height: CAP_FONT_SIZE > 60 ? 520 : 360,
+      fontSize: CAP_FONT_SIZE,
+      uppercase: CAP_UPPERCASE, // mixed-case is calmer; CAP_UPPERCASE=1 → TikTok punch style
       accentColor: ZEVO_BRAND.visual.primaryColor,
-    });
+    }, opts.captionTokens);
     if (frames.length > 0) {
       // Compute reveal start times.
       // If ElevenLabs alignment was provided AND count matches, use real per-word timings.
@@ -107,6 +164,15 @@ async function renderShot(opts: {
         starts = frames.map((_, i) => i * perWord);
       }
       const holdEnd = dur - 0.35;
+
+      // Soft gradient scrim BEHIND the caption so text is always readable and never collides
+      // with busy app-UI footage (fixes the recurring QC "caption collision" failure). Applied
+      // to the base video before the caption frames are overlaid.
+      const scrimPath = await renderCaptionScrim(opts.captionWorkDir);
+      const scrimIdx = inputs.length;
+      inputs.push(`-loop 1 -i "${scrimPath}"`);
+      filters.push(`[${lastLabel}][${scrimIdx}:v]overlay=0:0:format=auto[v0s]`);
+      lastLabel = "v0s";
 
       // Add an input per caption frame
       let inputIdx = inputs.length;
@@ -129,8 +195,15 @@ async function renderShot(opts: {
           captionFilters.push(`[${inputIdx}:v]format=rgba[${lbl}]`);
         }
         const nextLabel = `vov${i}`;
+        // Full-bleed footage everywhere now → keep the caption in the lower-third (over the hand/
+        // table area on brand phone shots, over the floor/empty space on cinematic shots). The
+        // gradient scrim guarantees legibility without a blurred letterbox band.
+        // Center/large kinetic captions (CAP_Y override) are ONLY safe over cinematic stock
+        // footage. On brand app-UI shots, text over the center covers the very UI we're showing
+        // (QC fails it hard), so brand-UI shots always keep the lower-third placement.
+        const capYFactor = isBrandUI ? 0.84 : (CAP_Y_OVERRIDE ?? 0.80);
         overlayChain.push(
-          `[${current}][${lbl}]overlay=(W-w)/2:H*0.62-h/2:enable='between(t,${start},${isLast ? dur.toFixed(3) : end})':format=auto[${nextLabel}]`
+          `[${current}][${lbl}]overlay=(W-w)/2:H*${capYFactor}-h/2:enable='between(t,${start},${isLast ? dur.toFixed(3) : end})':format=auto[${nextLabel}]`
         );
         current = nextLabel;
         inputIdx++;
@@ -162,11 +235,12 @@ async function renderOutroShot(opts: {
   workDir: string;
 }): Promise<void> {
   const dur = opts.durationSec;
-  // The new user-uploaded logo-reveal already includes the brand tagline + App Store + Google
-  // Play badges as INTENTIONAL design — we no longer fade the bottom. Just scale to 9:16 and
-  // trim. (Legacy: previously masked bottom 27% to hide Veo watermark; that source is gone.)
-  // To restore the fade behavior, set OUTRO_FADE_MASK=1 in .env.
-  const useFadeMask = process.env.OUTRO_FADE_MASK === "1";
+  // The logo-reveal.mp4 is a Veo-generated outro: it has App Store / Google Play badges AND a
+  // bottom-right "Veo" watermark baked in. Both must NOT ship (the Veo label exposes us; the
+  // store badges clutter the brand beat). So the SOFT GRADIENT FADE is now the DEFAULT — it
+  // darkens the bottom ~28% to navy, hiding badges + watermark while the ZEVO logo + Turkish
+  // tagline stay crisp up top. To disable (show source as-is) set OUTRO_FADE_MASK=0 in .env.
+  const useFadeMask = process.env.OUTRO_FADE_MASK !== "0";
   if (useFadeMask) {
     const maskPath = join(opts.workDir, "outro-fade-mask.png");
     await renderOutroFadeMask(maskPath);
@@ -188,9 +262,9 @@ async function renderOutroShot(opts: {
 
 /**
  * Renders a 1080x1920 PNG mask tuned to the Veo source layout:
- *  - y=0..1305 (top 68%): fully transparent → ZEVO logo + full 2-line Turkish tagline stay crisp
- *  - y=1305..1410 (68-73%): smooth gradient transparent → opaque
- *  - y=1410..1920 (bottom 27%): fully opaque dark navy → hides App Store icons + Play Store icons + Veo watermark
+ *  - y=0..1344 (top 70%): fully transparent → ZEVO logo + full 2-line Turkish tagline stay crisp
+ *  - y=1344..1440 (70-75%): smooth gradient transparent → opaque
+ *  - y=1440..1920 (bottom 25%): fully opaque dark navy → hides App Store icons + Play Store icons + Veo watermark
  * The gradient zone is intentionally short (5% of height) so the transition is visible but quick.
  */
 async function renderOutroFadeMask(outPath: string): Promise<void> {
@@ -202,8 +276,8 @@ async function renderOutroFadeMask(outPath: string): Promise<void> {
       background: linear-gradient(
         to bottom,
         rgba(10,22,40,0) 0%,
-        rgba(10,22,40,0) 68%,
-        ${bg} 73%,
+        rgba(10,22,40,0) 69%,
+        ${bg} 72.5%,
         ${bg} 100%
       );
     }
@@ -550,7 +624,7 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
     opts.assetsManifestFile && existsSync(opts.assetsManifestFile)
       ? (JSON.parse(await readFile(opts.assetsManifestFile, "utf8")) as Record<
           string,
-          { shotIdx: number; source?: "brand-image" | "brand-video" | "pexels"; localPath: string; sourceUrl?: string }[]
+          { shotIdx: number; source?: "brand-image" | "brand-video" | "curated-stock" | "pexels" | "pixabay" | "stock"; localPath: string; sourceUrl?: string; brandAssetId?: string }[]
         >)
       : {};
   const langs = opts.langs ?? ["tr", "en"];
@@ -567,56 +641,76 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
 
       console.log(`[render] ${concept.id} [${lang}]...`);
 
-      // 1) Generate per-shot voiceovers FIRST so we can sync each shot's duration to its VO.
+      // 1) Generate ONE continuous voiceover for the whole script (natural human flow, no dead
+      //    pause / prosody-reset between shots). Returns per-line word timings (GLOBAL seconds)
+      //    so we can both place the single audio track and drive per-shot karaoke captions.
       const voLines = concept.shotlist.map((s) => s.voiceover[lang]);
-      const perShotVo = await generateVoiceoverPerShot({
+      const contVo = await generateVoiceoverContinuous({
         lines: voLines,
         lang,
         outDir: workDir,
         prefix: "vo",
       });
-      const voProvider = perShotVo.find((v) => v.provider !== "skipped")?.provider ?? "skipped";
+      const voProvider = contVo.provider;
+      // Total spoken-audio duration (probe to be safe; continuous synthesis returns it too).
+      const voAudioDur = contVo.path ? (contVo.totalDur || await probeDuration(contVo.path)) : 0;
 
-      // 2) Render each shot with duration = max(concept-hint, vo-duration + 0.4s breathing room).
-      //    This guarantees the voiceover finishes before the cut, eliminating drift.
+      // 2) Each shot's VISUAL span is driven by where its line sits in the continuous audio, so
+      //    the cut lands exactly as the next sentence begins — no gap. We add XFADE_DUR per shot
+      //    to compensate for the crossfade overlap (so shot i's visual start == its line's audio
+      //    start). The single continuous audio is placed at t=0 over the whole timeline below.
+      const spokenShotIdx = contVo.shots
+        .map((s, i) => ({ i, has: s.words.length > 0, startSec: s.startSec }))
+        .filter((x) => x.has);
       const shotParts: { path: string; durationSec: number }[] = [];
       const shotMeta: RenderedAd["shots"] = [];
-      const voPaths: (string | null)[] = [];
+
+      // Per-video "look" (rotating color grade) + beat-synced entry punch — gives each ad a
+      // distinct visual identity instead of one flat shared grade. Look is deterministic per
+      // concept id (pin with LOOK=<name>); beat punch on by default (disable with BEAT_PUNCH=0).
+      const look = pickLook(`${concept.id}-${lang}`);
+      const beatPunch = process.env.BEAT_PUNCH !== "0";
+      console.log(`[render]   look=${look.name} beatPunch=${beatPunch ? "on" : "off"}`);
 
       for (let i = 0; i < concept.shotlist.length; i++) {
         const shot = concept.shotlist[i];
         const [start, end] = shot.seconds;
         const hintDur = Math.max(1, end - start);
-        const voEntry = perShotVo[i];
-        const voDur = voEntry?.path ? await probeDuration(voEntry.path) : 0;
+        const voShot = contVo.shots[i];
+        const hasVo = voShot && voShot.words.length > 0;
         const asset = manifest[concept.id]?.find((m: any) => m.shotIdx === i);
-        // Probe the source asset's natural duration so we can cap the shot length to it.
-        // Rationale: if the brand video is only 2s but the VO is 3s, we'd rather end the shot
-        // at 2s (and let the VO tail get clipped at the mix step) than loop the visual.
-        // For Pexels we don't cap because their videos are reliably long enough.
         let sourceDur = 0;
         if (asset?.localPath && (asset.source === "brand-video" || asset.source === "brand-image")) {
           sourceDur = await probeDuration(asset.localPath).catch(() => 0);
         }
-        // Compute desired duration from VO (or hint if no VO).
-        const desiredDur = voDur > 0 ? voDur + INTER_SHOT_GAP : hintDur;
-        // Cap: never exceed the source video's natural length when the source is a brand asset.
-        // Only the visual is shortened — VO mp3 is unchanged at render time but will be trimmed
-        // at the audio mix step (its mapping uses the shot's actual duration).
+        // Visual span = from this line's audio start to the NEXT spoken line's start (gap-free).
+        // For the last spoken line, span to end of audio + a short tail. Shots with no VO use hint.
+        let voSpan = hintDur;
+        if (hasVo) {
+          const pos = spokenShotIdx.findIndex((x) => x.i === i);
+          const nextStart =
+            pos >= 0 && pos < spokenShotIdx.length - 1
+              ? spokenShotIdx[pos + 1].startSec
+              : voAudioDur + 0.3; // last spoken line → run to end of audio + tail
+          voSpan = Math.max(0.8, nextStart - voShot.startSec);
+        }
+        // +XFADE so that, after the crossfade subtracts it, the visual start aligns to the audio.
+        const desiredDur = voSpan + XFADE_DUR;
         const dur = sourceDur > 0 ? Math.min(desiredDur, sourceDur) : desiredDur;
         if (sourceDur > 0 && desiredDur > sourceDur + 0.05) {
-          console.warn(`[render] shot ${i} (${asset?.brandAssetId}): VO needs ${desiredDur.toFixed(1)}s but asset is only ${sourceDur.toFixed(1)}s — trimming shot to asset length (no loop).`);
+          console.warn(`[render] shot ${i} (${asset?.brandAssetId}): needs ${desiredDur.toFixed(1)}s but asset is only ${sourceDur.toFixed(1)}s — trimming shot to asset length (no loop).`);
         }
         const shotPath = join(workDir, `shot-${i}.mp4`);
-        // Caption = spoken voiceover text (so the on-screen words match what's heard).
-        // If alignment is available, each word reveals at its actual spoken moment.
-        // If shot has no voiceover (e.g. logo outro shot), no caption is rendered.
-        const voWords = voEntry?.words ?? [];
+        // Caption = spoken voiceover text; word reveal times are rebased to shot-local (global
+        // word time minus this shot's audio start) so karaoke stays in sync with the heard word.
+        const voWords = voShot?.words ?? [];
         let caption: string | undefined;
         let wordStartTimes: number[] | undefined;
+        let captionTokens: string[] | undefined;
         if (voWords.length > 0) {
-          caption = voWords.map((w) => w.text).join(" ");
-          wordStartTimes = voWords.map((w) => w.startSec);
+          captionTokens = voWords.map((w) => w.text);
+          caption = captionTokens.join(" ");
+          wordStartTimes = voWords.map((w) => Math.max(0, w.startSec - voShot.startSec));
         }
         const sourceKind =
           asset?.source === "brand-image"
@@ -632,17 +726,22 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
           captionWorkDir: caption ? workDir : undefined,
           captionPrefix: caption ? `caption-${i}` : undefined,
           wordStartTimes,
+          captionTokens,
           outPath: shotPath,
           kenBurnsDirection: i % 2 === 0 ? "in" : "out",
+          stockGrade: look.stock,
+          brandGrade: look.brand,
+          beatPunch,
         });
         shotParts.push({ path: shotPath, durationSec: dur });
-        voPaths.push(voEntry?.path ?? null);
         shotMeta.push({
           seconds: [start, end],
           sourceUrl: asset?.sourceUrl,
           sourcePath: asset?.localPath,
           provider: asset
             ? (asset.source === "pexels" ? "pexels"
+              : asset.source === "pixabay" ? "pixabay"
+              : asset.source === "stock" ? "stock"
               : asset.source === "curated-stock" ? "curated-stock"
               : "placeholder")
             : "placeholder",
@@ -665,61 +764,39 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
           workDir,
         });
         shotParts.push({ path: outroShotPath, durationSec: outroDur });
-        voPaths.push(null); // no VO over outro
       }
 
       // 5) Concat with crossfades
       const concatPath = join(workDir, "concat.mp4");
       await concatWithCrossfade(shotParts, concatPath);
 
-      // 6) Build a combined VO track by placing each shot's audio at its computed shot start time
-      //    (accounting for crossfade overlap). Empty entries (no VO for that shot) are skipped.
-      const voPath = join(workDir, "vo.mp3");
-      const voTotalDur = await probeDuration(concatPath);
-      const haveAnyVo = voPaths.some((p) => p !== null);
-      if (haveAnyVo) {
-        // shotStartAcc = global start time of shot i in the crossfaded output.
-        // With chained xfade, shot (i+1) starts XFADE_DUR before shot i ends, so each
-        // increment subtracts XFADE_DUR. (Previously we skipped subtraction for shot 0,
-        // which made every audio delay XFADE_DUR too LATE → captions ahead of voice
-        // at every cut. This now aligns audio with the visual start exactly.)
-        let shotStartAcc = 0;
-        const voInputs: string[] = [];
-        const voFilters: string[] = [];
-        let voIdx = 0;
-        for (let i = 0; i < shotParts.length; i++) {
-          const p = voPaths[i];
-          if (p) {
-            voInputs.push(`-i "${p}"`);
-            const delayMs = Math.max(0, Math.round(shotStartAcc * 1000));
-            // Trim each VO to its shot's visual duration so a long VO does not bleed into the
-            // next shot's audio. The visual is already capped to source length above — match
-            // the VO. afade=out softens the cut so it doesn't feel like a hard chop.
-            const shotDurMs = (shotParts[i].durationSec).toFixed(3);
-            const fadeStart = Math.max(0, shotParts[i].durationSec - 0.15).toFixed(3);
-            voFilters.push(`[${voIdx}:a]atrim=duration=${shotDurMs},afade=t=out:st=${fadeStart}:d=0.15,adelay=${delayMs}:all=1[v${voIdx}]`);
-            voIdx++;
-          }
-          shotStartAcc += shotParts[i].durationSec - XFADE_DUR;
-        }
-        if (voIdx > 0) {
-          const mixLabels = Array.from({ length: voIdx }, (_, k) => `[v${k}]`).join("");
-          voFilters.push(`${mixLabels}amix=inputs=${voIdx}:duration=longest:normalize=0[aout]`);
-          const cmd = `ffmpeg -y ${voInputs.join(" ")} -filter_complex "${voFilters.join(";")}" -map "[aout]" -t ${voTotalDur} -c:a libmp3lame -b:a 192k "${voPath}"`;
-          await execp(cmd);
-        }
-      }
+      // 6) Voiceover track = the SINGLE continuous audio, placed at t=0 over the whole timeline.
+      //    Shot visual spans were computed (with +XFADE compensation) so each sentence lands on
+      //    its shot exactly, and muxRichAudio pads/places the voice at t=0 → no per-shot stitching,
+      //    no gaps. (The old per-shot adelay mix that caused the audible pauses is gone.)
+      const voPath = contVo.path ?? join(workDir, "vo.mp3");
 
       const finalPath = join(rendersDir, `${concept.id}-${lang}.mp4`);
       const totalDur = await probeDuration(concatPath);
 
-      // Background music — try ElevenLabs, fall back to none.
+      // Background music — try ElevenLabs first; if unavailable, fall back to the LOCAL music
+      // library (brand-assets/music/). Music can be disabled entirely with MUSIC=0.
       const musicPath = join(workDir, "music.mp3");
-      const musicResult = await generateMusic({
-        prompt: buildMusicPrompt(concept.musicMood || "uplifting energetic", totalDur),
-        durationSec: Math.ceil(totalDur),
-        outPath: musicPath,
-      });
+      let musicResult: string | null = null;
+      let musicSource = "none";
+      if (process.env.MUSIC !== "0") {
+        musicResult = await generateMusic({
+          prompt: buildMusicPrompt(concept.musicMood || "uplifting energetic", totalDur),
+          durationSec: Math.ceil(totalDur),
+          outPath: musicPath,
+        });
+        if (musicResult) {
+          musicSource = "elevenlabs";
+        } else {
+          musicResult = await selectLocalMusic({ moodSeed: concept.musicMood || "energetic" });
+          if (musicResult) musicSource = `local:${musicResult.split(/[\\/]/).pop()}`;
+        }
+      }
 
       // SFX: whoosh (at scene cuts) + impact (at outro). Whoosh is OPT-IN via SFX_WHOOSH=1 —
       // user prefers a clean cut without transition sweep. Impact remains on for outro emphasis.
@@ -756,7 +833,7 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
       } else {
         await execp(`ffmpeg -y -i "${concatPath}" -c copy "${finalPath}"`);
       }
-      console.log(`[render]   audio: voice=${hasVoice ? voProvider : "none"} music=${musicResult ? "elevenlabs" : "none"} sfx=procedural`);
+      console.log(`[render]   audio: voice=${hasVoice ? voProvider : "none"} music=${musicSource} sfx=procedural`);
 
       const rendered: RenderedAd = {
         conceptId: concept.id,
@@ -771,6 +848,9 @@ export async function renderAds(opts: RenderOptions): Promise<RenderedAd[]> {
       };
       results.push(rendered);
       console.log(`[render] ✓ ${finalPath} (${totalDur.toFixed(1)}s, vo=${voProvider})`);
+      // NOTE: pool copy intentionally happens LATER, in the iterate phase (9-iterate.ts),
+      // and ONLY for videos that pass the QC bar — render runs before QC, so copying here
+      // would dump failed cuts into the pool. The pool is the "ready to ship" shelf.
     }
   }
 

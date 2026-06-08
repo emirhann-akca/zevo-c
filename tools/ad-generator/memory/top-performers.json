@@ -1,5 +1,65 @@
 [
   {
+    "conceptId": "donusum-aylardir-deniyorsun-v1",
+    "hookLine": "Aylardır deniyorsun ama hiçbir şey değişmiyor.",
+    "hookType": "before-after-tease",
+    "overallScore": 94,
+    "virality": {
+      "hookStrength": 95,
+      "holdPrediction": 90,
+      "captionHook": 100,
+      "brandSafety": 90
+    },
+    "shotCount": 4,
+    "rationale": "This concept uses the highly effective 'Dönüşüm' (Before/After) structure to create a strong emotional arc. It hooks with a relatable pain point (stagnation), diagnoses the problem (generic plans), introduces Zevo's AI form check as the specific, game-changing solution, and pays off with a clear, triumphant transformation. The visual contrast between the 'ÖNCE' and 'SONRA' shots amplifies the feeling of progress. Each VO line is a complete, self-contained thought, ensuring a smooth, non-jerky narrative flow that addresses a common complaint from the TR audience.",
+    "capturedAt": "2026-06-05T19:23:15.389Z"
+  },
+  {
+    "conceptId": "donusum-kisisel-plan-01",
+    "hookLine": "O ‘herkese uygun’ programlar aslında kimseye uymuyor.",
+    "hookType": "contrarian-claim",
+    "overallScore": 93,
+    "virality": {
+      "hookStrength": 95,
+      "holdPrediction": 90,
+      "captionHook": 90,
+      "brandSafety": 95
+    },
+    "shotCount": 6,
+    "rationale": "This ad uses the proven 'Dönüşüm' (Before/After) format, structured around a 'contrarian-claim' hook that challenges generic online programs. It directly addresses the pain of stagnation and positions Zevo's personalization (onboarding, custom plan) and AI form check as the turning point. The visual arc contrasts a frustrated 'before' with a confident 'after', creating a strong emotional payoff. The narrative flows logically from problem to solution to result, using micro-connectors for a smooth VO in Turkish. It leverages three key Zevo assets to showcase the product's real value.",
+    "capturedAt": "2026-06-05T18:39:06.940Z"
+  },
+  {
+    "conceptId": "donusum-aylardir-deniyorsun-1",
+    "hookLine": "Aylardır deniyorsun ama hiçbir şey değişmiyor.",
+    "hookType": "before-after-tease",
+    "overallScore": 92,
+    "virality": {
+      "hookStrength": 90,
+      "holdPrediction": 95,
+      "captionHook": 95,
+      "brandSafety": 90
+    },
+    "shotCount": 5,
+    "rationale": "This ad uses the classic and highly effective 'Dönüşüm' (Before/After) structure. It hooks the viewer with a deeply relatable moment of frustration (ÖNCE) and immediately explains the logical reason for their failure, positioning generic plans as the villain. The 'DÖNÜM NOKTASI' introduces Zevo's core differentiator—AI form check—as the specific solution that changes everything. The 'SONRA' shot provides the emotional payoff with a triumphant visual that directly contrasts the opening shot. The voiceover is structured with complete, self-contained clauses per shot to ensure a smooth narrative flow for the Turkish audience, avoiding any 'cırt' feeling. The final shot reinforces the brand and its benefit before the hard CTA card appears.",
+    "capturedAt": "2026-06-05T18:53:20.759Z"
+  },
+  {
+    "conceptId": "gps-for-your-body-v1",
+    "hookLine": "GPS olmadan bilmediğin bir şehirde araba kullanmazsın.",
+    "hookType": "pattern-interrupt",
+    "overallScore": 91,
+    "virality": {
+      "hookStrength": 95,
+      "holdPrediction": 90,
+      "captionHook": 95,
+      "brandSafety": 85
+    },
+    "shotCount": 6,
+    "rationale": "This ad uses the 'pattern-interrupt' structure to reframe the problem of directionless training. By comparing it to the universally understood frustration of being lost without GPS, it creates a powerful 'aha' moment. The bridge is logical and makes the viewer question their own methods. Zevo is then introduced not as another fitness app, but as the essential navigation tool they've been missing. The progression from 'mapping' (onboarding) to 'routing' (plan) to 'turn-by-turn guidance' (AI form check) perfectly extends the metaphor, making the solution feel intuitive and indispensable.",
+    "capturedAt": "2026-06-04T15:14:45.357Z"
+  },
+  {
     "conceptId": "form-check-plateau-breaker-1",
     "hookLine": "O mükemmel görünen formu... gerçekten doğru mu?",
     "hookType": "KLASIK",
@@ -30,6 +90,21 @@
     "capturedAt": "2026-05-25T14:44:00.946Z"
   },
   {
+    "conceptId": "pattern-interrupt-phone-battery-v2",
+    "hookLine": "Telefonun şarjı yüzde bire düşünce paniklersin.",
+    "hookType": "pattern-interrupt",
+    "overallScore": 68,
+    "virality": {
+      "hookStrength": 90,
+      "holdPrediction": 85,
+      "captionHook": 95,
+      "brandSafety": 70
+    },
+    "shotCount": 6,
+    "rationale": "This concept uses the high-risk, high-reward 'pattern-interrupt' structure. It hooks with a universal anxiety (a dying phone battery) completely unrelated to fitness, grabbing attention before the viewer can classify it as an ad. The critical 'bridge' sentence logically pivots this anxiety to the user's unmeasured physical state, creating a 'wait, that's a good point' moment. The ad then reveals Zevo as the solution, sequentially demonstrating its key differentiators: personalization (onboarding), the core AI form-check mechanism (our #1 USP), and the 'all-in-one' value of combined nutrition and training. The narrative arc builds from a relatable problem to a powerful, branded solution, ending on an emotional peak. It uses 3 key brand assets, ensuring the visuals are specific and convincing.",
+    "capturedAt": "2026-06-05T21:00:57.287Z"
+  },
+  {
     "conceptId": "plan-to-perfection-1",
     "hookLine": "Her gün salondasın, ama ayna aynı mı söylüyor?",
     "hookType": "AÇIK SORU",
@@ -43,5 +118,20 @@
     "shotCount": 5,
     "rationale": "This ad uses a dynamic visual narrative to fix the 'static slideshow' issue. It hooks with a relatable struggle (frustrated lifter), agitates with chaotic visuals representing 'no plan', presents Zevo's plan generation as the clear solution, proves its value with a dynamic split-screen of the AI form check, and concludes with a shot of the user's success, directly addressing the initial problem. The quick cuts and mix of real footage with app UI will maximize viewer hold.",
     "capturedAt": "2026-05-25T14:27:21.800Z"
+  },
+  {
+    "conceptId": "beslenme-ayna-yalan-soylemez",
+    "hookLine": "Aylardır salondasın ama ayna aynı mı?",
+    "hookType": "problem",
+    "overallScore": 65,
+    "virality": {
+      "hookStrength": 85,
+      "holdPrediction": 75,
+      "captionHook": 90,
+      "brandSafety": 60
+    },
+    "shotCount": 6,
+    "rationale": "This concept uses a classic Problem-Agitation-Solution structure, inspired by competitor ads #1548671303496100 and #943686954695122. It hooks the user by reframing their gym frustration from a lack of effort to a problem with their nutrition strategy. The narrative builds tension by showing the failure of 'generic plans' and then resolves it by showcasing Zevo's key differentiator: deep personalization via onboarding questions (`onboarding-health`, `onboarding-injury`). The hero UI shot (`nutrition-dashboard`) serves as the payoff, visually confirming the promise of a tailored plan. The ad's flow is designed for the Turkish audience, using connectors ('Çünkü...', 'Bu yüzden...', 'Ve...', 'Artık...') to ensure a smooth narrative and avoid a 'jerky' feel. The final shot provides an emotional peak of satisfaction, tying the solution directly to a tangible, positive outcome.",
+    "capturedAt": "2026-06-04T12:40:00.886Z"
   }
 ]

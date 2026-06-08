@@ -27,10 +27,12 @@ const DEFAULT_EDGE_VOICES = {
   en: "en-US-AndrewNeural",
 };
 
-// Default speaking-rate boost for ad-format energy. Scroll-stopping ads talk faster than
-// conversational neutral. SSML accepts "+25%" (25% faster) or a multiplier (1.25). Override
-// per-language via EDGE_TTS_RATE_TR / EDGE_TTS_RATE_EN, e.g. "+10%", "+40%", "1.15".
-const DEFAULT_EDGE_RATE = "+25%";
+// Default speaking-rate boost for ad-format energy. We pulled this DOWN from +25% to +8%
+// because the faster rate made the per-shot TTS sound rushed/robotic (user feedback: wants
+// it to sound like a real human read it). +8% keeps ad energy without clipping prosody, and
+// gives each complete-sentence shot line room to land naturally. SSML accepts "+8%" or a
+// multiplier (1.08). Override per-language via EDGE_TTS_RATE_TR / EDGE_TTS_RATE_EN.
+const DEFAULT_EDGE_RATE = "+8%";
 
 export type VoLang = "tr" | "en";
 export type VoProvider = "edge-tts" | "elevenlabs" | "macos-say" | "skipped";
@@ -48,6 +50,8 @@ async function edgeTtsWithAlignment(
     (lang === "tr" ? process.env.EDGE_TTS_VOICE_TR : process.env.EDGE_TTS_VOICE_EN) ?? DEFAULT_EDGE_VOICES[lang];
   const rate =
     (lang === "tr" ? process.env.EDGE_TTS_RATE_TR : process.env.EDGE_TTS_RATE_EN) ?? DEFAULT_EDGE_RATE;
+  // Optional pitch shift (e.g. "-2Hz", "+3%") to vary delivery away from the default monotone.
+  const pitch = (lang === "tr" ? process.env.EDGE_TTS_PITCH_TR : process.env.EDGE_TTS_PITCH_EN) || undefined;
   const tts = new MsEdgeTTS();
   // Multilingual voices speak any language via the voiceLocale field. For non-tr-TR voice
   // names we still want Turkish output, so force voiceLocale = the target lang.
@@ -58,7 +62,7 @@ async function edgeTtsWithAlignment(
     sentenceBoundaryEnabled: false,
     ...(isNativeLocale ? {} : { voiceLocale: targetLocale }),
   });
-  const { audioStream, metadataStream } = tts.toStream(xmlEscape(text), { rate });
+  const { audioStream, metadataStream } = tts.toStream(xmlEscape(text), pitch ? { rate, pitch } : { rate });
 
   const audioChunks: Buffer[] = [];
   const words: WordTiming[] = [];
@@ -238,6 +242,148 @@ export async function generateVoiceover(opts: {
   }
   console.warn("[voiceover] no provider available — skipping");
   return "skipped";
+}
+
+async function probeMp3Duration(path: string): Promise<number> {
+  try {
+    const { stdout } = await execp(
+      `ffprobe -v error -show_entries format=duration -of csv=p=0 "${path}"`
+    );
+    const d = parseFloat(stdout.trim());
+    return Number.isFinite(d) ? d : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function normToken(s: string): string {
+  return s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+}
+
+/**
+ * Split a flat list of word-boundary timings (from ONE continuous synthesis) back into
+ * per-line groups, by greedily consuming words until each line's normalized text is covered.
+ * Tolerant of tokenization differences (numbers, punctuation). Returns null on gross mismatch.
+ */
+function mapWordsToLines(words: WordTiming[], lines: string[]): ContinuousVoShot[] | null {
+  const result: ContinuousVoShot[] = [];
+  let k = 0;
+  for (let li = 0; li < lines.length; li++) {
+    const target = normToken(lines[li]);
+    let acc = "";
+    const seg: WordTiming[] = [];
+    while (k < words.length && acc.length < target.length) {
+      acc += normToken(words[k].text);
+      seg.push(words[k]);
+      k++;
+    }
+    if (seg.length === 0) return null;
+    result.push({ words: seg, startSec: seg[0].startSec, endSec: seg[seg.length - 1].endSec });
+  }
+  // Any trailing words → fold into the last line so nothing is lost.
+  if (k < words.length && result.length > 0) {
+    const last = result[result.length - 1];
+    for (; k < words.length; k++) {
+      last.words.push(words[k]);
+      last.endSec = words[k].endSec;
+    }
+  }
+  return result;
+}
+
+export interface ContinuousVoShot {
+  /** word timings in GLOBAL seconds (relative to the whole continuous audio). */
+  words: WordTiming[];
+  startSec: number;
+  endSec: number;
+}
+
+export interface ContinuousVoResult {
+  /** path to the single continuous audio file, or null if nothing was spoken. */
+  path: string | null;
+  provider: VoProvider;
+  /** one entry per input line (empty lines → empty words). GLOBAL times. */
+  shots: ContinuousVoShot[];
+  /** total audio duration in seconds (0 if unknown — caller may probe). */
+  totalDur: number;
+}
+
+/**
+ * Synthesize the ENTIRE script as ONE continuous voiceover so the delivery flows like a real
+ * person reading top-to-bottom — natural sentence-final intonation and a short human breath
+ * between sentences, NOT a dead pause and prosody-reset at every shot (the old per-shot TTS).
+ * Returns per-line word timings (GLOBAL) so the renderer can both place the single audio track
+ * and drive per-shot karaoke captions.
+ */
+export async function generateVoiceoverContinuous(opts: {
+  lines: string[];
+  lang: VoLang;
+  outDir: string;
+  prefix?: string;
+}): Promise<ContinuousVoResult> {
+  await mkdir(opts.outDir, { recursive: true }).catch(() => {});
+  const prefix = opts.prefix ?? "vo";
+  const lines = opts.lines.map((l) => (l ?? "").trim());
+  const spoken = lines.map((l, i) => ({ i, l })).filter((x) => x.l.length > 0);
+  const emptyShots = (): ContinuousVoShot[] => lines.map(() => ({ words: [], startSec: 0, endSec: 0 }));
+
+  if (spoken.length === 0) {
+    return { path: null, provider: "skipped", shots: emptyShots(), totalDur: 0 };
+  }
+
+  const outPath = join(opts.outDir, `${prefix}-cont.mp3`);
+  // Ensure each line ends with sentence punctuation → natural intonation + a short breath
+  // (not a dead pause) between sentences in the single synthesis.
+  const withStops = spoken.map((x) => (/[.!?…]$/.test(x.l) ? x.l : x.l + "."));
+  const combined = withStops.join(" ");
+
+  // PRIMARY: one continuous Edge TTS synthesis (natural prosody over the whole script).
+  try {
+    const words = await edgeTtsWithAlignment(combined, opts.lang, outPath);
+    const mapped = mapWordsToLines(words, spoken.map((x) => x.l));
+    if (mapped) {
+      const shots = emptyShots();
+      for (let s = 0; s < spoken.length; s++) shots[spoken[s].i] = mapped[s];
+      const totalDur = await probeMp3Duration(outPath);
+      return { path: outPath, provider: "edge-tts", shots, totalDur };
+    }
+    console.warn("[voiceover] continuous word→line mapping mismatch — falling back to per-line concat");
+  } catch (err) {
+    console.warn("[voiceover] continuous edge-tts failed — falling back to per-line concat:", (err as Error).message);
+  }
+
+  // FALLBACK: synthesize each line separately, concat audio back-to-back with NO silence, and
+  // offset each line's word times by the cumulative duration. Gap-free; prosody resets per line.
+  const perLine = await generateVoiceoverPerShot({ lines, lang: opts.lang, outDir: opts.outDir, prefix });
+  const shots = emptyShots();
+  const segPaths: string[] = [];
+  let acc = 0;
+  let provider: VoProvider = "skipped";
+  for (let i = 0; i < lines.length; i++) {
+    const entry = perLine[i];
+    if (!entry?.path) continue;
+    if (entry.provider !== "skipped") provider = entry.provider;
+    const d = await probeMp3Duration(entry.path);
+    shots[i] = {
+      words: entry.words.map((w) => ({ text: w.text, startSec: w.startSec + acc, endSec: w.endSec + acc })),
+      startSec: acc,
+      endSec: acc + d,
+    };
+    segPaths.push(entry.path);
+    acc += d;
+  }
+  if (segPaths.length === 0) {
+    return { path: null, provider: "skipped", shots: emptyShots(), totalDur: 0 };
+  }
+  const listFile = join(opts.outDir, `${prefix}-cont-list.txt`);
+  await writeFile(listFile, segPaths.map((p) => `file '${p.replace(/'/g, "'\\''")}'`).join("\n"));
+  try {
+    await execp(`ffmpeg -y -f concat -safe 0 -i "${listFile}" -c:a libmp3lame -b:a 192k "${outPath}"`);
+  } catch (err) {
+    console.warn("[voiceover] continuous concat failed:", (err as Error).message);
+    return { path: null, provider: "skipped", shots: emptyShots(), totalDur: 0 };
+  }
+  return { path: outPath, provider, shots, totalDur: acc };
 }
 
 export async function generateVoiceoverPerShot(opts: {

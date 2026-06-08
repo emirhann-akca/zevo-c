@@ -6,13 +6,14 @@
  * artifacts) is on disk under tools/ad-generator/output/<date>/, so nothing is destroyed.
  */
 import { spawn, type ChildProcess } from "node:child_process";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { EventEmitter } from "node:events";
 
 export type RunStatus = "queued" | "running" | "completed" | "failed" | "killed";
 
 export interface RunSpec {
-  tip: "zevo-template" | "klasik" | "motivasyon";
+  tip: "zevo-template" | "klasik" | "motivasyon" | "kurucu" | "beslenme";
   count: number;
   langs: ("tr" | "en")[];
   skip: string[];                   // phase names to skip
@@ -51,9 +52,45 @@ const runs = new Map<string, InternalRun>();
 const REPO_ROOT = process.cwd();
 const AD_GENERATOR_DIR = join(REPO_ROOT, "tools", "ad-generator");
 
-// ffmpeg lives outside the default PATH on this machine; prepend so child can use it.
-const FFMPEG_BIN =
-  "C:\\Users\\serve\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin";
+// ffmpeg often lives outside the default PATH (WinGet doesn't always propagate it
+// system-wide). Resolve a machine-agnostic location instead of hardcoding a user dir:
+//   1. FFMPEG_BIN env override (explicit wins),
+//   2. the WinGet Gyan.FFmpeg package dir under THIS user's LOCALAPPDATA,
+//   3. empty string → rely on whatever ffmpeg is already on PATH.
+function resolveFfmpegBin(): string {
+  const explicit = process.env.FFMPEG_BIN;
+  if (explicit && existsSync(explicit)) return explicit;
+
+  const localAppData =
+    process.env.LOCALAPPDATA ??
+    (process.env.USERPROFILE ? join(process.env.USERPROFILE, "AppData", "Local") : null);
+  if (localAppData) {
+    const pkgRoot = join(
+      localAppData,
+      "Microsoft",
+      "WinGet",
+      "Packages",
+      "Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe",
+    );
+    // The version folder (e.g. ffmpeg-8.1.1-full_build) changes across updates, so
+    // probe for any ffmpeg-*-full_build/bin under the package root.
+    if (existsSync(pkgRoot)) {
+      try {
+        const { readdirSync } = require("node:fs") as typeof import("node:fs");
+        const versions = readdirSync(pkgRoot).filter((d) => d.toLowerCase().startsWith("ffmpeg-"));
+        for (const v of versions) {
+          const bin = join(pkgRoot, v, "bin");
+          if (existsSync(join(bin, "ffmpeg.exe"))) return bin;
+        }
+      } catch {
+        /* ignore and fall through */
+      }
+    }
+  }
+  return ""; // fall back to PATH
+}
+
+const FFMPEG_BIN = resolveFfmpegBin();
 
 function todayStamp(): string {
   return new Date().toISOString().slice(0, 10);
@@ -99,7 +136,7 @@ export function startRun(spec: RunSpec): RunState {
   const args = specToArgs(spec);
   const env: NodeJS.ProcessEnv = {
     ...process.env,
-    PATH: `${FFMPEG_BIN};${process.env.PATH ?? ""}`,
+    PATH: FFMPEG_BIN ? `${FFMPEG_BIN};${process.env.PATH ?? ""}` : (process.env.PATH ?? ""),
   };
   if (spec.voiceTr) env.EDGE_TTS_VOICE_TR = spec.voiceTr;
   if (spec.voiceEn) env.EDGE_TTS_VOICE_EN = spec.voiceEn;

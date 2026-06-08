@@ -144,6 +144,70 @@
     "capturedAt": "2026-05-28T14:15:49.146Z"
   },
   {
+    "conceptId": "beslenme-oyun-plani-1",
+    "hookLine": "Her yerde gördüğün o 'sağlıklı' tabaklar...",
+    "hookType": "problem",
+    "overallScore": 45,
+    "virality": {
+      "hookStrength": 60,
+      "holdPrediction": 75,
+      "captionHook": 80,
+      "brandSafety": 30
+    },
+    "shotCount": 6,
+    "failureSummary": "This ad fails due to a critical brand violation: illegible text in frame 4 makes the ad look amateurish and un-shippable.",
+    "primaryFailure": "low brandSafety (30/100)",
+    "capturedAt": "2026-06-04T12:31:58.727Z"
+  },
+  {
+    "conceptId": "donusum-oncesi-sonrasi-1",
+    "hookLine": "Aylardır deniyorsun ama hiçbir şey değişmiyor.",
+    "hookType": "problem",
+    "overallScore": 45,
+    "virality": {
+      "hookStrength": 90,
+      "holdPrediction": 85,
+      "captionHook": 95,
+      "brandSafety": 20
+    },
+    "shotCount": 5,
+    "failureSummary": "Strong narrative concept crippled by critical caption readability and text collision issues, making the ad look unprofessional and unusable.",
+    "primaryFailure": "low brandSafety (20/100)",
+    "capturedAt": "2026-06-04T13:22:36.807Z"
+  },
+  {
+    "conceptId": "donusum-aylarca-ayni-1",
+    "hookLine": "Her gün spor salonuna gitmek seni bir yere götürmeyecek.",
+    "hookType": "contrarian-statement",
+    "overallScore": 45,
+    "virality": {
+      "hookStrength": 95,
+      "holdPrediction": 85,
+      "captionHook": 95,
+      "brandSafety": 20
+    },
+    "shotCount": 5,
+    "failureSummary": "The ad has a powerful hook but fails due to severe and repeated caption collisions with the app's UI, making it look unprofessional.",
+    "primaryFailure": "low brandSafety (20/100)",
+    "capturedAt": "2026-06-04T15:48:46.945Z"
+  },
+  {
+    "conceptId": "pattern-interrupt-phone-battery-v2",
+    "hookLine": "Telefonun şarjı yüzde bire düşünce paniklersin.",
+    "hookType": "pattern-interrupt",
+    "overallScore": 45,
+    "virality": {
+      "hookStrength": 85,
+      "holdPrediction": 90,
+      "captionHook": 95,
+      "brandSafety": 40
+    },
+    "shotCount": 6,
+    "failureSummary": "The ad has a brilliant hook and great visual pacing, but fails catastrophically due to unreadable captions colliding with the app UI in key frames.",
+    "primaryFailure": "low brandSafety (40/100)",
+    "capturedAt": "2026-06-05T20:51:11.553Z"
+  },
+  {
     "conceptId": "wasted-effort-to-payoff",
     "hookLine": "Her gün aynı efor, aynı ter... peki ya sonuç?",
     "hookType": "KLASIK",
@@ -160,19 +224,19 @@
     "capturedAt": "2026-05-28T13:53:33.848Z"
   },
   {
-    "conceptId": "form-over-everything-tr1",
-    "hookLine": "Sadece spor yapmak yetmez.",
-    "hookType": "KLASIK",
-    "overallScore": 50,
+    "conceptId": "beslenme-sonuclar-ayni-mi-v1",
+    "hookLine": "Her gün o 'sağlıklı' tabağı yiyorsun... peki sonuç?",
+    "hookType": "problem",
+    "overallScore": 49,
     "virality": {
-      "hookStrength": 0,
+      "hookStrength": 20,
       "holdPrediction": 0,
-      "captionHook": 0,
-      "brandSafety": 0
+      "captionHook": 85,
+      "brandSafety": 90
     },
     "shotCount": 6,
-    "failureSummary": "Vision call failed: [VertexAI.GoogleGenerativeAIError]: exception posting request to model",
-    "primaryFailure": "low hookStrength (0/100)",
-    "capturedAt": "2026-05-25T12:46:48.443Z"
+    "failureSummary": "This ad is a hard fail; it's a static text slideshow, not a video, and will have zero viewer retention.",
+    "primaryFailure": "low holdPrediction (0/100)",
+    "capturedAt": "2026-06-03T20:41:25.715Z"
   }
 ]

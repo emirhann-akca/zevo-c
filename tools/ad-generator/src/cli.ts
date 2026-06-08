@@ -27,7 +27,7 @@ interface CliFlags {
   headful: boolean;
   dryRun: boolean;
   date?: string;
-  tip: "zevo-template" | "klasik" | "motivasyon" | "kurucu" | "beslenme";
+  tip: "zevo-template" | "klasik" | "motivasyon" | "kurucu" | "beslenme" | "donusum" | "pattern-interrupt";
   viralityThreshold: number;
   maxRetries: number;
   targetDuration: number;
@@ -57,7 +57,7 @@ function parseFlags(argv: string[]): CliFlags {
     headful: false,
     dryRun: false,
     tip: "klasik",
-    viralityThreshold: 60,
+    viralityThreshold: 80,
     maxRetries: 0,
     targetDuration: 20,
   };
@@ -75,7 +75,7 @@ function parseFlags(argv: string[]): CliFlags {
     else if (a === "--headful") flags.headful = true;
     else if (a === "--dry-run") flags.dryRun = true;
     else if (a === "--date") flags.date = next();
-    else if (a === "--tip") flags.tip = next() as "zevo-template" | "klasik" | "motivasyon" | "kurucu" | "beslenme";
+    else if (a === "--tip") flags.tip = next() as "zevo-template" | "klasik" | "motivasyon" | "kurucu" | "beslenme" | "donusum" | "pattern-interrupt";
     else if (a === "--virality-threshold") flags.viralityThreshold = Number(next());
     else if (a === "--max-retries") flags.maxRetries = Number(next());
     else if (a === "--target-duration") flags.targetDuration = Number(next());
@@ -164,6 +164,7 @@ async function main() {
       threshold: flags.viralityThreshold,
       maxRetries: flags.maxRetries,
       langs: flags.langs,
+      tip: flags.tip,
     });
   }
 

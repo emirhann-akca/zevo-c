@@ -19,6 +19,7 @@ import { gatherAssets } from "./4-assets.ts";
 import { renderAds } from "./6-render.ts";
 import { runQc, type AdQcReport } from "./8-qc.ts";
 import { updateMemoryFromReports } from "./memory.ts";
+import { copyToPool } from "./pool.ts";
 import { ZEVO_BRAND } from "../brand.ts";
 
 const CONCEPT_REVISION_SYSTEM = `You are the lead Zevo ad copywriter revising a concept that QC scored below the acceptable threshold. You receive: the previous concept JSON, the QC critique, and the brand rules. Output a REVISED concept JSON that addresses every recommendation. Keep the same id. Change scenes, hook, or voiceover lines as needed to lift the weakest virality dimension.
@@ -38,6 +39,7 @@ export interface IterateOptions {
   maxRetries: number;         // default 2 (so up to 3 total attempts per ad)
   langs: ("tr" | "en")[];
   cleanupFrames?: boolean;
+  tip?: string;               // ad kind/topic, embedded into the pool filename
 }
 
 export interface IterationHistory {
@@ -231,6 +233,21 @@ export async function iterateDecisionLoop(opts: IterateOptions): Promise<Iterati
   const accepted = histories.filter((h) => h.reason === "accepted").length;
   const maxed = histories.filter((h) => h.reason === "max_retries").length;
   console.log(`[iterate] summary — accepted: ${accepted}, max_retries: ${maxed}`);
+
+  // Pool copy — ONLY videos that cleared the QC bar land in the central pool, with a
+  // date+time stamp in the filename. Failed/below-bar cuts are intentionally left out.
+  for (const h of histories) {
+    if (h.finalScore >= opts.threshold && existsSync(h.finalVideoPath)) {
+      try {
+        const dest = await copyToPool(h.finalVideoPath, h.conceptId, h.lang, opts.outputDir, opts.tip);
+        console.log(`[iterate] → pool (score ${h.finalScore} ≥ ${opts.threshold}): ${dest}`);
+      } catch (e) {
+        console.warn(`[iterate] ⚠ pool copy failed for ${h.conceptId}: ${(e as Error).message}`);
+      }
+    } else {
+      console.log(`[iterate] ✗ not pooled (score ${h.finalScore} < ${opts.threshold}): ${h.conceptId} [${h.lang}]`);
+    }
+  }
 
   // Update persistent memory: extract lessons from failures, capture high performers.
   // Reads the latest qc-report.json (contains the final QC pass per ad).

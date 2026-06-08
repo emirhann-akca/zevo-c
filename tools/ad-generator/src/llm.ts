@@ -106,7 +106,10 @@ export async function generateWithImages(opts: VisionPickOptions): Promise<strin
     systemInstruction: { role: "system", parts: [{ text: opts.system }] },
     generationConfig: {
       temperature: 0.2,
-      maxOutputTokens: opts.maxOutputTokens ?? 256,
+      // Gemini 2.5 flash is a THINKING model — internal reasoning tokens count toward
+      // maxOutputTokens. 256 was far too low (thinking ate the whole budget → empty output).
+      // Mirror generate()'s generous default so the visible JSON/answer is never truncated.
+      maxOutputTokens: opts.maxOutputTokens ?? 4096,
     },
     safetySettings: SAFETY,
   });

@@ -1,0 +1,191 @@
+{
+  "$schema": "Each asset describes a real Zevo app screen/feature. The concept generator and asset picker prefer these over Pexels stock when there is a semantic match for the shot.",
+  "assets": [
+    {
+      "id": "sorular-onboarding-1",
+      "description": "A user completes the Zevo app's Turkish onboarding questionnaire. They select their workout availability (\"3'ten fazla\" hours) and desired progress rate (\"Agresif\"). The app then displays a confirmation screen, \"Tebrikler! Programınız Hazır\", with confetti, and prompts the user to \"Diyet Planı Oluştur\" (Create Diet Plan).",
+      "tags": [
+        "onboarding",
+        "personalization",
+        "questionnaire",
+        "ui",
+        "turkish"
+      ],
+      "narrative": "feature-demo — The video walks through the multi-step personalization questionnaire, showing how the app gathers user preferences to generate a custom fitness program.",
+      "type": "video",
+      "path": "videos/sorular/Sorular1.mp4",
+      "feature": "onboarding"
+    },
+    {
+      "id": "onboarding-questions-turkish",
+      "description": "A user completes the Zevo app's onboarding questionnaire in Turkish. They select their age as \"22\", height as \"186 cm\", and weight as \"92 kg\". The process finishes on a screen that reads \"Tebrikler! Programınız Hazır\" (Congratulations! Your program is ready), with confetti animation.",
+      "tags": [
+        "onboarding",
+        "questionnaire",
+        "personalization",
+        "ui",
+        "turkish"
+      ],
+      "narrative": "feature-demo — The video walks through the step-by-step process of a user inputting their personal data during the app's initial setup.",
+      "type": "video",
+      "path": "videos/sorular/Sorular2.mp4",
+      "feature": "onboarding"
+    },
+    {
+      "id": "onboarding-questions-turkish-2",
+      "description": "A user's hand holds a phone, quickly tapping through the Zevo app's Turkish onboarding questions. Screens ask 'Nerede antrenman yapıyorsun?', 'Deneyim seviyen nedir?', and 'Fitness hedefiniz nedir?'. The flow ends on a success screen with confetti, reading 'Tebrikler! Programınız Hazır', demonstrating the creation of a personalized plan.",
+      "tags": [
+        "onboarding",
+        "ui",
+        "feature-demo",
+        "personalization",
+        "turkish"
+      ],
+      "narrative": "feature-demo — The video showcases the step-by-step user onboarding and personalization flow, from answering initial questions to the program creation confirmation.",
+      "type": "video",
+      "path": "videos/sorular/Sorular3.mp4",
+      "feature": "onboarding"
+    },
+    {
+      "id": "onboarding-questionnaire-turkish",
+      "description": "A user's hand holds a phone and quickly taps through the Turkish onboarding questionnaire, selecting options for activity level, health issues, and progress goals. The process concludes with a confirmation screen showing confetti and the text \"Tebrikler! Programınız Hazır\" before prompting the user to \"Diyet Planı Oluştur\" (Create Diet Plan).",
+      "tags": [
+        "onboarding",
+        "questionnaire",
+        "personalization",
+        "app setup",
+        "turkish"
+      ],
+      "narrative": "feature-demo — The video clearly demonstrates the step-by-step user flow of the initial onboarding questionnaire, a core feature for personalizing the fitness plan.",
+      "type": "video",
+      "path": "videos/sorular/Sorular4.mp4",
+      "feature": "onboarding"
+    },
+    {
+      "id": "hareketler-squat-form-check-demo",
+      "description": "A user sets up their phone and begins a workout. The screen recording shows the Zevo app's AI form-check feature tracking squats with a skeletal overlay. The UI displays the exercise as \"Squat\", a \"FORM\" score fluctuating between \"50\" and \"45\", and a rep count of \"1 / 12\".",
+      "tags": [
+        "ai form check",
+        "squat",
+        "screen recording",
+        "ui",
+        "lower body"
+      ],
+      "narrative": "feature-demo — The video clearly demonstrates the AI form-check feature in action, showing the skeletal overlay, real-time form score, and rep counting during an exercise.",
+      "type": "video",
+      "path": "videos/hareketler/Hareketler1.mp4",
+      "feature": "ai-form-check"
+    },
+    {
+      "id": "hareketler-2-ai-form-check",
+      "description": "A screen recording of the Zevo app's AI form check feature. A user performs a seated dumbbell 'Shoulder Press' while a turquoise skeleton overlay tracks their movement. The app displays a '100' form score, counts reps ('TEKRAR') up to '2 / 12', and shows a weight of '50 Yük'.",
+      "tags": [
+        "ai form check",
+        "shoulder press",
+        "strength training",
+        "app ui",
+        "screen recording",
+        "dumbbells"
+      ],
+      "narrative": "feature-demo — The video showcases the live AI-powered rep counting and form scoring during a shoulder press exercise.",
+      "type": "video",
+      "path": "videos/hareketler/Hareketler2.mp4",
+      "feature": "ai-form-check"
+    },
+    {
+      "id": "hareketler3-sade",
+      "description": "A screen recording of the Zevo app's AI form check for a \"Squat\". A skeletal overlay tracks the user's movement, counting reps (\"TEKRAR\") up to \"4 / 12\". A \"FORM\" score is visible, starting at \"45\", and on-screen text indicates the bottom (\"DİPTE\") and top (\"ÜSTTE\") of the movement.",
+      "tags": [
+        "ai form check",
+        "squats",
+        "rep counting",
+        "screen recording",
+        "in-app footage",
+        "turkish"
+      ],
+      "narrative": "feature-demo — The video clearly demonstrates the app's core AI feature, showing real-time form tracking, rep counting, and scoring during a squat exercise.",
+      "type": "video",
+      "path": "videos/hareketler/Hareketler3 sade.mp4",
+      "feature": "ai-form-check"
+    },
+    {
+      "id": "hareketler4-sade",
+      "description": "A point-of-view shot of the Zevo app tracking a seated dumbbell shoulder press. The AI form check feature displays a skeletal overlay. The UI shows a perfect \"100\" form score, a rep count progressing from \"0 / 12\" to \"4 / 12\" under \"TEKRAR\", and the exercise name \"Shoulder Press\".",
+      "tags": [
+        "ai form check",
+        "shoulder press",
+        "strength training",
+        "rep counting",
+        "home workout",
+        "ui"
+      ],
+      "narrative": "feature-demo — The video clearly demonstrates the app's real-time AI form tracking, form scoring, and rep counting during a shoulder press exercise.",
+      "type": "video",
+      "path": "videos/hareketler/Hareketler4 sade.mp4",
+      "feature": "ai-form-check"
+    },
+    {
+      "id": "araya-workout-plan-1",
+      "description": "A user's hand holds a phone displaying the Zevo app. They navigate from the \"6. Gün - Full Body\" workout plan, which shows \"Warm-up\" and \"Workout\" sections, to the \"Squat\" exercise screen. This screen shows an animation, set tracking for \"Tekrar 12\" reps, and a \"Seti Tamamla\" button.",
+      "tags": [
+        "workout plan",
+        "full body",
+        "squat",
+        "exercise tracking",
+        "ui"
+      ],
+      "narrative": "feature-demo — It clearly demonstrates the user flow of selecting an exercise from a daily plan and interacting with the set and rep tracking screen.",
+      "type": "video",
+      "path": "videos/araya/Araya1.mp4",
+      "feature": "workout-plan"
+    },
+    {
+      "id": "araya-workout-plan-navigation-2",
+      "description": "A user navigates their \"Gün 5 - Omuz\" (Day 5 - Shoulder) workout plan. They scroll past exercises like \"Overhead Press\" and \"Lateral Raise\" before tapping the \"Sonraki Hareket\" (Next Exercise) button. The app then displays the \"Yürüyüş / Hafif Koşu\" (Walking / Light Jogging) exercise with a timer set to \"3:00\".",
+      "tags": [
+        "workout plan",
+        "shoulder day",
+        "exercise list",
+        "navigation",
+        "ui"
+      ],
+      "narrative": "feature-demo — The video shows a user navigating through the different exercises within their daily workout plan.",
+      "type": "video",
+      "path": "videos/araya/Araya2.mp4",
+      "feature": "workout-plan"
+    },
+    {
+      "id": "araya-workout-plan-day-five",
+      "description": "A user's hand navigates the Zevo app, tapping from the \"Dinlenme Günü\" (Rest Day) screen to the scheduled workout for \"Gün 5\". This is part of the \"Yağ Yakım Programı – Fitness\", a \"40 dk\" shoulder workout with \"9 hareket\". The user can tap \"Antrenmanı Başlat\" to begin.",
+      "tags": [
+        "workout plan",
+        "calendar",
+        "dark mode",
+        "ui",
+        "mobile app"
+      ],
+      "narrative": "feature-demo — The video clearly demonstrates how a user can view their scheduled workout for a specific day within their personalized fitness plan.",
+      "type": "video",
+      "path": "videos/araya/Araya3.mp4",
+      "feature": "workout-plan"
+    },
+    {
+      "id": "logo-reveal",
+      "type": "video",
+      "path": "videos/logo-reveal.mp4",
+      "description": "Full ZEVO logo reveal animation with final call-to-action. Neon-emerald 'ZEVO' logo with a tech/circuit-board pattern animates on a dark navy background. Tagline 'Cebindeki Antrenör' appears, followed by 'İNDİRİN Google Play' and 'App Store'dan indirin' buttons. Vertical 9:16 format. Serves as a complete short ad or outro.",
+      "tags": [
+        "logo",
+        "logo-reveal",
+        "cta",
+        "outro",
+        "vertical",
+        "neon",
+        "turkish"
+      ],
+      "feature": "brand",
+      "narrative": "brand-magic",
+      "duration_hint_sec": 3
+    }
+  ]
+}

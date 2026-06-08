@@ -48,6 +48,8 @@ const RESERVED_OUTRO_IDS = new Set(["logo-reveal"]);
 const TIP_FEATURE_WHITELIST: Record<string, Set<string> | null> = {
   klasik: null, // mixes everything
   kurucu: null, // founder story — all assets fair game
+  donusum: null, // before/after — Zevo is the turning point, so ALL product UI is on-message
+  "pattern-interrupt": null, // unrelated opener -> bridge -> any feature reveal; all assets fair game
   "form-check": new Set(["ai-form-check", "onboarding", "lifestyle"]),
   antrenman: new Set(["workout-plan", "onboarding", "lifestyle"]),
   beslenme: new Set(["nutrition", "onboarding", "lifestyle"]),

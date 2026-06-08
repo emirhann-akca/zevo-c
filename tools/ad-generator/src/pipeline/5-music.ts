@@ -1,12 +1,59 @@
 /**
- * Generates a music bed for an ad using ElevenLabs Music API.
+ * Generates a music bed for an ad.
  *
- * Returns the path to an mp3, or null if the API key lacks music permission / the call fails.
- * Pipeline gracefully falls back to voice-only audio if null is returned.
+ * Primary: ElevenLabs Music API (when the key has Music permission).
+ * Fallback: a LOCAL royalty-safe music library at brand-assets/music/ — tracks we previously
+ *   generated for Zevo ads, so we own commercial rights. This guarantees EVERY ad has a music
+ *   bed even when the ElevenLabs key lacks Music permission (the recurring "videos feel flat /
+ *   all the same" root cause was silent, voice-only audio). The mux step loops/trims any track
+ *   to the exact video length, so track duration doesn't need to match.
+ *
+ * Returns the path to an mp3, or null only if BOTH sources are unavailable.
  */
-import { writeFile } from "node:fs/promises";
+import { writeFile, readdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 const MUSIC_API = "https://api.elevenlabs.io/v1/music";
+
+// Maps concept musicMood phrases → a local track basename. The mood field is free text from the
+// LLM, so we match on keywords; anything unmatched falls back to "drive" (safe energetic default).
+const MOOD_TO_TRACK: { keywords: string[]; track: string }[] = [
+  { keywords: ["emotional", "duygusal", "heartfelt", "warm", "intimate", "founder", "story", "hikaye"], track: "emotional" },
+  { keywords: ["inspir", "ilham", "hopeful", "uplift", "rising", "triumph", "empower", "potansiyel"], track: "inspirational" },
+  { keywords: ["cinematic", "sinematik", "epic", "dramatic", "bold", "powerful"], track: "cinematic" },
+  { keywords: ["tense", "tension", "gerilim", "dark", "struggle", "problem", "urgent", "intense"], track: "tension" },
+  { keywords: ["calm", "uplifting", "bright", "positive", "fresh", "clean", "optimistic"], track: "uplifting" },
+  { keywords: ["energetic", "energy", "enerji", "drive", "hype", "workout", "motivational", "motivasyon", "fast", "upbeat"], track: "drive" },
+];
+
+function pickLocalMusic(moodSeed: string, rootDir: string = process.cwd()): string | null {
+  const dir = join(rootDir, "brand-assets", "music");
+  if (!existsSync(dir)) return null;
+  const seed = (moodSeed || "").toLowerCase();
+  let chosen = "drive";
+  for (const m of MOOD_TO_TRACK) {
+    if (m.keywords.some((k) => seed.includes(k))) { chosen = m.track; break; }
+  }
+  const path = join(dir, `${chosen}.mp3`);
+  if (existsSync(path)) return path;
+  // chosen track missing → use any available track so we still get music
+  return null;
+}
+
+/** Selects a local library track for the given mood, or null if the library is empty. */
+export async function selectLocalMusic(opts: {
+  moodSeed: string;
+  rootDir?: string;
+}): Promise<string | null> {
+  const root = opts.rootDir ?? process.cwd();
+  const direct = pickLocalMusic(opts.moodSeed, root);
+  if (direct) return direct;
+  const dir = join(root, "brand-assets", "music");
+  if (!existsSync(dir)) return null;
+  const files = (await readdir(dir)).filter((f) => /\.(mp3|wav|m4a|aac)$/i.test(f));
+  return files.length > 0 ? join(dir, files[0]) : null;
+}
 
 export async function generateMusic(opts: {
   prompt: string;

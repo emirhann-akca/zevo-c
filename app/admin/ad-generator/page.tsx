@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type Tip = "zevo-template" | "klasik" | "motivasyon";
+type Tip = "zevo-template" | "klasik" | "motivasyon" | "kurucu" | "beslenme";
 
 interface RunState {
   id: string;
@@ -205,6 +205,8 @@ export default function AdGeneratorAdminPage() {
                 <option value="zevo-template">⭐ Şablon — sabit yapı (sorular → hareketler → araya, garanti rotasyon)</option>
                 <option value="klasik">Klasik — esnek problem → çözüm yapısı (Gemini yapıyı seçer)</option>
                 <option value="motivasyon">Motivasyon — saf lifestyle, minimum UI (Nike/Adidas tarzı)</option>
+                <option value="kurucu">Kurucu — kurucu hikayesi / marka anlatısı</option>
+                <option value="beslenme">Beslenme — kalori/diyet odaklı (beslenme rakipleri)</option>
               </select>
             </label>
 

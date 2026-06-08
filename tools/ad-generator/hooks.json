@@ -1,0 +1,118 @@
+{
+  "_meta": {
+    "purpose": "Zevo short-form ad hook library. The first 1-3 seconds decide 80% of completion. A strong hook does 3 things at once in <3s: (1) pattern interrupt, (2) establish a content frame, (3) signal a payoff. First on-screen subtitle <= 7 words. Hook line 8-14 spoken words.",
+    "research_basis": [
+      "First 3s drive ~80% of completion variance; 60%+ retention past 3s = pushed to FYP.",
+      "Top viral formulas 2026: Contrarian Claim, Mistake Warning, List Tease, Curiosity Gap, Pattern Interrupt.",
+      "Most common viral narrative (2,626 clips): authority/attention signal -> curiosity gap -> promise of payoff.",
+      "Pattern interrupt + false premise works for views; MUST have a logical/emotional BRIDGE to the product or it converts poorly.",
+      "Fitness-specific winners: 'Stop doing X, it's not doing what you think' / 'Why your morning workout makes you fatter' (contradict an assumption)."
+    ],
+    "rules": [
+      "NEVER open with the app UI or the feature name — open with tension, contradiction, or a 'wait, what?' moment.",
+      "Hook visual (shot 0) = cinematic Pexels footage matching the emotional tone, NOT a product screen.",
+      "Pattern-interrupt hooks REQUIRE a believable bridge sentence that connects the unrelated opener to Zevo. No bridge = wasted views.",
+      "Keep the spoken hook concrete and specific ('3  aydır aynı kiloyu görmek' beats 'spor zor'). Specific > generic always."
+    ]
+  },
+  "techniques": [
+    {
+      "id": "contrarian-claim",
+      "name": "Contrarian / False-Belief Claim",
+      "why": "The brain cannot leave a contradiction unresolved, so the viewer stays to see how it resolves. Rejects a widely-held belief in the first line.",
+      "template": "Herkes [yaygın inanış] diyor. Yanlış.",
+      "zevo_tr": [
+        "Daha çok antrenman yapmak seni geliştirmiyor.",
+        "Spor salonuna gitmek vakit kaybı olabilir.",
+        "O 'herkese uygun' program aslında kimseye uymuyor."
+      ]
+    },
+    {
+      "id": "mistake-warning",
+      "name": "Mistake Warning",
+      "why": "Self-relevant fear of doing something wrong. Implies the viewer is already making the mistake.",
+      "template": "[Yaptığın şeyi] böyle yapıyorsan kendine zarar veriyorsun.",
+      "zevo_tr": [
+        "Squat'ı aynada kontrol ediyorsan yanlış yapıyorsun.",
+        "Formunu düzeltmeden devam edersen sakatlanırsın.",
+        "Yıllardır yanlış nefes alıyor olabilirsin."
+      ]
+    },
+    {
+      "id": "curiosity-gap",
+      "name": "Curiosity Gap",
+      "why": "Hints at a payoff without revealing it; the open loop pulls the viewer through.",
+      "template": "[Şey] yapmayı bırakınca olanlar...",
+      "zevo_tr": [
+        "Telefonumu antrenöre çevirdiğimde olanları beklemiyordum.",
+        "3 ay sonra aynaya baktığımda anladım ki...",
+        "Tek bir ayar her şeyi değiştirdi."
+      ]
+    },
+    {
+      "id": "pattern-interrupt",
+      "name": "Pattern Interrupt (unrelated opener -> bridge -> app)",
+      "why": "Opens on a topic that has nothing to do with fitness, hijacking attention before the viewer decides to scroll. The PIVOT is the payoff. The bridge sentence must be logical/emotional, never random.",
+      "template": "[Tamamen alakasız sahne + iddia] ... [köprü cümlesi] ... aslında spor da tam böyle.",
+      "zevo_tr": [
+        {
+          "opener": "Arabanı servise götürmeden 100 bin km kullanmazsın.",
+          "bridge": "Ama vücudunu hiç kontrol ettirmeden yıllarca zorluyorsun.",
+          "pivot": "Zevo her tekrarını izleyen o servis gibi — formunu anında düzeltiyor."
+        },
+        {
+          "opener": "GPS olmadan hiç bilmediğin şehirde araba sürer miydin?",
+          "bridge": "Programsız antrenman da tam olarak bu.",
+          "pivot": "Zevo sana özel rotayı çiziyor, her adımda yönlendiriyor."
+        },
+        {
+          "opener": "Telefonun şarjı %1'ken panik yaparsın.",
+          "bridge": "Peki kendi enerjini, formunu hiç ölçtün mü?",
+          "pivot": "Zevo onu da yapıyor — vücudunu okuyup planını ona göre kuruyor."
+        }
+      ]
+    },
+    {
+      "id": "list-tease",
+      "name": "List Tease",
+      "why": "A numbered promise sets a clear, finite payoff the viewer wants to complete.",
+      "template": "[Sayı] saniyede / adımda [sonuç].",
+      "zevo_tr": [
+        "30 saniyede sana özel antrenman planı.",
+        "3 soru sordu, gerisini kendi halletti.",
+        "Tek ekranda günlük kalorin, formun, ilerlemen."
+      ]
+    },
+    {
+      "id": "in-medias-res",
+      "name": "In Medias Res / Mid-Action",
+      "why": "Drops the viewer into the most intense moment, no setup — the action itself is the hook.",
+      "template": "[En yoğun an, sıfır kurulum].",
+      "zevo_tr": [
+        "Son tekrar. Diz titriyor. Ama bu sefer form mükemmel.",
+        "Nefes nefese. Ama ilk kez doğru yaptığını biliyorsun."
+      ]
+    },
+    {
+      "id": "before-after-tease",
+      "name": "Before/After Tease",
+      "why": "Promises a visible transformation up front; the contrast is the reward.",
+      "template": "[Önce hali] -> [şimdi hali], aradaki tek fark...",
+      "zevo_tr": [
+        "Aynı kişi. 90 gün arayla. Aradaki tek fark Zevo'ydu.",
+        "Eskiden tahminle çalışıyordum. Şimdi her tekrar ölçülüyor."
+      ]
+    },
+    {
+      "id": "direct-callout",
+      "name": "Direct Audience Callout",
+      "why": "Names the exact viewer so they feel the video is literally about them; raises self-relevance instantly.",
+      "template": "[Hedef kitleye] doğrudan seslen.",
+      "zevo_tr": [
+        "Tek başına antrenman yapan herkese:",
+        "Aylardır aynı kiloyu görenler, bu sizin için.",
+        "Antrenör tutamayanlar — bunu dinleyin."
+      ]
+    }
+  ]
+}

@@ -1,21 +1,21 @@
 [
   {
     "pattern": "Ensure captions are readable on *all* backgrounds by using a solid background block or a high-contrast text color with a subtle scrim, especially over busy or bright footage.",
-    "frequency": 22,
+    "frequency": 28,
     "firstSeen": "2026-05-24T15:05:57.593Z",
-    "lastSeen": "2026-05-28T16:27:32.778Z"
+    "lastSeen": "2026-06-05T22:47:10.760Z"
   },
   {
     "pattern": "Captions must be positioned to avoid collision or close proximity with on-screen app UI text elements.",
-    "frequency": 17,
+    "frequency": 23,
     "firstSeen": "2026-05-25T13:35:49.248Z",
-    "lastSeen": "2026-05-28T16:22:15.964Z"
+    "lastSeen": "2026-06-05T22:47:10.760Z"
   },
   {
     "pattern": "Strictly adhere to brand color guidelines for *all* visual elements: backgrounds, props, character attire, and UI highlights. Avoid dominant off-brand colors.",
-    "frequency": 17,
+    "frequency": 19,
     "firstSeen": "2026-05-24T15:05:57.593Z",
-    "lastSeen": "2026-05-28T16:27:32.778Z"
+    "lastSeen": "2026-06-04T15:48:46.945Z"
   },
   {
     "pattern": "Never feature competitor logos, UI, products, or any identifiable competitor branding in any ad creative.",
@@ -37,18 +37,24 @@
   },
   {
     "pattern": "Static text cards or visuals significantly reduce engagement and should be replaced with dynamic content to maintain viewer interest.",
-    "frequency": 5,
+    "frequency": 7,
     "firstSeen": "2026-05-25T13:31:58.596Z",
-    "lastSeen": "2026-05-28T14:15:49.146Z"
-  },
-  {
-    "pattern": "Remove all recording artifacts (e.g., screen recording UI, watermarks, timestamps) to maintain a professional appearance.",
-    "frequency": 3,
-    "firstSeen": "2026-05-24T15:05:57.593Z",
-    "lastSeen": "2026-05-25T12:19:07.409Z"
+    "lastSeen": "2026-06-03T20:41:25.715Z"
   },
   {
     "pattern": "Keep captions to a maximum of 1-2 lines for quick readability in fast-scrolling feeds; avoid dense paragraphs.",
+    "frequency": 4,
+    "firstSeen": "2026-05-24T15:05:57.593Z",
+    "lastSeen": "2026-06-05T20:51:11.553Z"
+  },
+  {
+    "pattern": "Captions require sufficient contrast against their background; consider using a scrim or solid background for complex or light scenes.",
+    "frequency": 4,
+    "firstSeen": "2026-05-28T13:42:49.886Z",
+    "lastSeen": "2026-06-05T22:47:10.760Z"
+  },
+  {
+    "pattern": "Remove all recording artifacts (e.g., screen recording UI, watermarks, timestamps) to maintain a professional appearance.",
     "frequency": 3,
     "firstSeen": "2026-05-24T15:05:57.593Z",
     "lastSeen": "2026-05-25T12:19:07.409Z"
@@ -60,33 +66,27 @@
     "lastSeen": "2026-05-25T13:48:43.669Z"
   },
   {
+    "pattern": "Opening shots should be dynamic or visually interesting to maximize hook strength.",
+    "frequency": 3,
+    "firstSeen": "2026-05-28T14:09:45.247Z",
+    "lastSeen": "2026-06-03T20:41:25.715Z"
+  },
+  {
+    "pattern": "Captions must not obscure critical visual information or overlays.",
+    "frequency": 3,
+    "firstSeen": "2026-05-28T12:01:32.035Z",
+    "lastSeen": "2026-06-05T21:00:57.287Z"
+  },
+  {
     "pattern": "Screen recordings used in ads must exhibit clear lighting and high visual clarity.",
     "frequency": 2,
     "firstSeen": "2026-05-25T13:21:36.935Z",
     "lastSeen": "2026-05-28T13:42:49.886Z"
   },
   {
-    "pattern": "Captions must not obscure critical visual information or overlays.",
-    "frequency": 2,
-    "firstSeen": "2026-05-28T12:01:32.035Z",
-    "lastSeen": "2026-05-28T14:07:43.974Z"
-  },
-  {
-    "pattern": "Captions require sufficient contrast against their background; consider using a scrim or solid background for complex or light scenes.",
-    "frequency": 2,
-    "firstSeen": "2026-05-28T13:42:49.886Z",
-    "lastSeen": "2026-05-28T14:09:45.247Z"
-  },
-  {
     "pattern": "Chaotic or unprofessional transition effects negatively impact readability and brand perception.",
     "frequency": 2,
     "firstSeen": "2026-05-25T14:50:02.052Z",
-    "lastSeen": "2026-05-28T16:13:52.330Z"
-  },
-  {
-    "pattern": "Opening shots should be dynamic or visually interesting to maximize hook strength.",
-    "frequency": 2,
-    "firstSeen": "2026-05-28T14:09:45.247Z",
     "lastSeen": "2026-05-28T16:13:52.330Z"
   },
   {
@@ -112,5 +112,11 @@
     "frequency": 1,
     "firstSeen": "2026-05-28T16:27:32.778Z",
     "lastSeen": "2026-05-28T16:27:32.778Z"
+  },
+  {
+    "pattern": "Ad creative should visually depict the problem and solution.",
+    "frequency": 1,
+    "firstSeen": "2026-06-03T20:41:25.715Z",
+    "lastSeen": "2026-06-03T20:41:25.715Z"
   }
 ]

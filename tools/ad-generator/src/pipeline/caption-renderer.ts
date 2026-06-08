@@ -32,7 +32,14 @@ export async function renderKineticCaptions(
   fullText: string,
   outDir: string,
   prefix: string,
-  style: CaptionStyle
+  style: CaptionStyle,
+  /**
+   * Explicit per-word tokens. When provided, these are used VERBATIM as the karaoke
+   * frames instead of re-splitting `fullText` on whitespace. This GUARANTEES the frame
+   * count equals the TTS word-timing count, so the caller's per-word alignment never
+   * silently falls back to even-distribution (which caused audio/caption drift).
+   */
+  tokensOverride?: string[]
 ): Promise<{ path: string; revealedThrough: number }[]> {
   const browser = await getBrowser();
   const width = style.width;
@@ -41,8 +48,10 @@ export async function renderKineticCaptions(
   const accent = style.accentColor ?? "#10DC78";
   const upper = style.uppercase ?? true;
 
-  // Split into words, preserving emphasis markers
-  const tokens = fullText.split(/\s+/).filter(Boolean);
+  // Prefer explicit tokens (locked to the TTS word boundaries). Fall back to whitespace split.
+  const tokens = (tokensOverride && tokensOverride.length > 0)
+    ? tokensOverride.map((t) => t.trim()).filter(Boolean)
+    : fullText.split(/\s+/).filter(Boolean);
   if (tokens.length === 0) return [];
 
   const results: { path: string; revealedThrough: number }[] = [];
@@ -101,6 +110,41 @@ export interface CaptionStyle {
   accentColor?: string;
   fontSize?: number;
   uppercase?: boolean;
+}
+
+/**
+ * Renders a SOFT GRADIENT SCRIM PNG (1080x1920) for caption readability. Transparent across the
+ * top ~58%, then a smooth fade to ~62% dark-navy by the bottom. Placed BEHIND the lower-third
+ * captions so text never collides with (or gets lost over) busy app-UI footage — addressing the
+ * recurring QC "caption readability / text collision" failure. NOT a hard rectangle/drawbox:
+ * it's a feathered gradient, consistent with the brand's soft-fade aesthetic.
+ *
+ * Cached per directory: the scrim is identical every render, so we only generate it once.
+ */
+export async function renderCaptionScrim(outDir: string, width = 1080, height = 1920): Promise<string> {
+  const { existsSync } = await import("node:fs");
+  const outPath = `${outDir}/caption-scrim.png`;
+  if (existsSync(outPath)) return outPath;
+  const browser = await getBrowser();
+  const html = `<!doctype html><html><head><meta charset="utf-8"><style>
+    html, body { margin: 0; padding: 0; width: ${width}px; height: ${height}px; }
+    .scrim {
+      width: ${width}px; height: ${height}px;
+      background: linear-gradient(
+        to bottom,
+        rgba(10,22,40,0) 0%,
+        rgba(10,22,40,0) 58%,
+        rgba(10,22,40,0.62) 80%,
+        rgba(10,22,40,0.62) 100%
+      );
+    }
+  </style></head><body><div class="scrim"></div></body></html>`;
+  const page = await browser.newPage({ viewport: { width, height } });
+  await page.setContent(html, { waitUntil: "networkidle" });
+  const buf = await page.screenshot({ omitBackground: true, type: "png", clip: { x: 0, y: 0, width, height } });
+  await writeFile(outPath, buf);
+  await page.close();
+  return outPath;
 }
 
 /**

@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "purpose": "Competitor gap-analysis directives auto-injected into Zevo concept generation. Distilled from a fresh Meta Ad Library scrape (fitness/running/sports + nutrition). Tells the concept model what the category currently rewards, what is saturated/fatigued, and the benchmarks to hit. Re-generate after each market scrape.",
+    "generated": "2026-06-05",
+    "sample": "99 freshly analyzed Meta ads, June 2026 — 48 fitness/running/sports + 51 nutrition/diet",
+    "sources": [
+      "output/market-fitness/analyses.json (48 ads: AI fitness/workout/running/form apps, Strava, Freeletics, Whoop, Future, Fitbod, NTC)",
+      "output/market-nutrition/analyses.json (51 ads: MyFitnessPal, Noom, Lose It, Bevel, calorie/macro/AI-diet trackers, TR kalori/diyet apps)",
+      "Hook mix: problem 52%, curiosity 19%, demo 7%, social_proof 4%, stat_drop 3%, before_after 2%, shock 1%",
+      "CTA: 91% outro placement; dominant CTAs 'Install Now' (34) and 'Learn More' (26), usually paired with a free/cheap entry offer",
+      "Durations: median 32s; clusters at 11-20s, 21-30s, 31-45s, plus a large long-form/testimonial tail (45s+)"
+    ]
+  },
+  "add": [
+    "Open with an instantly relatable PROBLEM beat even when using a fancy hook technique — 52% of the category opens problem-first because it works. The hook style can be contrarian/curiosity/pattern-interrupt, but shot 0 must make the viewer feel a specific pain they recognize in <3s.",
+    "Lead with Zevo's ONE demonstrable mechanism (real-time, per-rep AI form correction) instead of a generic 'AI-powered' claim. The whole category screams 'AI' — our edge is that ours is visible and specific. Show the thing, don't just name it.",
+    "Add a credibility / social-proof beat (testimonial tone, a number, a before→after, or a 'binlerce kişi' style signal). Competitors lean hard on authority + transformation stories; Zevo concepts currently skip this almost entirely.",
+    "Use an 'all-in-one / tek uygulama' framing against fragmentation — competitors sell 'stop juggling 5 apps'. Zevo combines antrenman + form düzeltme + beslenme + ilerleme; say it explicitly in one breath.",
+    "End on a concrete, barrier-lowering CTA spoken in the outro voiceover (e.g. 'Bugün ücretsiz dene', 'Kart gerekmiyor') — NOT a CTA card. 91% of the category puts a low-friction install CTA at the very end; we removed the card but should keep the spoken low-friction nudge.",
+    "Quantify wherever possible — a timeframe, a count, a metric ('30 saniyede plan', '90 günde', 'her tekrarı'). Specific numbers beat vague aspiration and match what's converting now.",
+    "For donusum/kurucu tips, allow a longer ~30s storytelling/transformation arc — the category's winning emotional ads run 30-45s, longer than our default 20s, and need room for the arc to land."
+  ],
+  "remove": [
+    "Generic 'AI-powered app solves your problem' framing with no on-screen proof — this is the single most saturated message in the category (the majority of the 99 ads). If we sound like everyone else in the first 3s, we lose.",
+    "Vague aspirational fluff ('forma gir', 'kendini daha iyi hisset') with no specific pain, number, or visible mechanism — the winning ads are concrete; the generic ones blend in.",
+    "Opening on the app UI or the feature name (already a hook rule; re-confirmed — zero top performers open on a product screen).",
+    "Burying the hook behind setup — keep shot 0 a pure pattern-interrupt/problem; never spend the first 3s on logo, slow intro, or context.",
+    "Long undifferentiated feature lists read like a spec sheet — competitors that list metrics still wrap them in a benefit. List at most 3, each tied to an outcome."
+  ],
+  "benchmarks": [
+    "First on-screen subtitle <= 7 words; spoken hook 8-14 words; relatable pain landed within 3 seconds.",
+    "Total duration: 20s default for klasik/motivasyon/pattern-interrupt; allow up to ~30s for donusum/kurucu storytelling.",
+    "Exactly one concrete outro CTA with a low-friction offer, spoken (no card).",
+    "At least one credibility signal per concept (number, before/after, or testimonial-tone line).",
+    "Diversify hooks across concepts — do NOT collapse to plain 'problem' just because it's the category default; out-execute the 52% with sharper, specific openers."
+  ]
+}
